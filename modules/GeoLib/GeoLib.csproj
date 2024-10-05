@@ -12,4 +12,8 @@
     <Platforms>x64;x86;AnyCPU</Platforms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DataStructures\DataStructures.csproj" />
+  </ItemGroup>
+
 </Project>
