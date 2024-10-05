@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<OutputPath Condition="'$(Configuration)' == 'Release' and '$(Platform)' == 'x86'">$(ProjectDir)..\..\run\</OutputPath>
+    <OutputPath Condition="'$(Configuration)' == 'Debug' and '$(Platform)' == 'x86'">$(ProjectDir)..\..\run_D\</OutputPath>
+    <OutputPath Condition="'$(Configuration)' == 'Release' and '$(Platform)' == 'x64'">$(ProjectDir)..\..\run64\</OutputPath>
+    <OutputPath Condition="'$(Configuration)' == 'Debug' and '$(Platform)' == 'x64'">$(ProjectDir)..\..\run64_D\</OutputPath>
+    <IntermediateOutputPath>$(ProjectDir)..\..\tmp\$(Configuration)\$(Platform)\$(MSBuildProjectName)\obj</IntermediateOutputPath>
+    <Platforms>x64;x86;AnyCPU</Platforms>
+  </PropertyGroup>
+
+</Project>
