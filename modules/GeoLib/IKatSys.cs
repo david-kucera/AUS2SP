@@ -1,6 +1,9 @@
-﻿namespace GeoLib
+﻿using DataStructures;
+using DataStructures.Data;
+
+namespace GeoLib
 {
-	public interface IKatSys
+    public interface IKatSys
 	{
 		void VyhladajNehnutelnosti(GPSPos pozicia);
 		void VyhladajParcely(GPSPos pozicia);

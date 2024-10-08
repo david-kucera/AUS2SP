@@ -38,25 +38,25 @@
 
 		private int CompareDlzka(GPSPos gpsPos)
 		{
-			int nasobic_other = 1;
+			int multiplierOther = 1;
 			if (gpsPos.Dlzka != 'E')
 			{
-				nasobic_other = -1;
+				multiplierOther = -1;
 			}
-			var hodnota_other = nasobic_other * gpsPos.PoziciaDlzky;
+			var valueOther = multiplierOther * gpsPos.PoziciaDlzky;
 
-			int nasobic_this = 1;
+			int multiplierThis = 1;
 			if (Dlzka != 'E')
 			{
-				nasobic_this = -1;
+				multiplierThis = -1;
 			}
-			var hodnota_this = nasobic_this * PoziciaDlzky;
+			var valueThis = multiplierThis * PoziciaDlzky;
 
-			if (hodnota_this < hodnota_other)
+			if (valueThis < valueOther)
 			{
 				return 1; // Doprava
 			}
-			else if (hodnota_this > hodnota_other)
+			else if (valueThis > valueOther)
 			{
 				return -1; // Dolava
 			}
@@ -68,25 +68,25 @@
 
 		private int CompareSirka(GPSPos gpsPos)
 		{
-			int nasobic_other = 1;
+			int multiplierOther = 1;
 			if (gpsPos.Sirka != 'N')
 			{
-				nasobic_other = -1;
+				multiplierOther = -1;
 			}
-			var hodnota_other = nasobic_other * gpsPos.PoziciaSirky;
+			var valueOther = multiplierOther * gpsPos.PoziciaSirky;
 
-			int nasobic_this = 1;
+			int multiplierThis = 1;
 			if (Sirka != 'N')
 			{
-				nasobic_this = -1;
+				multiplierThis = -1;
 			}
-			var hodnota_this = nasobic_this * PoziciaSirky;
+			var valueThis = multiplierThis * PoziciaSirky;
 
-			if (hodnota_this < hodnota_other)
+			if (valueThis < valueOther)
 			{
 				return 1; // Doprava
 			}
-			else if (hodnota_this > hodnota_other)
+			else if (valueThis > valueOther)
 			{
 				return -1; // Dolava
 			}

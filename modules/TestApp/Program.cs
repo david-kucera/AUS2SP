@@ -1,8 +1,9 @@
 ﻿using DataStructures;
+using DataStructures.Data;
 
 namespace TestApp
 {
-	public class Program
+    public class Program
 	{
 		static void Main(string[] args)
 		{
@@ -17,6 +18,14 @@ namespace TestApp
 			
 			nehnutelnosti.Insert(nehnutelnost);
 			Console.WriteLine(nehnutelnosti.Count);
+			while (true)
+			{
+				var key = Console.ReadKey();
+				if (key.Key == ConsoleKey.A)
+				{
+					break;
+				}
+			}
 		}
 	}
 }

@@ -1,6 +1,8 @@
-﻿namespace DataStructures
+﻿using DataStructures.Data;
+
+namespace DataStructures
 {
-	public class Node<T> where T : class
+    public class Node<T> where T : class
 	{
 		#region Properties
 		public T Data { get; set; } = null!;

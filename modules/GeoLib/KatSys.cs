@@ -1,11 +1,14 @@
 ﻿using DataStructures;
+using DataStructures.Data;
 
 namespace GeoLib
 {
     class KatSys : IKatSys
     {
 		#region Properties
-		public KdTree<Nehnutelnost> Nehnutelnosti { get; private set; }
+		public KdTree<Nehnutelnost> Nehnutelnosti { get; private set; } = new KdTree<Nehnutelnost>(2);
+		public KdTree<Parcela> Parcely { get; private set; } = new KdTree<Parcela>(2);
+		public KdTree<GeoObjekt> Objekty { get; private set; } = new KdTree<GeoObjekt>(2);
 		#endregion //Properties
 
 		#region Public functions
