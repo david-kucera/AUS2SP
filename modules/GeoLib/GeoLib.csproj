@@ -9,7 +9,7 @@
     <OutputPath Condition="'$(Configuration)' == 'Release' and '$(Platform)' == 'x64'">$(ProjectDir)..\..\run64\</OutputPath>
     <OutputPath Condition="'$(Configuration)' == 'Debug' and '$(Platform)' == 'x64'">$(ProjectDir)..\..\run64_D\</OutputPath>
     <IntermediateOutputPath>$(ProjectDir)..\..\tmp\$(Configuration)\$(Platform)\$(MSBuildProjectName)\obj</IntermediateOutputPath>
-    <Platforms>x64;x86;AnyCPU</Platforms>
+    <Platforms>x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
