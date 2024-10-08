@@ -5,7 +5,7 @@ namespace GeoLib
     class KatSys : IKatSys
     {
 		#region Properties
-		public KDTree<Nehnutelnost> Nehnutelnosti { get; private set; }
+		public KdTree<Nehnutelnost> Nehnutelnosti { get; private set; }
 		#endregion //Properties
 
 		#region Public functions
