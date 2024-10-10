@@ -28,6 +28,10 @@ namespace TestApp
 				nehnutelnosti.Insert(nehnutelnost);
 			}
 
+			Console.WriteLine(nehnutelnosti.Root.Data.ToString());
+			Console.WriteLine(nehnutelnosti.Root.Left.Data.ToString());
+			Console.WriteLine(nehnutelnosti.Root.Left.Left.Data.ToString());
+
 			Console.WriteLine(nehnutelnosti.Count);
 			while (true)
 			{

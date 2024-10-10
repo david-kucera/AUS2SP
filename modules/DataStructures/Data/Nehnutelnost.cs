@@ -10,6 +10,6 @@
         public Nehnutelnost()
         {
         }
-        #endregion //Constructor
+		#endregion //Constructor
     }
 }

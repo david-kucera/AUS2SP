@@ -1,6 +1,6 @@
 ﻿namespace DataStructures.Data
 {
-    public class Parcela
+    public class Parcela : GeoObjekt
     {
         #region Properties
         public List<Nehnutelnost> Nehnutelnosti { get; set; } = new List<Nehnutelnost>();       // iba referencie
@@ -10,6 +10,6 @@
         public Parcela()
         {
         }
-        #endregion //Constructor
+		#endregion //Constructor
     }
 }
