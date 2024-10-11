@@ -3,14 +3,14 @@
     public class GpsPos
     {
         #region Properties
-        public char Sirka { get; set; } = char.MinValue;              // N alebo S
-        public double PoziciaSirky { get; set; } = double.MinValue;
-        public char Dlzka { get; set; } = char.MinValue;              // E alebo W
-        public double PoziciaDlzky { get; set; } = double.MinValue;
-        #endregion //Properties
+        public char Sirka { get; set; } = char.MinValue;                // N alebo S
+        public double PoziciaSirky { get; set; } = double.MinValue;     // Latitude
+		public char Dlzka { get; set; } = char.MinValue;                // E alebo W
+        public double PoziciaDlzky { get; set; } = double.MinValue;     // Longitude
+		#endregion //Properties
 
-        #region Constructor
-        public GpsPos()
+		#region Constructor
+		public GpsPos()
         {
         }
 
