@@ -10,7 +10,7 @@
 		#endregion //Properties
 
 		#region Abstract functions
-		public abstract int CompareTo(T data, int dimension, int positionIndex);
+		public abstract int CompareTo(T node, int comparator, int dimension);
 		#endregion //Abstract functions
 	}
 }

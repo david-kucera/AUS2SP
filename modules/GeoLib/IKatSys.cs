@@ -5,11 +5,11 @@ namespace GeoLib
 {
     public interface IKatSys
 	{
-		void VyhladajNehnutelnosti(GPSPos pozicia);
-		void VyhladajParcely(GPSPos pozicia);
-		void Vyhladaj(GPSPos poz1, GPSPos poz2);
-		void PridajNehnutelnost(int supisneCislo, string popis, GPSPos[] pozicie);
-		void PridajParcelu(int cisloParcely, string popis, GPSPos[] pozicie);
+		void VyhladajNehnutelnosti(GpsPos pozicia);
+		void VyhladajParcely(GpsPos pozicia);
+		void Vyhladaj(GpsPos poz1, GpsPos poz2);
+		void PridajNehnutelnost(int supisneCislo, string popis, GpsPos[] pozicie);
+		void PridajParcelu(int cisloParcely, string popis, GpsPos[] pozicie);
 		void EditNehnutelnost(Nehnutelnost nehnutelnost);
 		void EditParcela(Parcela parcela);
 		void VymazNehnutelnost(Nehnutelnost nehnutelnost);

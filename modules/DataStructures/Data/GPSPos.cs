@@ -1,6 +1,6 @@
 ﻿namespace DataStructures.Data
 {
-    public class GPSPos
+    public class GpsPos
     {
         #region Properties
         public char Sirka { get; set; } = char.MinValue;              // N alebo S
@@ -10,11 +10,11 @@
         #endregion //Properties
 
         #region Constructor
-        public GPSPos()
+        public GpsPos()
         {
         }
 
-        public GPSPos(char sirka, double poziciaSirky, char dlzka, double poziciaDlzky)
+        public GpsPos(char sirka, double poziciaSirky, char dlzka, double poziciaDlzky)
         {
             Sirka = sirka;
             PoziciaSirky = poziciaSirky;
@@ -23,77 +23,83 @@
         }
         #endregion //Constructor
 
-        public int CompareTo(GPSPos gpsPos, int positionIndex)
+        #region Public functions
+        public int CompareTo(GpsPos gpsPos, int positionIndex)
         {
             switch (positionIndex)
             {
                 case 0:
                     return CompareSirka(gpsPos);
+                    break;
                 case 1:
                     return CompareDlzka(gpsPos);
+                    break;
                 default:
                     throw new NotSupportedException();
             }
         }
+        #endregion //Public functions
 
-        private int CompareDlzka(GPSPos gpsPos)
+        #region Private functions
+        private int CompareDlzka(GpsPos gpsPos)
         {
-            int multiplierOther = 1;
+            int multiplier = 1;
             if (gpsPos.Dlzka != 'E')
             {
-                multiplierOther = -1;
+                multiplier = -1;
             }
-            var valueOther = multiplierOther * gpsPos.PoziciaDlzky;
+            var valueOther = multiplier * gpsPos.PoziciaDlzky;
 
-            int multiplierThis = 1;
+            multiplier = 1;
             if (Dlzka != 'E')
             {
-                multiplierThis = -1;
+                multiplier = -1;
             }
-            var valueThis = multiplierThis * PoziciaDlzky;
+            var valueThis = multiplier * PoziciaDlzky;
 
-            if (valueThis < valueOther)
+            if (Math.Abs(valueThis - valueOther) < 0 && Sirka == gpsPos.Sirka)
+            {
+	            return 0; // Dolava, kedze rovnake
+            }
+            if (valueThis > valueOther)
+            {
+	            return -1; // Dolava
+            }
+			else
             {
                 return 1; // Doprava
             }
-            else if (valueThis > valueOther)
-            {
-                return -1; // Dolava
-            }
-            else
-            {
-                return 0; // Dolava, kedze rovnake
-            }
         }
 
-        private int CompareSirka(GPSPos gpsPos)
+        private int CompareSirka(GpsPos gpsPos)
         {
-            int multiplierOther = 1;
+            int multiplier = 1;
             if (gpsPos.Sirka != 'N')
             {
-                multiplierOther = -1;
+                multiplier = -1;
             }
-            var valueOther = multiplierOther * gpsPos.PoziciaSirky;
+            var valueOther = multiplier * gpsPos.PoziciaSirky;
 
-            int multiplierThis = 1;
+            multiplier = 1;
             if (Sirka != 'N')
             {
-                multiplierThis = -1;
+                multiplier = -1;
             }
-            var valueThis = multiplierThis * PoziciaSirky;
+            var valueThis = multiplier * PoziciaSirky;
 
-            if (valueThis < valueOther)
+            if (Math.Abs(valueThis - valueOther) < 0 && Dlzka == gpsPos.Dlzka)
+            {
+	            return 0; // Dolava, kedze rovnake
+            }
+            if (valueThis > valueOther)
+            {
+	            return -1; // Dolava
+            }
+			else
             {
                 return 1; // Doprava
             }
-            else if (valueThis > valueOther)
-            {
-                return -1; // Dolava
-            }
-            else
-            {
-                return 0; // Dolava, kedze rovnake
-            }
         }
+		#endregion //Private functions
     }
 }

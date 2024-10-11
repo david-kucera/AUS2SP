@@ -1,4 +1,6 @@
-﻿namespace DataStructures
+﻿using DataStructures.Data;
+
+namespace DataStructures
 {
 	public class KdTree<T> : AbstractTree<T> where T : class
 	{
@@ -18,80 +20,81 @@
 		#region Public functions
 		public override void Insert(T data)
 		{
-			int depth = 0;
-			int positionIndex = 0;
 			if (Root == null!)
 			{
 				Root = new KdTreeNode<T>
 				{
 					Data = data,
 					Parent = null!,
-					Dimension = positionIndex
+					Comparator = 0,
+					Left = null!,
+					Right = null!,
 				};
 				Count++;
-				depth++;
-				positionIndex++;
 
-				int position = Root.CompareTo(data, depth % TreeDimension, positionIndex);
-				KdTreeNode<T> newKdTreeNode = new KdTreeNode<T>
+				KdTreeNode<T> secondRoot = new KdTreeNode<T>
 				{
 					Data = data,
 					Parent = Root,
-					Dimension = positionIndex
+					Comparator = 1,
+					Left = null!,
+					Right = null!,
 				};
+				Count++;
+
+				int position = Root.CompareTo(secondRoot.Data, secondRoot.Comparator, 0);
 				if (position == -1 || position == 0)
 				{
-					Root.Left = newKdTreeNode;
+					Root.Left = secondRoot;
 				}
 				else
 				{
-					Root.Right = newKdTreeNode;
+					Root.Right = secondRoot;
 				}
-
-				Count++;
-				return;
 			}
-
-			for (int i = 0; i < TreeDimension; i++)
+			else
 			{
-				var currentKdTreeNode = Root;
-				var parentKdTreeNode = Root.Parent;
-				depth = 0;
-
-				while (currentKdTreeNode != null!)
+				for (int i = 0; i < TreeDimension; i++)
 				{
-					parentKdTreeNode = currentKdTreeNode;
-
-					int position = currentKdTreeNode.CompareTo(data, depth % TreeDimension, i);
-					if (position == -1 || position == 0)
+					KdTreeNode<T> newNode = new KdTreeNode<T>
 					{
-						currentKdTreeNode = currentKdTreeNode.Left;
-					}
-					else
+						Data = data,
+						Comparator = i,
+						Left = null!,
+						Right = null!,
+						Parent = null!
+					};
+					Count++;
+
+					var currentNode = Root;
+					int depth = 0;
+					while (true)
 					{
-						currentKdTreeNode = currentKdTreeNode.Right;
+						int position = currentNode.CompareTo(newNode.Data, newNode.Comparator, depth % TreeDimension);
+						if (position == -1 || position == 0)
+						{
+							if (currentNode.Left == null!)
+							{
+								currentNode.Left = newNode;
+								newNode.Parent = currentNode;
+								break;
+							}
+							currentNode = currentNode.Left;
+						}
+						else
+						{
+							if (currentNode.Right == null!)
+							{
+								currentNode.Right = newNode;
+								newNode.Parent = currentNode;
+								break;
+							}
+							currentNode = currentNode.Right;
+							
+						}
+						depth++;
 					}
-
-					depth++;
 				}
-
-				KdTreeNode<T> newKdTreeNode = new KdTreeNode<T>
-				{
-					Data = data,
-					Parent = parentKdTreeNode,
-					Dimension = i
-				};
-
-				int newPosition = parentKdTreeNode.CompareTo(data, depth % TreeDimension, i);
-				if (newPosition == -1 || newPosition == 0)
-				{
-					parentKdTreeNode.Left = newKdTreeNode;
-				}
-				else
-				{
-					parentKdTreeNode.Right = newKdTreeNode;
-				}
-				Count++;
 			}
 		}
 
@@ -100,7 +103,7 @@
 			throw new NotImplementedException();
 		}
 
-		public override KdTreeNode<T> Find(object value)
+		public override KdTreeNode<T> Find(T data)
 		{
 			throw new NotImplementedException();
 		}

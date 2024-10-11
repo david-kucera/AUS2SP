@@ -12,27 +12,27 @@ namespace GeoLib
 		#endregion //Properties
 
 		#region Public functions
-		public void VyhladajNehnutelnosti(GPSPos pozicia)
+		public void VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void VyhladajParcely(GPSPos pozicia)
+	    public void VyhladajParcely(GpsPos pozicia)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void Vyhladaj(GPSPos poz1, GPSPos poz2)
+	    public void Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void PridajNehnutelnost(int supisneCislo, string popis, GPSPos[] pozicie)
+	    public void PridajNehnutelnost(int supisneCislo, string popis, GpsPos[] pozicie)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void PridajParcelu(int cisloParcely, string popis, GPSPos[] pozicie)
+	    public void PridajParcelu(int cisloParcely, string popis, GpsPos[] pozicie)
 	    {
 		    throw new NotImplementedException();
 	    }

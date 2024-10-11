@@ -10,7 +10,7 @@
 		#region Abstract functions
 		public abstract void Insert(T data);
 		public abstract void Delete(T data);
-		public abstract AbstractNode<T> Find(object value);
+		public abstract AbstractNode<T> Find(T data);
 		#endregion //Abstract functions
 
 	}
