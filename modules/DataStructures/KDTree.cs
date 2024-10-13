@@ -123,7 +123,7 @@ namespace DataStructures
 			{
 				if (node == null!) return;
 
-				builder.AppendLine($"{new string('-', depth * 4)}{position} {node}");
+				builder.AppendLine($"{new string(' ', depth * 4)}{position} {node}");
 				if (node.Left != null!)
 				{
 					BuildString(node.Left, builder, depth + 1, "L");

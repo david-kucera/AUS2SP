@@ -12,12 +12,11 @@ namespace TestApp
 		{
 			KdTree<GeoObjekt> objekty = new KdTree<GeoObjekt>(2);
 
-			Console.WriteLine("Generované nehnuteľnosti");
+			Console.WriteLine("Generované objekty");
 			Random rnd = new Random(BASE_SEED);
 			DataGenerator generator = new DataGenerator(BASE_SEED);
 
-
-			int pocetGenerovanych = 100;
+			int pocetGenerovanych = 1_000_000;
 			int pocetNehnutelnosti = 0;
 			int pocetParcel = 0;
 			Stopwatch stopWatch = new Stopwatch();
