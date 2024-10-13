@@ -26,17 +26,12 @@
         #region Public functions
         public int CompareTo(GpsPos gpsPos, int positionIndex)
         {
-            switch (positionIndex)
-            {
-                case 0:
-                    return CompareSirka(gpsPos);
-                    break;
-                case 1:
-                    return CompareDlzka(gpsPos);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+	        return positionIndex switch
+	        {
+		        0 => CompareSirka(gpsPos),
+		        1 => CompareDlzka(gpsPos),
+		        _ => throw new IndexOutOfRangeException()
+	        };
         }
         #endregion //Public functions
 

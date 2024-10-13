@@ -1,6 +1,4 @@
-﻿using DataStructures.Data;
-
-namespace DataStructures
+﻿namespace DataStructures
 {
 	public class KdTree<T> : AbstractTree<T> where T : class
 	{
@@ -32,7 +30,7 @@ namespace DataStructures
 				};
 				Count++;
 
-				KdTreeNode<T> secondRoot = new KdTreeNode<T>
+				KdTreeNode<T> secondRoot = new()
 				{
 					Data = data,
 					Parent = Root,
@@ -56,7 +54,7 @@ namespace DataStructures
 			{
 				for (int i = 0; i < TreeDimension; i++)
 				{
-					KdTreeNode<T> newNode = new KdTreeNode<T>
+					KdTreeNode<T> newNode = new()
 					{
 						Data = data,
 						Comparator = i,
@@ -103,7 +101,7 @@ namespace DataStructures
 			throw new NotImplementedException();
 		}
 
-		public override KdTreeNode<T> Find(T data)
+		public override T Find(T data)
 		{
 			throw new NotImplementedException();
 		}
