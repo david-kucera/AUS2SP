@@ -11,5 +11,12 @@
         {
         }
 		#endregion //Constructor
-    }
+
+		#region Public functions
+		public override string ToString()
+		{
+			return "Nehnuteľnosť: " + base.ToString();
+		}
+		#endregion //Public functions
+	}
 }

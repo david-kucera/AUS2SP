@@ -24,7 +24,12 @@
         #endregion //Constructor
 
         #region Public functions
-        public int CompareTo(GpsPos gpsPos, int positionIndex)
+        public override string ToString()
+		{
+			return "[" + Sirka + PoziciaSirky.ToString("F2") + ", " + Dlzka + PoziciaDlzky.ToString("F2") + "]"; 
+		}
+
+		public int CompareTo(GpsPos gpsPos, int positionIndex)
         {
 	        return positionIndex switch
 	        {
