@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoLib", "..\modules\GeoLib
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataStructures", "..\modules\DataStructures\DataStructures.csproj", "{DE15C285-8187-4CBB-8870-492E2262E444}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "..\modules\TestApp\TestApp.csproj", "{3693B610-C2F7-4FA8-A418-88A4F143A25A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "..\modules\TestApp\TestApp.csproj", "{3693B610-C2F7-4FA8-A418-88A4F143A25A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoViewer", "..\modules\GeoViewer\GeoViewer.csproj", "{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{3693B610-C2F7-4FA8-A418-88A4F143A25A}.Release|x64.Build.0 = Release|x64
 		{3693B610-C2F7-4FA8-A418-88A4F143A25A}.Release|x86.ActiveCfg = Release|x86
 		{3693B610-C2F7-4FA8-A418-88A4F143A25A}.Release|x86.Build.0 = Release|x86
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Debug|x64.ActiveCfg = Debug|x64
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Debug|x64.Build.0 = Debug|x64
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Debug|x86.ActiveCfg = Debug|x86
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Debug|x86.Build.0 = Debug|x86
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Release|x64.ActiveCfg = Release|x64
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Release|x64.Build.0 = Release|x64
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Release|x86.ActiveCfg = Release|x86
+		{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
