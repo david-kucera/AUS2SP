@@ -1,21 +1,23 @@
 ﻿using System.Diagnostics;
 using DataStructures;
 using DataStructures.Data;
+using GeoLib;
 
 namespace TestApp
 {
     public class Program
 	{
+		public static int BASE_SEED = 0;
 		static void Main(string[] args)
 		{
 			KdTree<GeoObjekt> objekty = new KdTree<GeoObjekt>(2);
 
 			Console.WriteLine("Generované nehnuteľnosti");
-			Random rnd = new Random();
-			DataGenerator generator = new DataGenerator(0);
+			Random rnd = new Random(BASE_SEED);
+			DataGenerator generator = new DataGenerator(BASE_SEED);
 
 
-			int pocetGenerovanych = 10000;
+			int pocetGenerovanych = 100;
 			int pocetNehnutelnosti = 0;
 			int pocetParcel = 0;
 			Stopwatch stopWatch = new Stopwatch();
@@ -42,10 +44,12 @@ namespace TestApp
 			Console.WriteLine("Počet nehnuteľností: " + pocetNehnutelnosti);
 
 			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
+			Console.WriteLine(objekty.ToString());
 			while (true)
 			{
+				Console.WriteLine("Stlač akúkoľvek klávesu pre ukočenie aplikácie");
 				var key = Console.ReadKey();
-				if (key.Key == ConsoleKey.A)
+				if (key.KeyChar > 0 && key.KeyChar < 255)
 				{
 					break;
 				}

@@ -1,4 +1,6 @@
-﻿namespace DataStructures
+﻿using System.Text;
+
+namespace DataStructures
 {
 	public class KdTree<T> : AbstractTree<T> where T : class
 	{
@@ -88,7 +90,6 @@
 								break;
 							}
 							currentNode = currentNode.Right;
-							
 						}
 						depth++;
 					}
@@ -105,6 +106,38 @@
 		{
 			throw new NotImplementedException();
 		}
+
+		public override string ToString()
+		{
+			if (Root == null!) return string.Empty;
+			var builder = new StringBuilder();
+			BuildString(Root, builder, 0, "");
+			return builder.ToString();
+		}
 		#endregion //Public functions
+
+		#region Private functions
+		private static void BuildString(AbstractNode<T> node, StringBuilder builder, int depth, string position)
+		{
+			while (true)
+			{
+				if (node == null!) return;
+
+				builder.AppendLine($"{new string('-', depth * 4)}{position} {node}");
+				if (node.Left != null!)
+				{
+					BuildString(node.Left, builder, depth + 1, "L");
+				}
+				if (node.Right != null!)
+				{
+					node = node.Right;
+					depth += 1;
+					position = "R";
+					continue;
+				}
+				break;
+			}
+		}
+		#endregion //Private functions
 	}
 }

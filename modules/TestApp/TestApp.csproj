@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataStructures\DataStructures.csproj" />
+    <ProjectReference Include="..\GeoLib\GeoLib.csproj" />
   </ItemGroup>
 
 </Project>

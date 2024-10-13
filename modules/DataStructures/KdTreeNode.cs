@@ -48,6 +48,11 @@ namespace DataStructures
 			
 			return nodeData!.Pozicie[Comparator].CompareTo(other!.Pozicie[comparator], dimension);
 		}
+
+		public override string ToString()
+		{
+			return Data.ToString()! + " " + "Comparator: " + Comparator;
+		}
 		#endregion //Public functions
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using DataStructures.Data;
 
-namespace TestApp
+namespace GeoLib
 {
 	public class DataGenerator
 	{
@@ -30,6 +30,7 @@ namespace TestApp
 		{
 			Nehnutelnost nehnutelnost = new Nehnutelnost
 			{
+				SupisneCislo = _random.Next(0, 10000),
 				Pozicie =
 				{
 					[0] = GenerateGpsPos(),
@@ -43,11 +44,12 @@ namespace TestApp
 		{
 			Parcela parcela = new Parcela
 			{
+				SupisneCislo = _random.Next(0, 10000),
 				Pozicie =
 				{
 					[0] = GenerateGpsPos(),
 					[1] = GenerateGpsPos()
-				}
+				},
 			};
 			return parcela;
 		}
