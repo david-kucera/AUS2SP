@@ -16,11 +16,12 @@ namespace TestApp
 			Random rnd = new Random(BASE_SEED);
 			DataGenerator generator = new DataGenerator(BASE_SEED);
 
-			int pocetGenerovanych = 1_000_000;
+			int pocetGenerovanych = 10;
 			int pocetNehnutelnosti = 0;
 			int pocetParcel = 0;
 			Stopwatch stopWatch = new Stopwatch();
 			stopWatch.Start();
+			GeoObjekt objektToFind = null!;
 			for (int i = 0; i < pocetGenerovanych; i++)
 			{
 				GeoObjekt objekt;
@@ -34,7 +35,14 @@ namespace TestApp
 					objekt = generator.GenerateParcela();
 					pocetParcel++;
 				}
-				
+
+				Console.WriteLine(i + ". " + objekt.ToString());
+
+				if (i == 6)
+				{
+					objektToFind = objekt;
+				}
+
 				objekty.Insert(objekt);
 			}
 			stopWatch.Stop();
@@ -42,8 +50,10 @@ namespace TestApp
 			Console.WriteLine("Počet parciel: " + pocetParcel);
 			Console.WriteLine("Počet nehnuteľností: " + pocetNehnutelnosti);
 
+			Console.WriteLine("Nájdený objekt: " + objekty.Find(objektToFind));
+
 			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
-			Console.WriteLine(objekty.ToString());
+			//Console.WriteLine(objekty.ToString());
 			while (true)
 			{
 				Console.WriteLine("Stlač akúkoľvek klávesu pre ukočenie aplikácie");

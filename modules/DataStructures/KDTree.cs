@@ -104,7 +104,26 @@ namespace DataStructures
 
 		public override T Find(T data)
 		{
-			throw new NotImplementedException();
+			var currentNode = Root;
+			int depth = 0;
+
+			while (true)
+			{
+				if (currentNode == null!) return null!;
+
+				if (currentNode.Data.Equals(data)) return currentNode.Data;
+
+				int position = currentNode.CompareTo(data, 0, depth % TreeDimension);
+				if (position == -1 || position == 0)
+				{
+					currentNode = currentNode.Left;
+				}
+				else
+				{
+					currentNode = currentNode.Right;
+				}
+				depth++;
+			}
 		}
 
 		public override string ToString()
