@@ -38,7 +38,7 @@ namespace TestApp
 
 				Console.WriteLine(i + ". " + objekt.ToString());
 
-				if (i == 6)
+				if (i == 0)
 				{
 					objektToFind = objekt;
 				}
@@ -49,8 +49,9 @@ namespace TestApp
 			Console.WriteLine("Čas generovania a vkladania " + pocetGenerovanych + ": " + stopWatch.ElapsedMilliseconds + " ms");
 			Console.WriteLine("Počet parciel: " + pocetParcel);
 			Console.WriteLine("Počet nehnuteľností: " + pocetNehnutelnosti);
-
 			Console.WriteLine("Nájdený objekt: " + objekty.Find(objektToFind));
+			Console.WriteLine("Objekt na vymazanie: ");
+			objekty.Delete(objektToFind);
 
 			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
 			//Console.WriteLine(objekty.ToString());

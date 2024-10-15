@@ -99,10 +99,28 @@ namespace DataStructures
 
 		public override void Delete(T data)
 		{
-			throw new NotImplementedException();
+			for (int i = 0; i < 2; i++)
+			{
+				KdTreeNode<T> nodeToDelete = Find(data);
+
+				if (nodeToDelete == null!) return;
+
+				if (nodeToDelete == Root)
+				{
+					Root = null!;
+					Count = 0;
+					return;
+				}
+				if (nodeToDelete.Left == null! && nodeToDelete.Right == null!)
+				{
+					// TODO 
+				}
+
+				// TODO - implement delete
+			}
 		}
 
-		public override T Find(T data)
+		public override KdTreeNode<T> Find(T data)
 		{
 			var currentNode = Root;
 			int depth = 0;
@@ -111,7 +129,7 @@ namespace DataStructures
 			{
 				if (currentNode == null!) return null!;
 
-				if (currentNode.Data.Equals(data)) return currentNode.Data;
+				if (currentNode.Data.Equals(data)) return (KdTreeNode<T>?)currentNode!;
 
 				int position = currentNode.CompareTo(data, 0, depth % TreeDimension);
 				if (position == -1 || position == 0)
