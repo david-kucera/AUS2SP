@@ -107,9 +107,7 @@ namespace DataStructures
 
 				if (nodeToDelete == Root)
 				{
-					Root = null!;
-					Count = 0;
-					return;
+					// TODO
 				}
 				if (nodeToDelete.Left == null! && nodeToDelete.Right == null!)
 				{
@@ -129,7 +127,7 @@ namespace DataStructures
 			{
 				if (currentNode == null!) return null!;
 
-				if (currentNode.Data.Equals(data)) return (KdTreeNode<T>?)currentNode!;
+				if (currentNode.Data.Equals(data)) return (KdTreeNode<T>)currentNode;
 
 				int position = currentNode.CompareTo(data, 0, depth % TreeDimension);
 				if (position == -1 || position == 0)
