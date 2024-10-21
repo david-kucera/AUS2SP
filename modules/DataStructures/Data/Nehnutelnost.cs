@@ -10,6 +10,14 @@
         public Nehnutelnost()
         {
         }
+
+        public Nehnutelnost(int supisneCislo, string popis, GpsPos prvaGps, GpsPos druhaGps)
+		{
+			SupisneCislo = supisneCislo;
+			Popis = popis;
+			Pozicie[0] = prvaGps;
+			Pozicie[1] = druhaGps;
+		}
 		#endregion //Constructor
 
 		#region Public functions

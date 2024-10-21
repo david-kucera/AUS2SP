@@ -14,4 +14,12 @@
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DTO\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeoLib\GeoLib.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -3,38 +3,52 @@ using DataStructures.Data;
 
 namespace GeoLib
 {
-    class KatSys : IKatSys
+    public class KatSys : IKatSys
     {
-		#region Properties
-		public KdTree<Nehnutelnost> Nehnutelnosti { get; private set; } = new KdTree<Nehnutelnost>(2);
-		public KdTree<Parcela> Parcely { get; private set; } = new KdTree<Parcela>(2);
-		public KdTree<GeoObjekt> Objekty { get; private set; } = new KdTree<GeoObjekt>(2);
-		#endregion //Properties
+		#region Class members
+		private KdTree<Nehnutelnost> _nehnutelnosti = new(2);
+		private KdTree<Parcela> _parcely = new(2);
+		private KdTree<GeoObjekt> _objekty = new(2);
+		#endregion //Class members
+
+		#region Constructors
+		public KatSys()
+		{
+		}
+
+		public KatSys(string path)
+		{
+			// TODO load data from external file
+			throw new System.NotImplementedException();
+		}
+		#endregion //Constructors
 
 		#region Public functions
-		public void VyhladajNehnutelnosti(GpsPos pozicia)
+		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void VyhladajParcely(GpsPos pozicia)
+	    public List<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void Vyhladaj(GpsPos poz1, GpsPos poz2)
+	    public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
 		    throw new NotImplementedException();
 	    }
 
-	    public void PridajNehnutelnost(int supisneCislo, string popis, GpsPos[] pozicie)
+	    public void PridajNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-		    throw new NotImplementedException();
+			_nehnutelnosti.Insert(nehnutelnost);
+		    //throw new NotImplementedException();
 	    }
 
-	    public void PridajParcelu(int cisloParcely, string popis, GpsPos[] pozicie)
+	    public void PridajParcelu(Parcela parcela)
 	    {
-		    throw new NotImplementedException();
+
+		    //throw new NotImplementedException();
 	    }
 
 	    public void EditNehnutelnost(Nehnutelnost nehnutelnost)

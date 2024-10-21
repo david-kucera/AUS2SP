@@ -24,8 +24,8 @@
                 <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="Pridaj nehnuteľnosť"></MenuItem>
-                <MenuItem Header="Pridaj parcelu"></MenuItem>
+                <MenuItem Header="Pridaj nehnuteľnosť" Click="AddNehnutelnost_OnClick"></MenuItem>
+                <MenuItem Header="Pridaj parcelu" Click="AddParcela_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="About" Click="About_OnClick"></MenuItem>
