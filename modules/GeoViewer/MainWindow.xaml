@@ -7,6 +7,53 @@
         mc:Ignorable="d"
         Title="GeoViewer" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <!--menu-->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Click="OpenFile_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="_Save" Click="SaveFile_OnClick"></MenuItem>
+                <MenuItem Header="_Save..." Click="SaveNewFile_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Pridaj nehnuteľnosť"></MenuItem>
+                <MenuItem Header="Pridaj parcelu"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="About" Click="About_OnClick"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!--gps a buttony-->
+        <GroupBox Grid.Row="1" Margin="5" Header="Input">
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                <!--prva gps-->
+                <Label Margin="10,0,0,0">GPS 1:</Label>
+                <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <!--druha gps-->
+                <Label Margin="10,0,0,0">GPS 2:</Label>
+                <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="0,0,0,0" Text="N21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <!--buttony-->
+                <Button Name="FindAllButton" Margin="40,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi všetko" Click="FindAllButton_OnClick"></Button>
+                <Button Name="FindParcelyButton" Margin="10,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi parcely" Click="FindParcelyButton_OnClick"></Button>
+                <Button Name="FindNehnutelnostiButton" Margin="10,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi nehnuteľnosti" Click="FindNehnutelnostiButton_OnClick"></Button>
+            </StackPanel>
+        </GroupBox>
+        
+        <GroupBox Grid.Row="2" Margin="5" Header="Data">
+            <ListBox Name="ObjectListBox" Margin="5">
+
+            </ListBox>
+        </GroupBox>
     </Grid>
 </Window>

@@ -20,6 +20,11 @@ namespace DataStructures
 		#region Public functions
 		public override void Insert(T data)
 		{
+			// TODO - PRE NEHUTELNOSTI - vyhladat vsetky parcely na ktorych sa nachadza
+			// TODO - PRE PARCELY - vyhladat vsetky nehnutelnosti ktore sa na nej nachadzaju
+
+
+
 			if (Root == null!)
 			{
 				Root = new KdTreeNode<T>
