@@ -26,16 +26,19 @@ namespace GeoLib
 		#region Public functions
 		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
+			// TODO duplicity
 			return _nehnutelnosti.Find(pozicia);
 		}
 
 	    public List<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
+			// TODO duplicity
 		    return _parcely.Find(pozicia);
 	    }
 
 	    public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
+			// TODO duplicity
 			var ret = new List<GeoObjekt>();
 			ret.AddRange(_objekty.Find(poz1));
 			ret.AddRange(_objekty.Find(poz2));

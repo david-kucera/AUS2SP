@@ -3,7 +3,7 @@
     public class GpsPos
     {
 		#region Constants
-        public const double ROUNDING_ERROR = 0.01;
+        public const double ROUNDING_ERROR = 0.1;
 		#endregion //Constants
 
 		#region Properties
@@ -42,20 +42,28 @@
 		        _ => throw new IndexOutOfRangeException()
 	        };
         }
+
+        public override bool Equals(object? obj)
+        {
+            var gpsPos = obj as GpsPos;
+
+			return Math.Abs(PoziciaSirky - gpsPos.PoziciaSirky) < ROUNDING_ERROR && Math.Abs(PoziciaDlzky - gpsPos.PoziciaDlzky) < ROUNDING_ERROR && Sirka == gpsPos.Sirka && Dlzka == gpsPos.Dlzka;
+		}
+
         #endregion //Public functions
 
-        #region Private functions
-        private int CompareDlzka(GpsPos gpsPos)
+		#region Private functions
+		private int CompareDlzka(GpsPos gpsPos)
         {
             int multiplier = 1;
-            if (gpsPos.Dlzka != 'E')
+            if (gpsPos.Dlzka != 'E' && gpsPos.Dlzka != 'e')
             {
                 multiplier = -1;
             }
             var valueOther = multiplier * gpsPos.PoziciaDlzky;
 
             multiplier = 1;
-            if (Dlzka != 'E')
+            if (Dlzka != 'E' && Dlzka != 'e')
             {
                 multiplier = -1;
             }
@@ -78,14 +86,14 @@
         private int CompareSirka(GpsPos gpsPos)
         {
             int multiplier = 1;
-            if (gpsPos.Sirka != 'N')
+            if (gpsPos.Sirka != 'N' && gpsPos.Sirka != 'n')
             {
                 multiplier = -1;
             }
             var valueOther = multiplier * gpsPos.PoziciaSirky;
 
             multiplier = 1;
-            if (Sirka != 'N')
+            if (Sirka != 'N' && Sirka != 'n')
             {
                 multiplier = -1;
             }

@@ -92,6 +92,11 @@ namespace GeoViewer
 
 		private void FindAllButton_OnClick(object sender, RoutedEventArgs e)
 		{
+			if (string.IsNullOrEmpty(GpsFirstLongitude.Text)
+				|| string.IsNullOrEmpty(GpsFirstLatitude.Text)
+				|| string.IsNullOrEmpty(GpsSecondLongitude.Text) 
+				|| string.IsNullOrEmpty(GpsSecondLatitude.Text)) 
+				MessageBox.Show("Je potrbné zadať oboje GPS súradnice!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 			var lat1 = GpsFirstLatitude.Text.Split(",");
 			var lon1 = GpsFirstLongitude.Text.Split(",");
 			GpsPos pozicia1 = new GpsPos(lat1[0].First(), double.Parse(lat1[1]), lon1[0].First(), double.Parse(lon1[1]));
@@ -119,6 +124,7 @@ namespace GeoViewer
 			var lat = GpsFirstLatitude.Text.Split(",");
 			var lon = GpsFirstLongitude.Text.Split(",");
 			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
+
 			var ret = _katSys.VyhladajParcely(pozicia);
 			if (ret.Count == 0)
 			{
@@ -138,6 +144,7 @@ namespace GeoViewer
 			var lat = GpsFirstLatitude.Text.Split(",");
 			var lon = GpsFirstLongitude.Text.Split(",");
 			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
+
 			var ret = _katSys.VyhladajNehnutelnosti(pozicia);
 			if (ret.Count == 0)
 			{
@@ -176,6 +183,8 @@ namespace GeoViewer
 
 				Nehnutelnost result = new(supisneCislo, popis, gpsPrva, gpsDruha);
 				_katSys.PridajNehnutelnost(result);
+				_currentlyDisplayedObjects.Add(result);
+				RefreshData();
 				MessageBox.Show("Dáta nehnuteľnosti boli pridané do databázy!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 		}
@@ -199,6 +208,8 @@ namespace GeoViewer
 
 				Parcela result = new(cisloParcely, popis, gpsPrva, gpsDruha);
 				_katSys.PridajParcelu(result);
+				_currentlyDisplayedObjects.Add(result);
+				RefreshData();
 				MessageBox.Show("Dáta parcely boli pridané do databázy!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 		}
@@ -221,8 +232,11 @@ namespace GeoViewer
 		/// <exception cref="NotImplementedException"></exception>
 		private void RefreshData()
 		{
-			// TODO refresh data so user sees all data
-			//throw new NotImplementedException();
+			ObjectListBox.Items.Clear();
+			foreach (var obj in _currentlyDisplayedObjects)
+			{
+				ObjectListBox.Items.Add(obj);
+			}
 		}
 		#endregion //Private functions
 	}
