@@ -44,20 +44,30 @@ namespace GeoLib
 
 	    public void PridajNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-		    for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
+			for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
 		    {
 				_nehnutelnosti.Insert(nehnutelnost.Pozicie[i], nehnutelnost);
 				_objekty.Insert(nehnutelnost.Pozicie[i], nehnutelnost);
 			}
-	    }
+
+			var nachadzaSaNa = _parcely.Find(nehnutelnost.Pozicie[0]);
+			nachadzaSaNa.AddRange(_parcely.Find(nehnutelnost.Pozicie[1]));
+			nehnutelnost.Parcely = nachadzaSaNa;
+			// TODO refresh pri kazdom pridani
+		}
 
 	    public void PridajParcelu(Parcela parcela)
 	    {
-		    for (int i = 0; i < parcela.Pozicie.Length; i++)
+			for (int i = 0; i < parcela.Pozicie.Length; i++)
 		    {
 				_parcely.Insert(parcela.Pozicie[i], parcela);
 				_objekty.Insert(parcela.Pozicie[i], parcela);
 			}
+
+			var nachadzajuSaNaNej = _nehnutelnosti.Find(parcela.Pozicie[0]);
+			nachadzajuSaNaNej.AddRange(_nehnutelnosti.Find(parcela.Pozicie[1]));
+			parcela.Nehnutelnosti = nachadzajuSaNaNej;
+			// TODO refresh pri kazdom pridani
 		}
 
 	    public void EditNehnutelnost(Nehnutelnost nehnutelnost)
@@ -74,16 +84,20 @@ namespace GeoLib
 
 	    public void VymazNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-			// TODO delete
-			//_nehnutelnosti.Delete(nehnutelnost);
-			//_objekty.Delete(nehnutelnost);
+		    for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
+		    {
+				_nehnutelnosti.Delete(nehnutelnost.Pozicie[i], nehnutelnost);
+				_objekty.Delete(nehnutelnost.Pozicie[i], nehnutelnost);
+			}
 		}
 
 		public void VymazParcelu(Parcela parcela)
 	    {
-			// TODO delete
-		    //_parcely.Delete(parcela);
-			//_objekty.Delete(parcela);
+		    for (int i = 0; i < parcela.Pozicie.Length; i++)
+		    {
+			    _parcely.Delete(parcela.Pozicie[i], parcela);
+			    _objekty.Delete(parcela.Pozicie[i], parcela);
+		    }
 		}
 	    
 		public bool ReadFile(string path)

@@ -9,7 +9,7 @@
 
 		#region Abstract functions
 		public abstract void Insert(TKey key, TValue data);
-		public abstract void Delete(TKey key);
+		public abstract void Delete(TKey key, TValue data);
 		public abstract List<TValue> Find(TKey key);
 		#endregion //Abstract functions
 

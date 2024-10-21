@@ -4,14 +4,14 @@ namespace DataStructures
 {
 	public class KdTree<TKey, TValue> : AbstractTree<TKey, TValue> where TValue : class where TKey : class
 	{
-		#region Properties
-		public int TreeDimension { get; set; }
-		#endregion //Properties
+		#region Class members
+		private readonly int _treeDimension;
+		#endregion //Class members
 
 		#region Constructor
 		public KdTree(int treeDimension)
 		{
-			TreeDimension = treeDimension;
+			_treeDimension = treeDimension;
 			Count = 0;
 			Root = null!;
 		}
@@ -20,9 +20,6 @@ namespace DataStructures
 		#region Public functions
 		public override void Insert(TKey key, TValue data)
 		{
-			// TODO - PRE NEHUTELNOSTI - vyhladat vsetky parcely na ktorych sa nachadza
-			// TODO - PRE PARCELY - vyhladat vsetky nehnutelnosti ktore sa na nej nachadzaju
-
 			if (Root == null!)
 			{
 				Root = new KdTreeNode<TKey, TValue>
@@ -51,7 +48,7 @@ namespace DataStructures
 				int depth = 0;
 				while (true)
 				{
-					int position = currentNode.CompareTo(newNode.Key, depth % TreeDimension);
+					int position = currentNode.CompareTo(newNode.Key, depth % _treeDimension);
 					if (position == -1 || position == 0)
 					{
 						if (currentNode.Left == null!)
@@ -77,14 +74,54 @@ namespace DataStructures
 			}
 		}
 
-		public override void Delete(TKey key)
+		public override void Delete(TKey key, TValue data)
 		{
-			List<TValue> foundNodes = Find(key);
+			var nodeToDelete = Find(key, data);
+			if (nodeToDelete == null!) return;
 
-			for (int i = 0; i < 2; i++)
+			var parentNode = nodeToDelete.Parent;
+			int depth = 0;
+
+			if (nodeToDelete.Left == null! && nodeToDelete.Right == null!)
 			{
-				// TODO - implement delete
+				if (parentNode != null!)
+				{
+					if (parentNode.Left == nodeToDelete)
+					{
+						parentNode.Left = null!;
+					}
+					else
+					{
+						parentNode.Right = null!;
+					}
+				}
+				else
+				{
+					Root = null!;
+				}
+
+				Count--;
+				return;
 			}
+
+			if (nodeToDelete.Right != null!)
+			{
+				var minNode = FindMin(nodeToDelete.Right, depth % _treeDimension);
+				nodeToDelete.Key = minNode.Key;
+				nodeToDelete.Data = minNode.Data;
+
+				Delete(minNode.Key, minNode.Data);
+			}
+			else if (nodeToDelete.Left != null!)
+			{
+				var minNode = FindMin(nodeToDelete.Left, depth % _treeDimension);
+				nodeToDelete.Key = minNode.Key;
+				nodeToDelete.Data = minNode.Data;
+
+				Delete(minNode.Key, minNode.Data);
+			}
+
+			Count--;
 		}
 
 		public override List<TValue> Find(TKey key)
@@ -97,7 +134,7 @@ namespace DataStructures
 			{
 				if (currentNode.Key.Equals(key)) ret.Add(currentNode.Data);
 
-				int position = currentNode.CompareTo(key, depth % TreeDimension);
+				int position = currentNode.CompareTo(key, depth % _treeDimension);
 				if (position == -1 || position == 0)
 				{
 					currentNode = currentNode.Left;
@@ -120,8 +157,75 @@ namespace DataStructures
 			return builder.ToString();
 		}
 		#endregion //Public functions
-
+		
 		#region Private functions
+		private KdTreeNode<TKey, TValue>? Find(TKey key, TValue data)
+		{
+			var currentNode = Root;
+			int depth = 0;
+
+			while (currentNode != null!)
+			{
+				if (currentNode.Key.Equals(key) && currentNode.Data.Equals(data)) return (KdTreeNode<TKey, TValue>)currentNode;
+
+				int position = currentNode.CompareTo(key, depth % _treeDimension);
+				if (position == -1 || position == 0)
+				{
+					currentNode = currentNode.Left;
+				}
+				else
+				{
+					currentNode = currentNode.Right;
+				}
+				depth++;
+			}
+
+			return null;
+		}
+
+		private KdTreeNode<TKey, TValue> FindMin(AbstractNode<TKey, TValue> node, int axis)
+		{
+			var currentNode = node;
+			var minNode = node;
+			int depth = 0;
+
+			while (currentNode != null!)
+			{
+				if (depth % _treeDimension == axis)
+				{
+					if (currentNode.Left != null!)
+					{
+						minNode = currentNode.Left;
+						currentNode = currentNode.Left;
+					}
+					else
+					{
+						return (KdTreeNode<TKey, TValue>)minNode;
+					}
+				}
+				else
+				{
+					if (currentNode.Left != null! && currentNode.CompareTo(minNode.Key, axis) < 0) // mozno pridat rovna sa
+					{
+						minNode = currentNode.Left;
+					}
+
+					if (currentNode.Right != null!)
+					{
+						currentNode = currentNode.Right;
+					}
+					else
+					{
+						currentNode = currentNode.Left;
+					}
+				}
+
+				depth++;
+			}
+
+			return (KdTreeNode<TKey, TValue>)minNode;
+		}
+
 		private static void BuildString(AbstractNode<TKey, TValue> node, StringBuilder builder, int depth, string position)
 		{
 			while (true)
