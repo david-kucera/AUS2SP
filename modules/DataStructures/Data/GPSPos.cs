@@ -2,8 +2,12 @@
 {
     public class GpsPos
     {
-        #region Properties
-        public char Sirka { get; set; } = char.MinValue;                // N alebo S
+		#region Constants
+        public const double ROUNDING_ERROR = 0.01;
+		#endregion //Constants
+
+		#region Properties
+		public char Sirka { get; set; } = char.MinValue;                // N alebo S
         public double PoziciaSirky { get; set; } = double.MinValue;     // Latitude
 		public char Dlzka { get; set; } = char.MinValue;                // E alebo W
         public double PoziciaDlzky { get; set; } = double.MinValue;     // Longitude
@@ -57,7 +61,7 @@
             }
             var valueThis = multiplier * PoziciaDlzky;
 
-            if (Math.Abs(valueThis - valueOther) < 0 && Sirka == gpsPos.Sirka)
+            if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR && Sirka == gpsPos.Sirka)
             {
 	            return 0; // Dolava, kedze rovnake
             }
@@ -87,7 +91,7 @@
             }
             var valueThis = multiplier * PoziciaSirky;
 
-            if (Math.Abs(valueThis - valueOther) < 0 && Dlzka == gpsPos.Dlzka)
+            if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR && Dlzka == gpsPos.Dlzka)
             {
 	            return 0; // Dolava, kedze rovnake
             }

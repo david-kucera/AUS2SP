@@ -9,7 +9,7 @@ namespace TestApp
 	{
 		#region Constants
 		public static int BASE_SEED = 0;
-		public static int POCET_GENEROVANYCH = 5;
+		public static int POCET_GENEROVANYCH = 10_000;
 		#endregion //Constants
 
 		static void Main(string[] args)
@@ -44,6 +44,9 @@ namespace TestApp
 				if (i == 3)
 				{
 					objektToFind = objekt;
+					Nehnutelnost parc = new Nehnutelnost(123, "Duplicitna Nehnutelnost na najdenie", objektToFind.Pozicie[0], objektToFind.Pozicie[1]);
+					objekty.Insert(parc.Pozicie[0], parc);
+					objekty.Insert(parc.Pozicie[1], parc);
 				}
 				objekty.Insert(objekt.Pozicie[0], objekt);
 				objekty.Insert(objekt.Pozicie[1], objekt);
@@ -52,7 +55,13 @@ namespace TestApp
 			Console.WriteLine("Čas generovania a vkladania " + POCET_GENEROVANYCH + ": " + stopWatch.ElapsedMilliseconds + " ms");
 			Console.WriteLine("Počet parciel: " + pocetParcel);
 			Console.WriteLine("Počet nehnuteľností: " + pocetNehnutelnosti);
-			Console.WriteLine("Nájdený objekt: " + objekty.Find(objektToFind.Pozicie[0]));
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
+			var objs = objekty.Find(objektToFind.Pozicie[0]);
+			foreach (var obj in objs)
+			{
+				Console.WriteLine(obj.ToString());
+			}
+			Console.WriteLine("----------------");
 			//objekty.Delete(objektToFind);
 
 			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
