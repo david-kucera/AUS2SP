@@ -8,21 +8,21 @@ namespace TestApp
 	public class Program
 	{
 		#region Constants
-		public static int BASE_SEED = 0;
-		public static int POCET_GENEROVANYCH = 5;
+		private const int BASE_SEED = 0;
+		private const int POCET_GENEROVANYCH = 5;
 		#endregion //Constants
 
-		static void Main(string[] args)
+		static void Main()
 		{
-			KdTree<GpsPos, GeoObjekt> objekty = new KdTree<GpsPos, GeoObjekt>(2);
+			KdTree<GpsPos, GeoObjekt> objekty = new(2);
 
 			Console.WriteLine("Generované objekty");
-			Random rnd = new Random(BASE_SEED);
-			DataGenerator generator = new DataGenerator(BASE_SEED);
+			Random rnd = new(BASE_SEED);
+			DataGenerator generator = new(BASE_SEED);
 
 			int pocetNehnutelnosti = 0;
 			int pocetParcel = 0;
-			Stopwatch stopWatch = new Stopwatch();
+			Stopwatch stopWatch = new();
 			stopWatch.Start();
 			GeoObjekt objektToFind = null!;
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
@@ -44,7 +44,7 @@ namespace TestApp
 				if (i == 3)
 				{
 					objektToFind = objekt;
-					Nehnutelnost parc = new Nehnutelnost(123, "Duplicitna Nehnutelnost na najdenie", objektToFind.Pozicie[0], objektToFind.Pozicie[1]);
+					Nehnutelnost parc = new(123, "Duplicitna Nehnutelnost na najdenie", objektToFind.Pozicie[0], objektToFind.Pozicie[1]);
 					objekty.Insert(parc.Pozicie[0], parc);
 					objekty.Insert(parc.Pozicie[1], parc);
 				}
@@ -64,7 +64,7 @@ namespace TestApp
 			}
 			Console.WriteLine("----------------");
 
-			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind.ToString()}");
+			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind}");
 			objekty.Delete(objektToFind.Pozicie[0], objektToFind);
 			objekty.Delete(objektToFind.Pozicie[1], objektToFind);
 			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
