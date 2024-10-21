@@ -18,7 +18,6 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..." Click="OpenFile_OnClick"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Header="_Save" Click="SaveFile_OnClick"></MenuItem>
                 <MenuItem Header="_Save..." Click="SaveNewFile_OnClick"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
@@ -37,22 +36,42 @@
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                 <!--prva gps-->
                 <Label Margin="10,0,0,0">GPS 1:</Label>
-                <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N,21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E,58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--druha gps-->
                 <Label Margin="10,0,0,0">GPS 2:</Label>
-                <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="0,0,0,0" Text="N21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="0,0,0,0" Text="" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--buttony-->
-                <Button Name="FindAllButton" Margin="40,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi všetko" Click="FindAllButton_OnClick"></Button>
-                <Button Name="FindParcelyButton" Margin="10,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi parcely" Click="FindParcelyButton_OnClick"></Button>
-                <Button Name="FindNehnutelnostiButton" Margin="10,0,0,0" MaxWidth="150" MinWidth="50" Content="Nájdi nehnuteľnosti" Click="FindNehnutelnostiButton_OnClick"></Button>
+                <!--hladanie-->
+                <Button Name="FindAllButton" Margin="30,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi všetko" Click="FindAllButton_OnClick"></Button>
+                <Button Name="FindParcelyButton" Margin="5,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi parcely" Click="FindParcelyButton_OnClick"></Button>
+                <Button Name="FindNehnutelnostiButton" Margin="5,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi nehnuteľnosti" Click="FindNehnutelnostiButton_OnClick"></Button>
+                <!--modifikacia-->
+                <Button Name="DeleteButton" Margin="30,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Vyraď" IsEnabled="False" Click="DeleteButton_OnClick"></Button>
+                <Button Name="EditButton" Margin="5,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Uprav" IsEnabled="False" Click="EditButton_OnClick"></Button>
             </StackPanel>
         </GroupBox>
         
         <GroupBox Grid.Row="2" Margin="5" Header="Data">
-            <ListBox Name="ObjectListBox" Margin="5">
-
+            <ListBox Name="ObjectListBox" Margin="5" d:ItemsSource="{d:SampleData ItemCount=5}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <Label>
+                                <Label.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="{Binding Pozicie[0]}" Margin="0,0,0,0"/>
+                                        <Label Content="{Binding Pozicie[1]}" Margin="0,0,0,0"/>
+                                    </StackPanel>
+                                </Label.Content>
+                            </Label>
+                            <!--<Label Content="{Binding Typ}" FontSize="14"/>-->
+                            <Label Content="{Binding SupisneCislo}" FontSize="12"/>
+                            <Label Content="{Binding Popis}" FontSize="10"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
     </Grid>

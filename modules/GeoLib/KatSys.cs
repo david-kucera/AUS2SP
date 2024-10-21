@@ -26,50 +26,69 @@ namespace GeoLib
 		#region Public functions
 		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
+			// TODO vyhladaj nehnutelnosti na pozicii
 		    throw new NotImplementedException();
 	    }
 
 	    public List<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
-		    throw new NotImplementedException();
+			// TODO vyhladaj parcely na pozicii
+			throw new NotImplementedException();
 	    }
 
 	    public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
-		    throw new NotImplementedException();
+			// TODO vyhladaj objekty na pozicii
+			throw new NotImplementedException();
 	    }
 
 	    public void PridajNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
 			_nehnutelnosti.Insert(nehnutelnost);
-		    //throw new NotImplementedException();
+			_objekty.Insert(nehnutelnost);
 	    }
 
 	    public void PridajParcelu(Parcela parcela)
 	    {
-
-		    //throw new NotImplementedException();
-	    }
+			_parcely.Insert(parcela);
+			_objekty.Insert(parcela);
+		}
 
 	    public void EditNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-		    throw new NotImplementedException();
+			// TODO edit nehnutelnost
+			throw new NotImplementedException();
 	    }
 
 	    public void EditParcela(Parcela parcela)
 	    {
-		    throw new NotImplementedException();
+			// TODO edit parcela
+			throw new NotImplementedException();
 	    }
 
 	    public void VymazNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-		    throw new NotImplementedException();
-	    }
+			_nehnutelnosti.Delete(nehnutelnost);
+			_objekty.Delete(nehnutelnost);
+		}
 
 	    public void VymazParcelu(Parcela parcela)
 	    {
-		    throw new NotImplementedException();
-	    }
+		    _parcely.Delete(parcela);
+			_objekty.Delete(parcela);
+		}
+	    
+		public bool ReadFile(string path)
+		{
+			// TODO nacitanie dat z csv
+			return false;
+		}
+
+		public bool SaveFile(string path)
+		{
+			// TODO ulozenie dat do csv
+			return false;
+		}
 		#endregion //Public functions
 	}
 }
