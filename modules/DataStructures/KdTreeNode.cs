@@ -2,7 +2,7 @@
 
 namespace DataStructures
 {
-    public class KdTreeNode<T> : AbstractNode<T> where T : class
+    public class KdTreeNode<TKey, TValue> : AbstractNode<TKey, TValue> where TKey : class where TValue : class
 	{
 		#region Properties
 		public int Comparator { get; set; } = 0;
@@ -14,22 +14,22 @@ namespace DataStructures
 			
 		}
 
-		public KdTreeNode(T data)
+		public KdTreeNode(TValue data, TKey key)
 		{
-			Comparator = 0;
+			Key = key;
 			Data = data;
 			Parent = null!;
 			Left = null!;
 			Right = null!;
 		}
 
-		public KdTreeNode(KdTreeNode<T> parent, KdTreeNode<T> left, KdTreeNode<T> right, T data, int comparator)
+		public KdTreeNode(KdTreeNode<TKey, TValue> parent, KdTreeNode<TKey, TValue> left, KdTreeNode<TKey, TValue> right, TValue data, TKey key)
 		{
 			Data = data;
 			Parent = parent;
 			Left = left;
 			Right = right;
-			Comparator = comparator;
+			Key = key;
 		}
 		#endregion //Constructor
 
@@ -37,21 +37,20 @@ namespace DataStructures
 		/// <summary>
 		/// Funkcia pre porovnanie dvoch kľúčov vrcholov stromu pre zistenie kam v prehliadke pokračovať.
 		/// </summary>
-		/// <param name="data">Dáta objektu</param>
-		/// <param name="comparator">Index GPS súradnice</param>
+		/// <param name="key">Kľúč objektu</param>
 		/// <param name="dimension">Značka, či porovnávame dĺžku alebo šírku vrcholov</param>
 		/// <returns></returns>
-		public override int CompareTo(T data, int comparator, int dimension)
+		public override int CompareTo(TKey key, int dimension)
 		{
-			var other = data as GeoObjekt;
-			var nodeData = Data as GeoObjekt;
-			
-			return nodeData!.Pozicie[Comparator].CompareTo(other!.Pozicie[comparator], dimension);
+			var thisKey = Key as GpsPos;
+			var otherKey = key as GpsPos;
+
+			return thisKey!.CompareTo(otherKey!, dimension);
 		}
 
 		public override string ToString()
 		{
-			return Data.ToString()! + " " + "Comparator: " + Comparator;
+			return Data.ToString()!;
 		}
 		#endregion //Public functions
 	}

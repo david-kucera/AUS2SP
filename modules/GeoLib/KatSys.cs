@@ -6,9 +6,9 @@ namespace GeoLib
     public class KatSys : IKatSys
     {
 		#region Class members
-		private KdTree<Nehnutelnost> _nehnutelnosti = new(2);
-		private KdTree<Parcela> _parcely = new(2);
-		private KdTree<GeoObjekt> _objekty = new(2);
+		private KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);
+		private KdTree<GpsPos, Parcela> _parcely = new(2);
+		private KdTree<GpsPos, GeoObjekt> _objekty = new(2);
 		#endregion //Class members
 
 		#region Constructors
@@ -26,32 +26,38 @@ namespace GeoLib
 		#region Public functions
 		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
-			// TODO vyhladaj nehnutelnosti na pozicii
-		    throw new NotImplementedException();
-	    }
+			return _nehnutelnosti.Find(pozicia);
+		}
 
 	    public List<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
-			// TODO vyhladaj parcely na pozicii
-			throw new NotImplementedException();
+		    return _parcely.Find(pozicia);
 	    }
 
 	    public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
-			// TODO vyhladaj objekty na pozicii
-			throw new NotImplementedException();
-	    }
+			var ret = new List<GeoObjekt>();
+			ret.AddRange(_objekty.Find(poz1));
+			ret.AddRange(_objekty.Find(poz2));
+			return ret;
+		}
 
 	    public void PridajNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-			_nehnutelnosti.Insert(nehnutelnost);
-			_objekty.Insert(nehnutelnost);
+		    for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
+		    {
+				_nehnutelnosti.Insert(nehnutelnost.Pozicie[i], nehnutelnost);
+				_objekty.Insert(nehnutelnost.Pozicie[i], nehnutelnost);
+			}
 	    }
 
 	    public void PridajParcelu(Parcela parcela)
 	    {
-			_parcely.Insert(parcela);
-			_objekty.Insert(parcela);
+		    for (int i = 0; i < parcela.Pozicie.Length; i++)
+		    {
+				_parcely.Insert(parcela.Pozicie[i], parcela);
+				_objekty.Insert(parcela.Pozicie[i], parcela);
+			}
 		}
 
 	    public void EditNehnutelnost(Nehnutelnost nehnutelnost)
@@ -68,14 +74,16 @@ namespace GeoLib
 
 	    public void VymazNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-			_nehnutelnosti.Delete(nehnutelnost);
-			_objekty.Delete(nehnutelnost);
+			// TODO delete
+			//_nehnutelnosti.Delete(nehnutelnost);
+			//_objekty.Delete(nehnutelnost);
 		}
 
-	    public void VymazParcelu(Parcela parcela)
+		public void VymazParcelu(Parcela parcela)
 	    {
-		    _parcely.Delete(parcela);
-			_objekty.Delete(parcela);
+			// TODO delete
+		    //_parcely.Delete(parcela);
+			//_objekty.Delete(parcela);
 		}
 	    
 		public bool ReadFile(string path)
