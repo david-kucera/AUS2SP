@@ -223,6 +223,12 @@ namespace GeoViewer
 		{
 			throw new NotImplementedException();
 		}
+
+		private void ClearDataDisplay_OnClick(object sender, RoutedEventArgs e)
+		{
+			_currentlyDisplayedObjects.Clear();
+			RefreshData();
+		}
 		#endregion //Button handlers
 
 		#region Private functions

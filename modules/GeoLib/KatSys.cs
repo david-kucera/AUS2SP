@@ -6,9 +6,9 @@ namespace GeoLib
     public class KatSys : IKatSys
     {
 		#region Class members
-		private KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);
-		private KdTree<GpsPos, Parcela> _parcely = new(2);
-		private KdTree<GpsPos, GeoObjekt> _objekty = new(2);
+		private readonly KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);
+		private readonly KdTree<GpsPos, Parcela> _parcely = new(2);
+		private readonly KdTree<GpsPos, GeoObjekt> _objekty = new(2);
 		#endregion //Class members
 
 		#region Constructors
@@ -26,22 +26,50 @@ namespace GeoLib
 		#region Public functions
 		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
-			// TODO duplicity
-			return _nehnutelnosti.Find(pozicia);
+			var ret = _nehnutelnosti.Find(pozicia);
+
+			for (int i = ret.Count - 1; i > 0; i--)
+			{
+				if (ret[i].Equals(ret[i - 1]))
+				{
+					ret.RemoveAt(i);
+				}
+			}
+
+			return ret;
 		}
 
 	    public List<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
-			// TODO duplicity
-		    return _parcely.Find(pozicia);
+		    var ret = _parcely.Find(pozicia);
+
+			for (int i = ret.Count - 1; i > 0; i--)
+			{
+				if (ret[i].Equals(ret[i - 1]))
+				{
+					ret.RemoveAt(i);
+				}
+			}
+
+			return ret;
 	    }
 
 	    public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
-			// TODO duplicity
 			var ret = new List<GeoObjekt>();
-			ret.AddRange(_objekty.Find(poz1));
-			ret.AddRange(_objekty.Find(poz2));
+			var objekty1 = _objekty.Find(poz1);
+			var objekty2 = _objekty.Find(poz2);
+			ret.AddRange(objekty1);
+			ret.AddRange(objekty2);
+
+			for (int i = ret.Count - 1; i > 0; i--)
+			{
+				if (ret[i].Equals(ret[i - 1]))
+				{
+					ret.RemoveAt(i);
+				}
+			}
+
 			return ret;
 		}
 
