@@ -144,6 +144,22 @@ namespace GeoLib
 			// TODO ulozenie dat do csv
 			return false;
 		}
+
+		public IEnumerable<GeoObjekt> GetAllObjects()
+		{
+			var ret = new List<GeoObjekt>();
+			ret = _objekty.GetAll();
+
+			for (int i = ret.Count - 1; i > 0; i--)
+			{
+				if (ret[i].Equals(ret[i - 1]))
+				{
+					ret.RemoveAt(i);
+				}
+			}
+
+			return ret;
+		}
 		#endregion //Public functions
 	}
 }

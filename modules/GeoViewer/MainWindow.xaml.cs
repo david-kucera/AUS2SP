@@ -269,6 +269,13 @@ namespace GeoViewer
 			_currentlyDisplayedObjects.Clear();
 			RefreshData();
 		}
+
+		private void ShowAllData_OnClick(object sender, RoutedEventArgs e)
+		{
+			_currentlyDisplayedObjects.Clear();
+			_currentlyDisplayedObjects.AddRange(_katSys.GetAllObjects());
+			RefreshData();
+		}
 		#endregion //Button handlers
 
 		#region Action handlers

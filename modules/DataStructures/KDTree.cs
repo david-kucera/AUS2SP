@@ -149,6 +149,29 @@ namespace DataStructures
 			return ret;
 		}
 
+		public List<TValue> GetAll()
+		{
+			var ret = new List<TValue>();
+			var stack = new Stack<KdTreeNode<TKey, TValue>>();
+			var currentNode = Root;
+
+			while (currentNode != null || stack.Count > 0)
+			{
+				while (currentNode != null)
+				{
+					stack.Push((KdTreeNode<TKey, TValue>)currentNode);
+					currentNode = currentNode.Left;
+				}
+
+				currentNode = stack.Pop();
+				if (currentNode.Data != null) ret.Add(currentNode.Data);
+
+				currentNode = currentNode.Right;
+			}
+
+			return ret;
+		}
+
 		public override string ToString()
 		{
 			if (Root == null!) return string.Empty;
