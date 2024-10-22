@@ -101,17 +101,19 @@ namespace GeoLib
 			// TODO refresh pri kazdom pridani
 		}
 
-	    public void EditNehnutelnost(Nehnutelnost nehnutelnost)
+	    public void EditNehnutelnost(Nehnutelnost nehnutelnost, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			// TODO edit nehnutelnost
-			throw new NotImplementedException();
-	    }
+			//VymazNehnutelnost(nehnutelnost);
+			var novaNehnutelnost = new Nehnutelnost(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
+			PridajNehnutelnost(novaNehnutelnost);
+		}
 
-	    public void EditParcela(Parcela parcela)
+	    public void EditParcela(Parcela parcela, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			// TODO edit parcela
-			throw new NotImplementedException();
-	    }
+			//VymazParcelu(parcela);
+			var novaParcela = new Parcela(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
+			PridajParcelu(novaParcela);
+		}
 
 	    public void VymazNehnutelnost(Nehnutelnost nehnutelnost)
 	    {

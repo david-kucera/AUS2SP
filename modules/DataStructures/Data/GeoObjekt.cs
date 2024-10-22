@@ -3,7 +3,8 @@
     public class GeoObjekt
     {
         #region Properties
-        public int SupisneCislo { get; set; } = -1;
+        public char Typ { get; set; } = ' ';
+		public int SupisneCislo { get; set; } = -1;
         public string Popis { get; set; } = string.Empty;
         public GpsPos[] Pozicie { get; set; } = new GpsPos[2];
         #endregion //Properties

@@ -93,10 +93,14 @@ namespace GeoViewer
 		private void FindAllButton_OnClick(object sender, RoutedEventArgs e)
 		{
 			if (string.IsNullOrEmpty(GpsFirstLongitude.Text)
-				|| string.IsNullOrEmpty(GpsFirstLatitude.Text)
-				|| string.IsNullOrEmpty(GpsSecondLongitude.Text) 
-				|| string.IsNullOrEmpty(GpsSecondLatitude.Text)) 
+			    || string.IsNullOrEmpty(GpsFirstLatitude.Text)
+			    || string.IsNullOrEmpty(GpsSecondLongitude.Text)
+			    || string.IsNullOrEmpty(GpsSecondLatitude.Text))
+			{
 				MessageBox.Show("Je potrbné zadať oboje GPS súradnice!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+				
 			var lat1 = GpsFirstLatitude.Text.Split(",");
 			var lon1 = GpsFirstLongitude.Text.Split(",");
 			GpsPos pozicia1 = new GpsPos(lat1[0].First(), double.Parse(lat1[1]), lon1[0].First(), double.Parse(lon1[1]));
@@ -221,7 +225,43 @@ namespace GeoViewer
 
 		private void EditButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+			if (ObjectListBox.SelectedItem == null)
+			{
+				MessageBox.Show("Nie je vybraný žiadny objekt na editáciu!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+
+			var selectedObject = (GeoObjekt)ObjectListBox.SelectedItem;
+			EditObjektWindow editObjektWindow = new(selectedObject);
+			if (editObjektWindow.ShowDialog() == true)
+			{
+				var newCislo = Int32.Parse(editObjektWindow.CisloInput.Text);
+				var newPopis = editObjektWindow.PopisInput.Text;
+
+				// prva gps
+				var firstLatitudeValues = editObjektWindow.GpsFirstLatitude.Text.Split(",");
+				var firstLongitudeValues = editObjektWindow.GpsFirstLongitude.Text.Split(",");
+				GpsPos gpsPrvaNova = new(firstLatitudeValues[0].First(), double.Parse(firstLatitudeValues[1]), firstLongitudeValues[0].First(), double.Parse(firstLongitudeValues[1]));
+
+				// druha gps
+				var secondLatitudeValues = editObjektWindow.GpsSecondLatitude.Text.Split(",");
+				var secondLongitudeValues = editObjektWindow.GpsSecondLongitude.Text.Split(",");
+				GpsPos gpsDruhaNova = new(secondLatitudeValues[0].First(), double.Parse(secondLatitudeValues[1]), secondLongitudeValues[0].First(), double.Parse(secondLongitudeValues[1]));
+
+				if (selectedObject is Nehnutelnost)
+				{
+					var nehnutelnost = (Nehnutelnost)selectedObject;
+					_katSys.EditNehnutelnost(nehnutelnost, newCislo, newPopis, gpsPrvaNova, gpsDruhaNova);
+				}
+				else
+				{
+					var parcela = (Parcela)selectedObject;
+					_katSys.EditParcela(parcela, newCislo, newPopis, gpsPrvaNova, gpsDruhaNova);
+				}
+
+				MessageBox.Show("Objekt bol úspešne editovaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
+			MessageBox.Show("Objekt nebol editovaný!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 		private void ClearDataDisplay_OnClick(object sender, RoutedEventArgs e)
@@ -230,6 +270,22 @@ namespace GeoViewer
 			RefreshData();
 		}
 		#endregion //Button handlers
+
+		#region Action handlers
+		private void SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+		{
+			if (ObjectListBox.SelectedItem != null)
+			{
+				DeleteButton.IsEnabled = true;
+				EditButton.IsEnabled = true;
+			}
+			else
+			{
+				DeleteButton.IsEnabled = false;
+				EditButton.IsEnabled = false;
+			}
+		}
+		#endregion //Action handlers
 
 		#region Private functions
 		/// <summary>

@@ -56,7 +56,7 @@
         </GroupBox>
         
         <GroupBox Grid.Row="2" Margin="5" Header="Data">
-            <ListBox Name="ObjectListBox" Margin="5">
+            <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Vertical">
@@ -68,7 +68,7 @@
                                     </StackPanel>
                                 </Label.Content>
                             </Label>
-                            <!--<Label Content="{Binding Typ}" FontSize="14"/>-->
+                            <Label Content="{Binding Typ}" FontSize="14"/>
                             <Label Content="{Binding SupisneCislo}" FontSize="12"/>
                             <Label Content="{Binding Popis}" FontSize="10"/>
                         </StackPanel>

@@ -9,10 +9,12 @@
         #region Constructor
         public Parcela()
         {
+	        Typ = 'P';
         }
 
         public Parcela(int cisloparcely, string popis, GpsPos prvaGps, GpsPos druhaGps)
         {
+	        Typ = 'P';
 	        SupisneCislo = cisloparcely;
 			Popis = popis;
 			Pozicie[0] = prvaGps;

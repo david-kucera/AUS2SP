@@ -9,10 +9,12 @@
         #region Constructor
         public Nehnutelnost()
         {
+	        Typ = 'N';
         }
 
         public Nehnutelnost(int supisneCislo, string popis, GpsPos prvaGps, GpsPos druhaGps)
 		{
+			Typ = 'N';
 			SupisneCislo = supisneCislo;
 			Popis = popis;
 			Pozicie[0] = prvaGps;
