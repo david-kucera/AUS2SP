@@ -278,7 +278,10 @@ namespace GeoViewer
 
 				MessageBox.Show("Objekt bol úspešne editovaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
-			MessageBox.Show("Objekt nebol editovaný!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			else
+			{
+				MessageBox.Show("Objekt nebol editovaný!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
 		private void ClearDataDisplay_OnClick(object sender, RoutedEventArgs e)

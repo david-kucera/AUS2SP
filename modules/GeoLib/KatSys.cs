@@ -103,14 +103,14 @@ namespace GeoLib
 
 	    public void EditNehnutelnost(Nehnutelnost nehnutelnost, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			//VymazNehnutelnost(nehnutelnost);
+			VymazNehnutelnost(nehnutelnost);
 			var novaNehnutelnost = new Nehnutelnost(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
 			PridajNehnutelnost(novaNehnutelnost);
 		}
 
 	    public void EditParcela(Parcela parcela, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			//VymazParcelu(parcela);
+			VymazParcelu(parcela);
 			var novaParcela = new Parcela(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
 			PridajParcelu(novaParcela);
 		}
