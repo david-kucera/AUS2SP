@@ -33,6 +33,29 @@
 			return "[" + Sirka + PoziciaSirky.ToString("F2") + "; " + Dlzka + PoziciaDlzky.ToString("F2") + "]"; 
 		}
 
+        public double GetValue(int dimension)
+        {
+			int multiplier = 1;
+			// Dlzka
+			if (dimension == 1)
+            {
+				if (Dlzka != 'E' && Dlzka != 'e')
+				{
+					multiplier = -1;
+				}
+				return multiplier * PoziciaDlzky;
+            }
+			// Sirka
+			else
+			{
+				if (Sirka != 'N' && Sirka != 'n')
+				{
+					multiplier = -1;
+				}
+				return multiplier * PoziciaSirky;
+			}
+        }
+
 		public int CompareTo(GpsPos gpsPos, int positionIndex)
         {
 	        return positionIndex switch

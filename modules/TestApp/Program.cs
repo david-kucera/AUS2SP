@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DataStructures;
+﻿using DataStructures;
 using DataStructures.Data;
 using GeoLib;
 
@@ -9,52 +8,34 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 5;
+		private const int POCET_GENEROVANYCH = 10;
 		#endregion //Constants
 
 		static void Main()
 		{
-			KdTree<GpsPos, GeoObjekt> objekty = new(2);
+			KdTree<GpsPos, Nehnutelnost> objekty = new(2);
 
-			Console.WriteLine("Generované objekty");
+			Console.WriteLine("Generované nehnutelnosti");
 			Random rnd = new(BASE_SEED);
 			DataGenerator generator = new(BASE_SEED);
 
 			int pocetNehnutelnosti = 0;
-			int pocetParcel = 0;
-			Stopwatch stopWatch = new();
-			stopWatch.Start();
-			GeoObjekt objektToFind = null!;
+			Nehnutelnost objektToFind = null!;
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
 			{
-				GeoObjekt objekt;
-				if (rnd.NextSingle() < 0.5)
-				{
-					objekt = generator.GenerateNehnutelnost();
-					pocetNehnutelnosti++;
-				}
-				else
-				{
-					objekt = generator.GenerateParcela();
-					pocetParcel++;
-				}
+				Nehnutelnost objekt;
+				objekt = generator.GenerateNehnutelnost(i);
+				pocetNehnutelnosti++;
 
-				Console.WriteLine(i + ". " + objekt);
-
-				if (i == 3)
+				if (i == 2)
 				{
 					objektToFind = objekt;
-					Nehnutelnost parc = new(123, "Duplicitna Nehnutelnost na najdenie", objektToFind.Pozicie[0], objektToFind.Pozicie[1]);
-					objekty.Insert(parc.Pozicie[0], parc);
-					objekty.Insert(parc.Pozicie[1], parc);
 				}
 				objekty.Insert(objekt.Pozicie[0], objekt);
 				objekty.Insert(objekt.Pozicie[1], objekt);
 			}
-			stopWatch.Stop();
-			Console.WriteLine("Čas generovania a vkladania " + POCET_GENEROVANYCH + ": " + stopWatch.ElapsedMilliseconds + " ms");
-			Console.WriteLine("Počet parciel: " + pocetParcel);
-			Console.WriteLine("Počet nehnuteľností: " + pocetNehnutelnosti);
+			Console.WriteLine("POCET CELKOVO: " + objekty.Count);
+			Console.WriteLine(objekty.ToString());
 
 			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
 			var objs = objekty.Find(objektToFind.Pozicie[0]);
@@ -64,9 +45,18 @@ namespace TestApp
 			}
 			Console.WriteLine("----------------");
 
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[1]}");
+			var objss = objekty.Find(objektToFind.Pozicie[1]);
+			foreach (var obj in objss)
+			{
+				Console.WriteLine(obj.ToString());
+			}
+			Console.WriteLine("----------------");
+
 			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind}");
 			objekty.Delete(objektToFind.Pozicie[0], objektToFind);
-			objekty.Delete(objektToFind.Pozicie[1], objektToFind);
+			//objekty.Delete(objektToFind.Pozicie[1], objektToFind);
+
 			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
 			objs = objekty.Find(objektToFind.Pozicie[0]);
 			foreach (var obj in objs)
@@ -75,23 +65,34 @@ namespace TestApp
 			}
 			Console.WriteLine("----------------");
 
-			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
-			while (true)
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[1]}");
+			objs = objekty.Find(objektToFind.Pozicie[1]);
+			foreach (var obj in objs)
 			{
-				Console.WriteLine("Stlač kláves 'd/D' pre vypísanie dát stromu.");
-				Console.WriteLine("Stlač akúkoľvek klávesu pre ukočenie aplikácie");
-				var key = Console.ReadKey();
-				if (key.KeyChar is 'd' or 'D')
-				{
-					Console.Clear();
-					Console.WriteLine(objekty.ToString());
-					break;
-				}
-				if (key.KeyChar > 0 && key.KeyChar < 255)
-				{
-					break;
-				}
+				Console.WriteLine(obj.ToString());
 			}
+			Console.WriteLine("----------------");
+
+			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
+			Console.WriteLine(objekty.ToString());
+
+
+			//while (true)
+			//{
+			//	Console.WriteLine("Stlač kláves 'd/D' pre vypísanie dát stromu.");
+			//	Console.WriteLine("Stlač akúkoľvek klávesu pre ukočenie aplikácie");
+			//	var key = Console.ReadKey();
+			//	if (key.KeyChar is 'd' or 'D')
+			//	{
+			//		Console.Clear();
+			//		Console.WriteLine(objekty.ToString());
+			//		break;
+			//	}
+			//	if (key.KeyChar > 0 && key.KeyChar < 255)
+			//	{
+			//		break;
+			//	}
+			//}
 		}
 	}
 }

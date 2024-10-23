@@ -26,11 +26,11 @@ namespace GeoLib
 			_random = new Random(seed);
 		}
 
-		public Nehnutelnost GenerateNehnutelnost()
+		public Nehnutelnost GenerateNehnutelnost(int i)
 		{
 			Nehnutelnost nehnutelnost = new Nehnutelnost
 			{
-				SupisneCislo = _random.Next(0, 10000),
+				SupisneCislo = i,
 				Pozicie =
 				{
 					[0] = GenerateGpsPos(),

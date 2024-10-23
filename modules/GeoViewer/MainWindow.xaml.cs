@@ -220,7 +220,24 @@ namespace GeoViewer
 
 		private void DeleteButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+			if (ObjectListBox.SelectedItem == null)
+			{
+				MessageBox.Show("Nie je vybraný žiadny objekt na editáciu!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
+
+			var selectedObject = (GeoObjekt)ObjectListBox.SelectedItem;
+			if (selectedObject.Typ == 'N')
+			{
+				_katSys.VymazNehnutelnost(selectedObject as Nehnutelnost);
+			}
+			else
+			{
+				_katSys.VymazParcelu(selectedObject as Parcela);
+			}
+			_currentlyDisplayedObjects.Remove(selectedObject);
+			RefreshData();
+			MessageBox.Show("Objekt bol úspešne vymazaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
 
 		private void EditButton_OnClick(object sender, RoutedEventArgs e)
@@ -275,6 +292,12 @@ namespace GeoViewer
 			_currentlyDisplayedObjects.Clear();
 			_currentlyDisplayedObjects.AddRange(_katSys.GetAllObjects());
 			RefreshData();
+		}
+
+		private void ShowDataDetails_OnClick(object sender, RoutedEventArgs e)
+		{
+			var msg = _katSys.ZobrazTotalInfo();
+			MessageBox.Show(msg, "Info o dátach", MessageBoxButton.OK);
 		}
 		#endregion //Button handlers
 

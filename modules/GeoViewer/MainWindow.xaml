@@ -31,6 +31,8 @@
                 <MenuItem Header="Vyčisti obrazovku dát" Click="ClearDataDisplay_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
+                <MenuItem Header="Show data details..." Click="ShowDataDetails_OnClick"></MenuItem>
+                <Separator></Separator>
                 <MenuItem Header="About" Click="About_OnClick"></MenuItem>
             </MenuItem>
         </Menu>

@@ -4,10 +4,6 @@ namespace DataStructures
 {
     public class KdTreeNode<TKey, TValue> : AbstractNode<TKey, TValue> where TKey : class where TValue : class
 	{
-		#region Properties
-		public int Comparator { get; set; } = 0;
-		#endregion //Properties
-
 		#region Constructor
 		public KdTreeNode()
 		{
@@ -48,9 +44,15 @@ namespace DataStructures
 			return thisKey!.CompareTo(otherKey!, dimension);
 		}
 
+		public double GetKeyValue(int dimension)
+		{
+			var key = Key as GpsPos;
+			return key!.GetValue(dimension);
+		}
+
 		public override string ToString()
 		{
-			return Data.ToString()!;
+			return Key.ToString()! + " " + Data.ToString();
 		}
 		#endregion //Public functions
 	}

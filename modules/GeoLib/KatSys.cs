@@ -160,6 +160,22 @@ namespace GeoLib
 
 			return ret;
 		}
+
+		public string ZobrazTotalInfo()
+		{
+			return $"STROM PARCIEL\n" +
+				$"Počet prvkov: {_parcely.Count}\n" +
+				$"Pvky: {_parcely.ToString()}" +
+				$"\n" +
+				$"STROM NEHNUTELNOSTI\n" +
+				$"Počet prvkov: {_nehnutelnosti.Count}\n" +
+				$"Prvky: {_nehnutelnosti.ToString()}" +
+				$"\n" +
+				$"STROM OBOCH\n" +
+				$"Počet prvkov: {_objekty.Count}\n" +
+				$"Prvky: {_objekty.ToString()}" +
+				$"\n";
+		}
 		#endregion //Public functions
 	}
 }

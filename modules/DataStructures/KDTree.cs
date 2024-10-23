@@ -79,11 +79,10 @@ namespace DataStructures
 			var nodeToDelete = Find(key, data);
 			if (nodeToDelete == null!) return;
 
-			var parentNode = nodeToDelete.Parent;
-			int depth = 0;
-
 			if (nodeToDelete.Left == null! && nodeToDelete.Right == null!)
 			{
+				var parentNode = nodeToDelete.Parent;
+
 				if (parentNode != null!)
 				{
 					if (parentNode.Left == nodeToDelete)
@@ -94,6 +93,7 @@ namespace DataStructures
 					{
 						parentNode.Right = null!;
 					}
+					nodeToDelete.Parent = null!;
 				}
 				else
 				{
@@ -104,21 +104,106 @@ namespace DataStructures
 				return;
 			}
 
+			int dimensionNodeToDelete = GetDimension(nodeToDelete);
+			KdTreeNode<TKey, TValue> newNode = null!;
 			if (nodeToDelete.Right != null!)
 			{
-				var minNode = FindMin(nodeToDelete.Right, depth % _treeDimension);
-				nodeToDelete.Key = minNode.Key;
-				nodeToDelete.Data = minNode.Data;
+				double minimumKeyValue = double.MaxValue;
+				List<KdTreeNode<TKey, TValue>> nodesToSearch = new();
+				nodesToSearch.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
+				
+				while (nodesToSearch.Count > 0)
+				{
+					var currentNode = nodesToSearch[nodesToSearch.Count - 1];
+					nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
-				Delete(minNode.Key, minNode.Data);
+					var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
+					if (compareValue < minimumKeyValue)
+					{
+						minimumKeyValue = compareValue;
+						newNode = currentNode;
+					}
+
+					if (currentNode.Right != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
+					if (currentNode.Left != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+				}
 			}
 			else if (nodeToDelete.Left != null!)
 			{
-				var minNode = FindMin(nodeToDelete.Left, depth % _treeDimension);
-				nodeToDelete.Key = minNode.Key;
-				nodeToDelete.Data = minNode.Data;
+				double maximumKeyValue = double.MinValue;
+				List<KdTreeNode<TKey, TValue>> nodesToSearch = new();
+				nodesToSearch.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Left);
 
-				Delete(minNode.Key, minNode.Data);
+				while (nodesToSearch.Count > 0)
+				{
+					var currentNode = nodesToSearch[nodesToSearch.Count - 1];
+					nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
+
+					var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
+					if (compareValue > maximumKeyValue)
+					{
+						maximumKeyValue = compareValue;
+						newNode = currentNode;
+					}
+
+					if (currentNode.Right != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
+					if (currentNode.Left != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+				}
+			}
+
+			if (newNode == null!) return;
+
+			nodeToDelete.Key = newNode.Key;
+			nodeToDelete.Data = newNode.Data;
+
+			var nodesToReinsert = new List<KdTreeNode<TKey, TValue>>();
+			var nodesToSearchReinsert = new List<KdTreeNode<TKey, TValue>>();
+			if (nodeToDelete.Right != null!)
+			{
+				nodesToSearchReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
+				if (nodeToDelete.Right != newNode) nodesToReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
+			}
+
+			while (nodesToSearchReinsert.Count > 0)
+			{
+				var current = nodesToSearchReinsert[nodesToSearchReinsert.Count - 1];
+				nodesToSearchReinsert.RemoveAt(nodesToSearchReinsert.Count - 1);
+
+				if (current.Right != null)
+				{
+					nodesToSearchReinsert.Add((KdTreeNode<TKey, TValue>)current.Right);
+					if (current.Right != newNode) nodesToReinsert.Add((KdTreeNode<TKey, TValue>)current.Right);
+				}
+				if (current.Left != null)
+				{
+					nodesToSearchReinsert.Add((KdTreeNode<TKey, TValue>)current.Left);
+					if (current.Left != newNode) nodesToReinsert.Add((KdTreeNode<TKey, TValue>)current.Left);
+				}
+			}
+
+			var parent = newNode.Parent;
+			if (parent != null)
+			{
+				if (parent.Left == newNode)
+				{
+					parent.Left = null!;
+				}
+				else
+				{
+					parent.Right = null!;
+				}
+				newNode.Parent = null!;
+			}
+			else
+			{
+				Root = null!;
+			}
+
+			nodeToDelete.Right = null!;
+			foreach (var node in nodesToReinsert)
+			{
+				Count--;
+				Insert(node.Key, node.Data);
 			}
 
 			Count--;
@@ -206,47 +291,20 @@ namespace DataStructures
 			return null;
 		}
 
-		private KdTreeNode<TKey, TValue> FindMin(AbstractNode<TKey, TValue> node, int axis)
+		private int GetDimension(KdTreeNode<TKey, TValue> node)
 		{
-			var currentNode = node;
-			var minNode = node;
 			int depth = 0;
+			var currentNode = Root;
 
-			while (currentNode != null!)
+			while (currentNode != null && currentNode != node)
 			{
-				if (depth % _treeDimension == axis)
-				{
-					if (currentNode.Left != null!)
-					{
-						minNode = currentNode.Left;
-						currentNode = currentNode.Left;
-					}
-					else
-					{
-						return (KdTreeNode<TKey, TValue>)minNode;
-					}
-				}
-				else
-				{
-					if (currentNode.Left != null! && currentNode.CompareTo(minNode.Key, axis) < 0) // mozno pridat rovna sa
-					{
-						minNode = currentNode.Left;
-					}
-
-					if (currentNode.Right != null!)
-					{
-						currentNode = currentNode.Right;
-					}
-					else
-					{
-						currentNode = currentNode.Left;
-					}
-				}
-
-				depth++;
+				//depth++;
+				var comp = currentNode.CompareTo(node.Key, depth % _treeDimension);
+				currentNode = comp < 0 ? currentNode.Left : currentNode.Right;
+				if (currentNode != null) depth++;
 			}
 
-			return (KdTreeNode<TKey, TValue>)minNode;
+			return depth % _treeDimension;
 		}
 
 		private static void BuildString(AbstractNode<TKey, TValue> node, StringBuilder builder, int depth, string position)
