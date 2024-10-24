@@ -8,7 +8,7 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 10;
+		private const int POCET_GENEROVANYCH = 100;
 		#endregion //Constants
 
 		static void Main()
@@ -27,7 +27,7 @@ namespace TestApp
 				objekt = generator.GenerateNehnutelnost(i);
 				pocetNehnutelnosti++;
 
-				if (i == 2)
+				if (i == 0)
 				{
 					objektToFind = objekt;
 				}
@@ -55,7 +55,7 @@ namespace TestApp
 
 			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind}");
 			objekty.Remove(objektToFind.Pozicie[0], objektToFind);
-			//objekty.Delete(objektToFind.Pozicie[1], objektToFind);
+			objekty.Remove(objektToFind.Pozicie[1], objektToFind);
 
 			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
 			objs = objekty.Find(objektToFind.Pozicie[0]);

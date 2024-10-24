@@ -165,7 +165,6 @@ namespace DataStructures
 			}
 
 			if (newNode == null!) return;
-
 			nodeToDelete.Key = newNode.Key;
 			nodeToDelete.Data = newNode.Data;
 
@@ -175,6 +174,13 @@ namespace DataStructures
 			{
 				nodesToSearchReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
 				if (nodeToDelete.Right != newNode) nodesToReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
+				nodeToDelete.Right = null!;
+			} 
+			else if (nodeToDelete.Left != null!)
+			{
+				nodesToSearchReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Left);
+				if (nodeToDelete.Left != newNode) nodesToReinsert.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Left);
+				nodeToDelete.Left = null!;
 			}
 
 			while (nodesToSearchReinsert.Count > 0)
@@ -212,7 +218,6 @@ namespace DataStructures
 				Root = null!;
 			}
 
-			nodeToDelete.Right = null!;
 			foreach (var node in nodesToReinsert)
 			{
 				Count--;
