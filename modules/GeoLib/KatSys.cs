@@ -148,16 +148,16 @@ namespace GeoLib
 		/// <param name="nehnutelnost"></param>
 		public void VymazNehnutelnost(Nehnutelnost nehnutelnost)
 	    {
-		    for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
-		    {
-				_nehnutelnosti.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
-				_objekty.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
-			}
-
-			// Odstránenie každej parcele referenciu na odstraňovanú nehnutelnosti
+			// Odstránenie každej parcele referenciu na odstraňovanú nehnutelnosť
 			for (int i = 0; i < nehnutelnost.Parcely.Count; i++)
 			{
 				nehnutelnost.Parcely[i].Nehnutelnosti.Remove(nehnutelnost);
+			}
+
+			for (int i = 0; i < nehnutelnost.Pozicie.Length; i++)
+		    {
+				_nehnutelnosti.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
+				_objekty.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
 			}
 		}
 
@@ -167,17 +167,17 @@ namespace GeoLib
 		/// <param name="parcela"></param>
 		public void VymazParcelu(Parcela parcela)
 	    {
-		    for (int i = 0; i < parcela.Pozicie.Length; i++)
-		    {
-			    _parcely.Remove(parcela.Pozicie[i], parcela);
-			    _objekty.Remove(parcela.Pozicie[i], parcela);
-		    }
-
 			// Odstránenie každej nehnutelnosti referenciu na odstraňovanú parcelu
 			for (int i = 0; i < parcela.Nehnutelnosti.Count; i++)
 			{
 				parcela.Nehnutelnosti[i].Parcely.Remove(parcela);
 			}
+
+			for (int i = 0; i < parcela.Pozicie.Length; i++)
+		    {
+			    _parcely.Remove(parcela.Pozicie[i], parcela);
+			    _objekty.Remove(parcela.Pozicie[i], parcela);
+		    }
 		}
 
 		/// <summary>
