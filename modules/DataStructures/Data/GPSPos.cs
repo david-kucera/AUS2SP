@@ -70,7 +70,7 @@
         {
             var gpsPos = obj as GpsPos;
 
-			return Math.Abs(PoziciaSirky - gpsPos.PoziciaSirky) < ROUNDING_ERROR && Math.Abs(PoziciaDlzky - gpsPos.PoziciaDlzky) < ROUNDING_ERROR && Sirka == gpsPos.Sirka && Dlzka == gpsPos.Dlzka;
+			return Math.Abs(PoziciaSirky - gpsPos!.PoziciaSirky) < ROUNDING_ERROR && Math.Abs(PoziciaDlzky - gpsPos.PoziciaDlzky) < ROUNDING_ERROR && Sirka == gpsPos.Sirka && Dlzka == gpsPos.Dlzka;
 		}
 
         #endregion //Public functions

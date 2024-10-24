@@ -7,10 +7,10 @@
 		public int SupisneCislo { get; set; } = -1;
         public string Popis { get; set; } = string.Empty;
         public GpsPos[] Pozicie { get; set; } = new GpsPos[2];
-        #endregion //Properties
+		#endregion //Properties
 
-        #region Constructor
-        public GeoObjekt()
+		#region Constructor
+		public GeoObjekt()
         {
         }
 		#endregion //Constructor

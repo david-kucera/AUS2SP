@@ -12,11 +12,11 @@ namespace GeoViewer
 			CisloInput.Text = objekt.SupisneCislo.ToString();
 			PopisInput.Text = objekt.Popis;
 
-			GpsFirstLatitude.Text = objekt.Pozicie[0].Sirka + "," + objekt.Pozicie[0].PoziciaSirky;
-			GpsFirstLongitude.Text = objekt.Pozicie[0].Dlzka + "," + objekt.Pozicie[0].PoziciaDlzky;
+			GpsFirstLatitude.Text = objekt.Pozicie[0].Sirka + " " + objekt.Pozicie[0].PoziciaSirky;
+			GpsFirstLongitude.Text = objekt.Pozicie[0].Dlzka + " " + objekt.Pozicie[0].PoziciaDlzky;
 
-			GpsSecondLatitude.Text = objekt.Pozicie[1].Sirka + "," + objekt.Pozicie[1].PoziciaSirky;
-			GpsSecondLongitude.Text = objekt.Pozicie[1].Dlzka + "," + objekt.Pozicie[1].PoziciaDlzky;
+			GpsSecondLatitude.Text = objekt.Pozicie[1].Sirka + " " + objekt.Pozicie[1].PoziciaSirky;
+			GpsSecondLongitude.Text = objekt.Pozicie[1].Dlzka + " " + objekt.Pozicie[1].PoziciaDlzky;
 		}
 
 		private void Ok_OnClick(object sender, RoutedEventArgs e)

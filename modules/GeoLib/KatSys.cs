@@ -12,6 +12,8 @@ namespace GeoLib
 		private readonly KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);	// Strom nehnuteľností
 		private readonly KdTree<GpsPos, Parcela> _parcely = new(2);				// Strom parciel
 		private readonly KdTree<GpsPos, GeoObjekt> _objekty = new(2);			// Strom oboch objektov
+
+		private DataGenerator _generator = new(0);      // Generátor dát
 		#endregion //Class members
 
 		#region Constructors
@@ -32,19 +34,9 @@ namespace GeoLib
 		/// </summary>
 		/// <param name="pozicia"></param>
 		/// <returns></returns>
-		public List<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
+		public IEnumerable<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia)
 	    {
-			var ret = _nehnutelnosti.Find(pozicia);
-
-			for (int i = ret.Count - 1; i > 0; i--)
-			{
-				if (ret[i].Equals(ret[i - 1]))
-				{
-					ret.RemoveAt(i);
-				}
-			}
-
-			return ret;
+			return _nehnutelnosti.Find(pozicia).Distinct();
 		}
 
 		/// <summary>
@@ -52,19 +44,9 @@ namespace GeoLib
 		/// </summary>
 		/// <param name="pozicia"></param>
 		/// <returns></returns>
-		public List<Parcela> VyhladajParcely(GpsPos pozicia)
+		public IEnumerable<Parcela> VyhladajParcely(GpsPos pozicia)
 	    {
-		    var ret = _parcely.Find(pozicia);
-
-			for (int i = ret.Count - 1; i > 0; i--)
-			{
-				if (ret[i].Equals(ret[i - 1]))
-				{
-					ret.RemoveAt(i);
-				}
-			}
-
-			return ret;
+			return _parcely.Find(pozicia).Distinct();
 	    }
 
 		/// <summary>
@@ -73,7 +55,7 @@ namespace GeoLib
 		/// <param name="poz1"></param>
 		/// <param name="poz2"></param>
 		/// <returns></returns>
-		public List<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
+		public IEnumerable<GeoObjekt> Vyhladaj(GpsPos poz1, GpsPos poz2)
 	    {
 			var ret = new List<GeoObjekt>();
 			var objekty1 = _objekty.Find(poz1);
@@ -81,15 +63,7 @@ namespace GeoLib
 			ret.AddRange(objekty1);
 			ret.AddRange(objekty2);
 
-			for (int i = ret.Count - 1; i > 0; i--)
-			{
-				if (ret[i].Equals(ret[i - 1]))
-				{
-					ret.RemoveAt(i);
-				}
-			}
-
-			return ret;
+			return ret.Distinct();
 		}
 
 		/// <summary>
@@ -104,10 +78,15 @@ namespace GeoLib
 				_objekty.Insert(nehnutelnost.Pozicie[i], nehnutelnost);
 			}
 
-			var nachadzaSaNa = _parcely.Find(nehnutelnost.Pozicie[0]);
-			nachadzaSaNa.AddRange(_parcely.Find(nehnutelnost.Pozicie[1]));
-			nehnutelnost.Parcely = nachadzaSaNa;
-			// TODO refresh pri kazdom pridani
+			var nachadzaSaNaParcelach = _parcely.Find(nehnutelnost.Pozicie[0]);
+			nachadzaSaNaParcelach.AddRange(_parcely.Find(nehnutelnost.Pozicie[1]));
+			nehnutelnost.Parcely = nachadzaSaNaParcelach; // Naplnenie referencií pridávanej nehnutelnosti
+
+			// Naplnenie každej parcele referenciu na pridávanú nehnutelnosti
+			for (int i = 0; i < nachadzaSaNaParcelach.Count; i++)
+			{
+				nachadzaSaNaParcelach[i].Nehnutelnosti.Add(nehnutelnost);
+			}
 		}
 
 		/// <summary>
@@ -122,10 +101,15 @@ namespace GeoLib
 				_objekty.Insert(parcela.Pozicie[i], parcela);
 			}
 
-			var nachadzajuSaNaNej = _nehnutelnosti.Find(parcela.Pozicie[0]);
-			nachadzajuSaNaNej.AddRange(_nehnutelnosti.Find(parcela.Pozicie[1]));
-			parcela.Nehnutelnosti = nachadzajuSaNaNej;
-			// TODO refresh pri kazdom pridani
+			var nachadzajuSaNaNejNehnutelnosti = _nehnutelnosti.Find(parcela.Pozicie[0]);
+			nachadzajuSaNaNejNehnutelnosti.AddRange(_nehnutelnosti.Find(parcela.Pozicie[1]));
+			parcela.Nehnutelnosti = nachadzajuSaNaNejNehnutelnosti; // Naplnenie referencií na nehnutelnosti
+
+			// Naplnenie každej nehnutelnosti referenciu na pridávanú parcelu
+			for (int i = 0; i < nachadzajuSaNaNejNehnutelnosti.Count; i++)
+			{
+				nachadzajuSaNaNejNehnutelnosti[i].Parcely.Add(parcela);
+			}
 		}
 
 		/// <summary>
@@ -169,6 +153,12 @@ namespace GeoLib
 				_nehnutelnosti.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
 				_objekty.Remove(nehnutelnost.Pozicie[i], nehnutelnost);
 			}
+
+			// Odstránenie každej parcele referenciu na odstraňovanú nehnutelnosti
+			for (int i = 0; i < nehnutelnost.Parcely.Count; i++)
+			{
+				nehnutelnost.Parcely[i].Nehnutelnosti.Remove(nehnutelnost);
+			}
 		}
 
 		/// <summary>
@@ -182,6 +172,12 @@ namespace GeoLib
 			    _parcely.Remove(parcela.Pozicie[i], parcela);
 			    _objekty.Remove(parcela.Pozicie[i], parcela);
 		    }
+
+			// Odstránenie každej nehnutelnosti referenciu na odstraňovanú parcelu
+			for (int i = 0; i < parcela.Nehnutelnosti.Count; i++)
+			{
+				parcela.Nehnutelnosti[i].Parcely.Remove(parcela);
+			}
 		}
 
 		/// <summary>
@@ -215,15 +211,7 @@ namespace GeoLib
 			var ret = new List<GeoObjekt>();
 			ret = _objekty.GetAll();
 
-			for (int i = ret.Count - 1; i > 0; i--)
-			{
-				if (ret[i].Equals(ret[i - 1]))
-				{
-					ret.RemoveAt(i);
-				}
-			}
-
-			return ret;
+			return ret.Distinct();
 		}
 
 		public string ZobrazTotalInfo()
@@ -240,6 +228,24 @@ namespace GeoLib
 				$"Počet prvkov: {_objekty.Count}\n" +
 				$"Prvky: {_objekty.ToString()}" +
 				$"\n";
+		}
+
+		public void GenerujParcely(int count)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				var parcela = _generator.GenerateParcela(i);
+				PridajParcelu(parcela);
+			}
+		}
+
+		public void GenerujNehnutelnosti(int count)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				var nehnutelnost = _generator.GenerateNehnutelnost(i);
+				PridajNehnutelnost(nehnutelnost);
+			}
 		}
 		#endregion //Public functions
 	}

@@ -27,11 +27,11 @@
                 <StackPanel  FlowDirection="LeftToRight" Orientation="Horizontal">
                     <Label Content="  GPS Pozície:" Margin="0,0,50,0"></Label>
                     <!--prva gps-->
-                    <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N,21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                    <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E,58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N 21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                     <!--druha gps-->
-                    <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="40,0,0,0" Text="N,21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                    <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E,58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="40,0,0,0" Text="N 21" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

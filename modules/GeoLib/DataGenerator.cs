@@ -31,6 +31,7 @@ namespace GeoLib
 			Nehnutelnost nehnutelnost = new Nehnutelnost
 			{
 				SupisneCislo = i,
+				Popis = "Nehnutelnost " + i,
 				Pozicie =
 				{
 					[0] = GenerateGpsPos(),
@@ -40,11 +41,12 @@ namespace GeoLib
 			return nehnutelnost;
 		}
 
-		public Parcela GenerateParcela()
+		public Parcela GenerateParcela(int i)
 		{
 			Parcela parcela = new Parcela
 			{
-				SupisneCislo = _random.Next(0, 10000),
+				SupisneCislo = i,
+				Popis = "Parcela " + i,
 				Pozicie =
 				{
 					[0] = GenerateGpsPos(),

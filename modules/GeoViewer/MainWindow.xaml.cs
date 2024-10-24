@@ -101,16 +101,16 @@ namespace GeoViewer
 				return;
 			}
 				
-			var lat1 = GpsFirstLatitude.Text.Split(",");
-			var lon1 = GpsFirstLongitude.Text.Split(",");
+			var lat1 = GpsFirstLatitude.Text.Split(" ");
+			var lon1 = GpsFirstLongitude.Text.Split(" ");
 			GpsPos pozicia1 = new GpsPos(lat1[0].First(), double.Parse(lat1[1]), lon1[0].First(), double.Parse(lon1[1]));
 
-			var lat2 = GpsSecondLatitude.Text.Split(",");
-			var lon2 = GpsSecondLongitude.Text.Split(",");
+			var lat2 = GpsSecondLatitude.Text.Split(" ");
+			var lon2 = GpsSecondLongitude.Text.Split(" ");
 			GpsPos pozicia2 = new GpsPos(lat2[0].First(), double.Parse(lat2[1]), lon2[0].First(), double.Parse(lon2[1]));
 
 			var ret = _katSys.Vyhladaj(pozicia1, pozicia2);
-			if (ret.Count == 0)
+			if (!ret.Any())
 			{
 				MessageBox.Show("Neboli nájdené žiadne objekty na zadaných súradniciach!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
@@ -125,12 +125,12 @@ namespace GeoViewer
 
 		private void FindParcelyButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			var lat = GpsFirstLatitude.Text.Split(",");
-			var lon = GpsFirstLongitude.Text.Split(",");
+			var lat = GpsFirstLatitude.Text.Split(" ");
+			var lon = GpsFirstLongitude.Text.Split(" ");
 			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
 
 			var ret = _katSys.VyhladajParcely(pozicia);
-			if (ret.Count == 0)
+			if (!ret.Any())
 			{
 				MessageBox.Show("Neboli nájdené žiadne parcely na zadanej súradnici!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
@@ -145,12 +145,12 @@ namespace GeoViewer
 
 		private void FindNehnutelnostiButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			var lat = GpsFirstLatitude.Text.Split(",");
-			var lon = GpsFirstLongitude.Text.Split(",");
+			var lat = GpsFirstLatitude.Text.Split(" ");
+			var lon = GpsFirstLongitude.Text.Split(" ");
 			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
 
 			var ret = _katSys.VyhladajNehnutelnosti(pozicia);
-			if (ret.Count == 0)
+			if (!ret.Any())
 			{
 				MessageBox.Show("Neboli nájdené žiadne nehnuteľnosti na zadanej súradnici!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
@@ -176,13 +176,13 @@ namespace GeoViewer
 				int supisneCislo = Int32.Parse(addObjektWindow.CisloInput.Text);
 				string popis = addObjektWindow.PopisInput.Text;
 				// prva gps
-				var firstLatitudeValues = addObjektWindow.GpsFirstLatitude.Text.Split(",");
-				var firstLongitudeValues = addObjektWindow.GpsFirstLongitude.Text.Split(",");
+				var firstLatitudeValues = addObjektWindow.GpsFirstLatitude.Text.Split(" ");
+				var firstLongitudeValues = addObjektWindow.GpsFirstLongitude.Text.Split(" ");
 				GpsPos gpsPrva = new(firstLatitudeValues[0].First(), double.Parse(firstLatitudeValues[1]), firstLongitudeValues[0].First(), double.Parse(firstLongitudeValues[1]));
 
 				// druha gps
-				var secondLatitudeValues = addObjektWindow.GpsSecondLatitude.Text.Split(",");
-				var secondLongitudeValues = addObjektWindow.GpsSecondLongitude.Text.Split(",");
+				var secondLatitudeValues = addObjektWindow.GpsSecondLatitude.Text.Split(" ");
+				var secondLongitudeValues = addObjektWindow.GpsSecondLongitude.Text.Split(" ");
 				GpsPos gpsDruha = new(secondLatitudeValues[0].First(), double.Parse(secondLatitudeValues[1]), secondLongitudeValues[0].First(), double.Parse(secondLongitudeValues[1]));
 
 				Nehnutelnost result = new(supisneCislo, popis, gpsPrva, gpsDruha);
@@ -201,13 +201,13 @@ namespace GeoViewer
 				int cisloParcely = Int32.Parse(addObjektWindow.CisloInput.Text);
 				string popis = addObjektWindow.PopisInput.Text;
 				// prva gps
-				var firstLatitudeValues = addObjektWindow.GpsFirstLatitude.Text.Split(",");
-				var firstLongitudeValues = addObjektWindow.GpsFirstLongitude.Text.Split(",");
+				var firstLatitudeValues = addObjektWindow.GpsFirstLatitude.Text.Split(" ");
+				var firstLongitudeValues = addObjektWindow.GpsFirstLongitude.Text.Split(" ");
 				GpsPos gpsPrva = new(firstLatitudeValues[0].First(), double.Parse(firstLatitudeValues[1]), firstLongitudeValues[0].First(), double.Parse(firstLongitudeValues[1]));
 
 				// druha gps
-				var secondLatitudeValues = addObjektWindow.GpsSecondLatitude.Text.Split(",");
-				var secondLongitudeValues = addObjektWindow.GpsSecondLongitude.Text.Split(",");
+				var secondLatitudeValues = addObjektWindow.GpsSecondLatitude.Text.Split(" ");
+				var secondLongitudeValues = addObjektWindow.GpsSecondLongitude.Text.Split(" ");
 				GpsPos gpsDruha = new(secondLatitudeValues[0].First(), double.Parse(secondLatitudeValues[1]), secondLongitudeValues[0].First(), double.Parse(secondLongitudeValues[1]));
 
 				Parcela result = new(cisloParcely, popis, gpsPrva, gpsDruha);
@@ -229,11 +229,11 @@ namespace GeoViewer
 			var selectedObject = (GeoObjekt)ObjectListBox.SelectedItem;
 			if (selectedObject.Typ == 'N')
 			{
-				_katSys.VymazNehnutelnost(selectedObject as Nehnutelnost);
+				_katSys.VymazNehnutelnost((Nehnutelnost)selectedObject);
 			}
 			else
 			{
-				_katSys.VymazParcelu(selectedObject as Parcela);
+				_katSys.VymazParcelu((Parcela)selectedObject);
 			}
 			_currentlyDisplayedObjects.Remove(selectedObject);
 			RefreshData();
@@ -256,13 +256,13 @@ namespace GeoViewer
 				var newPopis = editObjektWindow.PopisInput.Text;
 
 				// prva gps
-				var firstLatitudeValues = editObjektWindow.GpsFirstLatitude.Text.Split(",");
-				var firstLongitudeValues = editObjektWindow.GpsFirstLongitude.Text.Split(",");
+				var firstLatitudeValues = editObjektWindow.GpsFirstLatitude.Text.Split(" ");
+				var firstLongitudeValues = editObjektWindow.GpsFirstLongitude.Text.Split(" ");
 				GpsPos gpsPrvaNova = new(firstLatitudeValues[0].First(), double.Parse(firstLatitudeValues[1]), firstLongitudeValues[0].First(), double.Parse(firstLongitudeValues[1]));
 
 				// druha gps
-				var secondLatitudeValues = editObjektWindow.GpsSecondLatitude.Text.Split(",");
-				var secondLongitudeValues = editObjektWindow.GpsSecondLongitude.Text.Split(",");
+				var secondLatitudeValues = editObjektWindow.GpsSecondLatitude.Text.Split(" ");
+				var secondLongitudeValues = editObjektWindow.GpsSecondLongitude.Text.Split(" ");
 				GpsPos gpsDruhaNova = new(secondLatitudeValues[0].First(), double.Parse(secondLatitudeValues[1]), secondLongitudeValues[0].First(), double.Parse(secondLongitudeValues[1]));
 
 				if (selectedObject is Nehnutelnost)
@@ -301,6 +301,30 @@ namespace GeoViewer
 		{
 			var msg = _katSys.ZobrazTotalInfo();
 			MessageBox.Show(msg, "Info o dátach", MessageBoxButton.OK);
+		}
+
+		private void GenerateParcely_OnClick(object sender, RoutedEventArgs e)
+		{
+			InputWindowCount inputWindow = new('P');
+			if (inputWindow.ShowDialog() == true)
+			{
+				int count = Int32.Parse(inputWindow.TextBoxCountToGenerate.Text);
+				_katSys.GenerujParcely(count);
+				MessageBox.Show("Parcely boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				RefreshData();
+			}
+		}
+
+		private void GenerateNehnutelnosti_OnClick(object sender, RoutedEventArgs e)
+		{
+			InputWindowCount inputWindow = new('N');
+			if (inputWindow.ShowDialog() == true)
+			{
+				int count = Int32.Parse(inputWindow.TextBoxCountToGenerate.Text);
+				_katSys.GenerujNehnutelnosti(count);
+				MessageBox.Show("Nehnutelnosti boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				_currentlyDisplayedObjects.Clear();
+			}
 		}
 		#endregion //Button handlers
 
