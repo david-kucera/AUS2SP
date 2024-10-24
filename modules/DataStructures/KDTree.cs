@@ -2,10 +2,15 @@
 
 namespace DataStructures
 {
+	/// <summary>
+	/// Impelementation of KdTree data structure.
+	/// </summary>
+	/// <typeparam name="TKey">Type of key values</typeparam>
+	/// <typeparam name="TValue">Type of data values</typeparam>
 	public class KdTree<TKey, TValue> : AbstractTree<TKey, TValue> where TValue : class where TKey : class
 	{
 		#region Class members
-		private readonly int _treeDimension;
+		private readonly int _treeDimension;    // Total number of dimensions in the tree
 		#endregion //Class members
 
 		#region Constructor
@@ -18,6 +23,11 @@ namespace DataStructures
 		#endregion //Constructor
 
 		#region Public functions
+		/// <summary>
+		/// Inserts the given node represented by key and data into the tree.
+		/// </summary>
+		/// <param name="key">Key of the node</param>
+		/// <param name="data">Data of the node</param>
 		public override void Insert(TKey key, TValue data)
 		{
 			if (Root == null!)
@@ -74,7 +84,12 @@ namespace DataStructures
 			}
 		}
 
-		public override void Delete(TKey key, TValue data)
+		/// <summary>
+		/// Removes the node with the given key and data.
+		/// </summary>
+		/// <param name="key">Key of the node to delete</param>
+		/// <param name="data">Data of the node to delete</param>
+		public override void Remove(TKey key, TValue data)
 		{
 			var nodeToDelete = Find(key, data);
 			if (nodeToDelete == null!) return;
@@ -109,12 +124,11 @@ namespace DataStructures
 			if (nodeToDelete.Right != null!)
 			{
 				double minimumKeyValue = double.MaxValue;
-				List<KdTreeNode<TKey, TValue>> nodesToSearch = new();
-				nodesToSearch.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Right);
+				List<KdTreeNode<TKey, TValue>> nodesToSearch = [(KdTreeNode<TKey, TValue>)nodeToDelete.Right];
 				
 				while (nodesToSearch.Count > 0)
 				{
-					var currentNode = nodesToSearch[nodesToSearch.Count - 1];
+					var currentNode = nodesToSearch[^1];
 					nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
 					var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
@@ -131,12 +145,11 @@ namespace DataStructures
 			else if (nodeToDelete.Left != null!)
 			{
 				double maximumKeyValue = double.MinValue;
-				List<KdTreeNode<TKey, TValue>> nodesToSearch = new();
-				nodesToSearch.Add((KdTreeNode<TKey, TValue>)nodeToDelete.Left);
+				List<KdTreeNode<TKey, TValue>> nodesToSearch = [(KdTreeNode<TKey, TValue>)nodeToDelete.Left];
 
 				while (nodesToSearch.Count > 0)
 				{
-					var currentNode = nodesToSearch[nodesToSearch.Count - 1];
+					var currentNode = nodesToSearch[^1];
 					nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
 					var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
@@ -166,7 +179,7 @@ namespace DataStructures
 
 			while (nodesToSearchReinsert.Count > 0)
 			{
-				var current = nodesToSearchReinsert[nodesToSearchReinsert.Count - 1];
+				var current = nodesToSearchReinsert[^1];
 				nodesToSearchReinsert.RemoveAt(nodesToSearchReinsert.Count - 1);
 
 				if (current.Right != null)
@@ -209,6 +222,11 @@ namespace DataStructures
 			Count--;
 		}
 
+		/// <summary>
+		/// Returns list of values for the given key.
+		/// </summary>
+		/// <param name="key">Key to look for</param>
+		/// <returns></returns>
 		public override List<TValue> Find(TKey key)
 		{
 			List<TValue> ret = [];
@@ -234,6 +252,10 @@ namespace DataStructures
 			return ret;
 		}
 
+		/// <summary>
+		/// Returns all values stored in tree.
+		/// </summary>
+		/// <returns></returns>
 		public List<TValue> GetAll()
 		{
 			var ret = new List<TValue>();
@@ -257,6 +279,10 @@ namespace DataStructures
 			return ret;
 		}
 
+		/// <summary>
+		/// Returns string representation of the tree.
+		/// </summary>
+		/// <returns></returns>
 		public override string ToString()
 		{
 			if (Root == null!) return string.Empty;
@@ -265,8 +291,14 @@ namespace DataStructures
 			return builder.ToString();
 		}
 		#endregion //Public functions
-		
+
 		#region Private functions
+		/// <summary>
+		/// Finds the exact node with the given key and data.
+		/// </summary>
+		/// <param name="key"></param>
+		/// <param name="data"></param>
+		/// <returns></returns>
 		private KdTreeNode<TKey, TValue>? Find(TKey key, TValue data)
 		{
 			var currentNode = Root;
@@ -291,6 +323,11 @@ namespace DataStructures
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the dimension of the given node.
+		/// </summary>
+		/// <param name="node"></param>
+		/// <returns></returns>
 		private int GetDimension(KdTreeNode<TKey, TValue> node)
 		{
 			int depth = 0;
@@ -307,6 +344,13 @@ namespace DataStructures
 			return depth % _treeDimension;
 		}
 
+		/// <summary>
+		/// Helper function to build string representation of the tree.
+		/// </summary>
+		/// <param name="node"></param>
+		/// <param name="builder"></param>
+		/// <param name="depth"></param>
+		/// <param name="position"></param>
 		private static void BuildString(AbstractNode<TKey, TValue> node, StringBuilder builder, int depth, string position)
 		{
 			while (true)

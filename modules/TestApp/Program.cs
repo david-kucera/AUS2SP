@@ -54,7 +54,7 @@ namespace TestApp
 			Console.WriteLine("----------------");
 
 			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind}");
-			objekty.Delete(objektToFind.Pozicie[0], objektToFind);
+			objekty.Remove(objektToFind.Pozicie[0], objektToFind);
 			//objekty.Delete(objektToFind.Pozicie[1], objektToFind);
 
 			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");

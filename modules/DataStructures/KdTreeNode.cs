@@ -2,9 +2,14 @@
 
 namespace DataStructures
 {
-    public class KdTreeNode<TKey, TValue> : AbstractNode<TKey, TValue> where TKey : class where TValue : class
+	/// <summary>
+	/// Trieda representujúca vrchol stromu.
+	/// </summary>
+	/// <typeparam name="TKey"></typeparam>
+	/// <typeparam name="TValue"></typeparam>
+	public class KdTreeNode<TKey, TValue> : AbstractNode<TKey, TValue> where TKey : class where TValue : class
 	{
-		#region Constructor
+		#region Constructors
 		public KdTreeNode()
 		{
 			
@@ -27,7 +32,7 @@ namespace DataStructures
 			Right = right;
 			Key = key;
 		}
-		#endregion //Constructor
+		#endregion //Constructors
 
 		#region Public functions
 		/// <summary>
@@ -44,6 +49,11 @@ namespace DataStructures
 			return thisKey!.CompareTo(otherKey!, dimension);
 		}
 
+		/// <summary>
+		/// Vráti hodnotu kľúča podľa zadanej dimenzie - dĺžka alebo šírka.
+		/// </summary>
+		/// <param name="dimension">Dimenzia</param>
+		/// <returns></returns>
 		public double GetKeyValue(int dimension)
 		{
 			var key = Key as GpsPos;
