@@ -12,6 +12,5 @@
 		public abstract void Remove(TKey key, TValue data);
 		public abstract List<TValue> Find(TKey key);
 		#endregion //Abstract functions
-
 	}
 }

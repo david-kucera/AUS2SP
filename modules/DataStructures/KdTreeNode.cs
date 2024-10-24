@@ -1,6 +1,4 @@
-﻿using DataStructures.Data;
-
-namespace DataStructures
+﻿namespace DataStructures
 {
 	/// <summary>
 	/// Trieda representujúca vrchol stromu.
@@ -43,10 +41,11 @@ namespace DataStructures
 		/// <returns></returns>
 		public override int CompareTo(TKey key, int dimension)
 		{
-			var thisKey = Key as GpsPos;
-			var otherKey = key as GpsPos;
-
-			return thisKey!.CompareTo(otherKey!, dimension);
+			if (Key is IComparable comparableKey)
+			{
+				return comparableKey.CompareTo(key, dimension);
+			}
+			throw new ArgumentException("Key must implement IComparable interface!");
 		}
 
 		/// <summary>
@@ -56,8 +55,11 @@ namespace DataStructures
 		/// <returns></returns>
 		public double GetKeyValue(int dimension)
 		{
-			var key = Key as GpsPos;
-			return key!.GetValue(dimension);
+			if (Key is IComparable comparableKey)
+			{
+				return comparableKey.GetValue(dimension);
+			}
+			throw new ArgumentException("Key must implement IComparable interface!");
 		}
 
 		public override string ToString()

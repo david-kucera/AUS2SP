@@ -1,6 +1,6 @@
 ﻿namespace DataStructures.Data
 {
-    public class GpsPos
+    public class GpsPos : IComparable
     {
 		#region Constants
         public const double ROUNDING_ERROR = 0.1;
@@ -56,12 +56,13 @@
 			}
         }
 
-		public int CompareTo(GpsPos gpsPos, int positionIndex)
+		public int CompareTo(object key, int dimension)
         {
-	        return positionIndex switch
+			var gpsPos = key as GpsPos;
+			return dimension switch
 	        {
-		        0 => CompareSirka(gpsPos),
-		        1 => CompareDlzka(gpsPos),
+		        0 => CompareSirka(gpsPos!),
+		        1 => CompareDlzka(gpsPos!),
 		        _ => throw new IndexOutOfRangeException()
 	        };
         }
@@ -72,7 +73,6 @@
 
 			return Math.Abs(PoziciaSirky - gpsPos!.PoziciaSirky) < ROUNDING_ERROR && Math.Abs(PoziciaDlzky - gpsPos.PoziciaDlzky) < ROUNDING_ERROR && Sirka == gpsPos.Sirka && Dlzka == gpsPos.Dlzka;
 		}
-
         #endregion //Public functions
 
 		#region Private functions
@@ -136,5 +136,5 @@
             }
         }
 		#endregion //Private functions
-    }
+	}
 }

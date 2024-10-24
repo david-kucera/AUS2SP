@@ -8,7 +8,7 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 100;
+		private const int POCET_GENEROVANYCH = 3;
 		#endregion //Constants
 
 		static void Main()
@@ -16,7 +16,6 @@ namespace TestApp
 			KdTree<GpsPos, Nehnutelnost> objekty = new(2);
 
 			Console.WriteLine("Generované nehnutelnosti");
-			Random rnd = new(BASE_SEED);
 			DataGenerator generator = new(BASE_SEED);
 
 			int pocetNehnutelnosti = 0;
@@ -75,24 +74,6 @@ namespace TestApp
 
 			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
 			Console.WriteLine(objekty.ToString());
-
-
-			//while (true)
-			//{
-			//	Console.WriteLine("Stlač kláves 'd/D' pre vypísanie dát stromu.");
-			//	Console.WriteLine("Stlač akúkoľvek klávesu pre ukočenie aplikácie");
-			//	var key = Console.ReadKey();
-			//	if (key.KeyChar is 'd' or 'D')
-			//	{
-			//		Console.Clear();
-			//		Console.WriteLine(objekty.ToString());
-			//		break;
-			//	}
-			//	if (key.KeyChar > 0 && key.KeyChar < 255)
-			//	{
-			//		break;
-			//	}
-			//}
 		}
 	}
 }
