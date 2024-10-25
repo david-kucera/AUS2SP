@@ -22,27 +22,66 @@ namespace TestApp
 			KdTree<TestKey, TestData> tree = new(4);
 			DataGenerator generator = new(BASE_SEED);
 
-			List<TestData> naMazanie = new(); 
+			List<TestData> vsetkyPrvky = new();
+			List<TestData> naHladanie = new();
+			List<TestData> naMazanie = new();
+			Console.WriteLine("Vkladam " + POCET_GENEROVANYCH + " prvkov do stromu.");
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
 			{
 				TestData data = generator.GenerateTestData(i);
+				vsetkyPrvky.Add(data);
 				tree.Insert(data.Kluce, data);
+
 				if (generator.GenerateBool())
 				{
 					naMazanie.Add(data);
 				}
+
+				if (generator.GenerateBool())
+				{
+					naHladanie.Add(data);
+				}
 			}
 
+			Console.WriteLine("Prvky boli uspesne vlozene:");
 			Console.WriteLine(tree.ToString());
 
+			//////// Hladanie /////////
+			//Console.WriteLine("HLADANIE");
+			//foreach (var prvok in naHladanie)
+			//{
+			//	Console.WriteLine("HLADAM " + prvok.ToString());
+			//	var res = tree.Find(prvok.Kluce);
+			//	Console.WriteLine("nasiel som: " + res.Count + " vyskytov v strome:");
+			//	foreach (var found in res)
+			//	{
+			//		Console.WriteLine(found.ToString());
+			//		if (found != prvok)
+			//		{
+			//			Console.WriteLine("Nasiel som zly prvok! (alebo prvok s inym klucom)");
+			//		}
+			//	}
+			//}
+
+			/////// Vymazavanie ///////
 			Console.WriteLine("VYMAZAVANIE");
 			foreach (var data in naMazanie)
 			{
 				Console.WriteLine("MAZEM " + data.ToString());
 				tree.Remove(data.Kluce, data);
 				Console.WriteLine("VYMAZAL SOM " + data.ToString());
-				Console.WriteLine(tree.ToString());
 				Console.WriteLine(tree.Count);
+				Console.WriteLine("SKUSAM NAJST VYMAZANY PRVOK V STROME");
+				var res = tree.Find(data.Kluce);
+				Console.WriteLine("nasiel som: " + res.Count + " vyskytov v strome:");
+				foreach (var found in res)
+				{
+					Console.WriteLine(found.ToString());
+					if (found == data)
+					{
+						Console.WriteLine("Nasiel som vymazany prvok!");
+					}
+				}
 			}
 			Console.WriteLine("PO VSETKYCH VYMAZANIACH");
 			Console.WriteLine("POVODNE BOLO: " + POCET_GENEROVANYCH);
