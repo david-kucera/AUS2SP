@@ -8,10 +8,50 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 3;
+		private const int POCET_GENEROVANYCH = 100;
 		#endregion //Constants
 
 		static void Main()
+		{
+			//TestObjekty();
+			TestKontrolaRozpracovania2();
+		}
+
+		private static void TestKontrolaRozpracovania2()
+		{
+			KdTree<TestKey, TestData> tree = new(4);
+			DataGenerator generator = new(BASE_SEED);
+
+			List<TestData> naMazanie = new(); 
+			for (int i = 0; i < POCET_GENEROVANYCH; i++)
+			{
+				TestData data = generator.GenerateTestData(i);
+				tree.Insert(data.Kluce, data);
+				if (generator.GenerateBool())
+				{
+					naMazanie.Add(data);
+				}
+			}
+
+			Console.WriteLine(tree.ToString());
+
+			Console.WriteLine("VYMAZAVANIE");
+			foreach (var data in naMazanie)
+			{
+				Console.WriteLine("MAZEM " + data.ToString());
+				tree.Remove(data.Kluce, data);
+				Console.WriteLine("VYMAZAL SOM " + data.ToString());
+				Console.WriteLine(tree.ToString());
+				Console.WriteLine(tree.Count);
+			}
+			Console.WriteLine("PO VSETKYCH VYMAZANIACH");
+			Console.WriteLine("POVODNE BOLO: " + POCET_GENEROVANYCH);
+			Console.WriteLine("MALO SA VYMAZAT: " + naMazanie.Count);
+			Console.WriteLine("V STROME OSTALO: " + tree.Count);
+			Console.WriteLine(POCET_GENEROVANYCH - naMazanie.Count == tree.Count);
+		}
+
+		private static void TestObjekty()
 		{
 			KdTree<GpsPos, Nehnutelnost> objekty = new(2);
 

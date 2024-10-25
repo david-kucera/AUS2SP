@@ -1,4 +1,5 @@
 ﻿using DataStructures.Data;
+using System.Text;
 
 namespace GeoLib
 {
@@ -56,6 +57,30 @@ namespace GeoLib
 			return parcela;
 		}
 
+		public TestData GenerateTestData(int i)
+		{
+			TestData testData = new TestData
+			{
+				Kluce = new TestKey
+				{
+					A = _random.NextDouble() * 10_000,
+					B = GenerateString(_random.Next(0,100)),
+					C = _random.Next(),
+					D = _random.NextDouble() * 10_000
+				},
+				Popis = "TestData " + i,
+				Cislo = i
+			};
+			return testData;
+		}
+
+		public bool GenerateBool()
+		{
+			return _random.Next(0, 2) == 0;
+		}
+		#endregion //Public methods
+
+		#region Private methods
 		private GpsPos GenerateGpsPos()
 		{
 			GpsPos gpsPos = new()
@@ -67,6 +92,18 @@ namespace GeoLib
 			};
 			return gpsPos;
 		}
-		#endregion //Public methods
+
+		private string GenerateString(int length)
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			var stringBuilder = new StringBuilder(length);
+			for (int i = 0; i < length; i++)
+			{
+				int index = _random.Next(chars.Length);
+				stringBuilder.Append(chars[index]);
+			}
+			return stringBuilder.ToString();
+		}
+		#endregion //Private methods
 	}
 }
