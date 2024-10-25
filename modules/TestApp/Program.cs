@@ -1,4 +1,5 @@
-﻿using DataStructures;
+﻿using System.Diagnostics;
+using DataStructures;
 using DataStructures.Data;
 using GeoLib;
 
@@ -8,86 +9,158 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 100;
+		private const int POCET_GENEROVANYCH = 10_000;
+		private const int POCET_OPERACII = 1_000_000;
 		#endregion //Constants
 
 		static void Main()
 		{
 			//TestObjekty();
-			TestKontrolaRozpracovania2();
+			TestKontrolaRozpracovania2_NaplnenaStruktura(true);
+			//TestKontrolaRozpracovania2_NenaplnenaStruktura();
 		}
 
-		private static void TestKontrolaRozpracovania2()
+		private static void TestKontrolaRozpracovania2_NaplnenaStruktura(bool vypis)
 		{
 			KdTree<TestKey, TestData> tree = new(4);
 			DataGenerator generator = new(BASE_SEED);
 
 			List<TestData> vsetkyPrvky = new();
-			List<TestData> naHladanie = new();
-			List<TestData> naMazanie = new();
 			Console.WriteLine("Vkladam " + POCET_GENEROVANYCH + " prvkov do stromu.");
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
 			{
 				TestData data = generator.GenerateTestData(i);
 				vsetkyPrvky.Add(data);
 				tree.Insert(data.Kluce, data);
-
-				if (generator.GenerateBool())
-				{
-					naMazanie.Add(data);
-				}
-
-				if (generator.GenerateBool())
-				{
-					naHladanie.Add(data);
-				}
 			}
-
 			Console.WriteLine("Prvky boli uspesne vlozene:");
-			Console.WriteLine(tree.ToString());
 
-			//////// Hladanie /////////
-			//Console.WriteLine("HLADANIE");
-			//foreach (var prvok in naHladanie)
-			//{
-			//	Console.WriteLine("HLADAM " + prvok.ToString());
-			//	var res = tree.Find(prvok.Kluce);
-			//	Console.WriteLine("nasiel som: " + res.Count + " vyskytov v strome:");
-			//	foreach (var found in res)
-			//	{
-			//		Console.WriteLine(found.ToString());
-			//		if (found != prvok)
-			//		{
-			//			Console.WriteLine("Nasiel som zly prvok! (alebo prvok s inym klucom)");
-			//		}
-			//	}
-			//}
-
-			/////// Vymazavanie ///////
-			Console.WriteLine("VYMAZAVANIE");
-			foreach (var data in naMazanie)
+			/////// Testovanie /////////
+			int pocetHladani = 0;
+			int pocetChybPriHladani = 0;
+			List<TestData> chybyPriHladani = new();
+			int pocetMazani = 0;
+			int pocetChybPriMazani = 0;
+			List<TestData> chybyPriMazani = new();
+			int pocetVkladani = 0;
+			int pocetChybPriVkladani = 0;
+			List<TestData> chybyPriVkladani = new();
+			Stopwatch sw = new();
+			for (int i = 0; i < POCET_OPERACII; i++)
 			{
-				Console.WriteLine("MAZEM " + data.ToString());
-				tree.Remove(data.Kluce, data);
-				Console.WriteLine("VYMAZAL SOM " + data.ToString());
-				Console.WriteLine(tree.Count);
-				Console.WriteLine("SKUSAM NAJST VYMAZANY PRVOK V STROME");
-				var res = tree.Find(data.Kluce);
-				Console.WriteLine("nasiel som: " + res.Count + " vyskytov v strome:");
-				foreach (var found in res)
+				sw.Start();
+				Console.WriteLine(i);
+				int typOperacie = generator.GenerateInt(0, 3);
+				switch (typOperacie)
 				{
-					Console.WriteLine(found.ToString());
-					if (found == data)
-					{
-						Console.WriteLine("Nasiel som vymazany prvok!");
-					}
+					case 0:
+						// Vkladanie
+						pocetVkladani++;
+						TestData data = generator.GenerateTestData(i);
+						if (vypis) Console.WriteLine("Vkladam novy prvok " + data);
+						vsetkyPrvky.Add(data);
+						tree.Insert(data.Kluce, data);
+						if (tree.Count != tree.GetAll().Count)
+						{
+							pocetChybPriVkladani++;
+							chybyPriVkladani.Add(data);
+						}
+						if (vypis) Console.WriteLine("Prvok bol vlozeny do stromu, aktualny pocet prvkov v strome je: " + tree.Count);
+						break;
+					case 1:
+						// Hladanie
+						pocetHladani++;
+						if (vsetkyPrvky.Count == 0)
+						{
+							break;
+						}
+						var hladanyPrvok = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+						if (vypis) Console.WriteLine("Hladam prvok " + hladanyPrvok.ToString());
+						var res = tree.Find(hladanyPrvok.Kluce);
+
+						bool najdeny = false;
+						foreach (var found in res)
+						{
+							if (found.Kluce.Equals(hladanyPrvok.Kluce))
+							{
+								najdeny = true;
+								break;
+							}
+						}
+						if (vypis) Console.WriteLine(!najdeny ? "Nenasiel som dany prvok!" : "Nasiel som dany prvok!");
+						if (!najdeny)
+						{
+							pocetChybPriHladani++;
+							chybyPriHladani.Add(hladanyPrvok);
+						}
+						break;
+					case 2:
+						// Mazanie
+						pocetMazani++;
+						if (vsetkyPrvky.Count == 0)
+						{
+							break;
+						}
+						var prvokNaZmazanie = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+						if (vypis) Console.WriteLine("Mazem prvok " + prvokNaZmazanie);
+						vsetkyPrvky.Remove(prvokNaZmazanie);
+						tree.Remove(prvokNaZmazanie.Kluce, prvokNaZmazanie);
+						if (vypis)
+						{
+							Console.WriteLine("Uspesne som vymazal dany prvok");
+							Console.WriteLine("---");
+							Console.WriteLine("POVODNE BOLO: " + vsetkyPrvky.Count + 1);
+							Console.WriteLine("V STROME OSTALO: " + tree.Count);
+							Console.WriteLine("V STROME REALNE JE: " + tree.GetAll().Count + " prvkov");
+						}
+
+						if (tree.GetAll().Count != tree.Count)
+						{
+							pocetChybPriMazani++;
+							chybyPriMazani.Add(prvokNaZmazanie);
+						}
+						break;
 				}
+
+				if (vypis) Console.WriteLine("--------------------------------------------------------------------");
 			}
-			Console.WriteLine("PO VSETKYCH VYMAZANIACH");
-			Console.WriteLine("POVODNE BOLO: " + POCET_GENEROVANYCH);
-			Console.WriteLine("MALO SA VYMAZAT: " + naMazanie.Count);
-			Console.WriteLine("V STROME OSTALO: " + tree.Count);
-			Console.WriteLine(POCET_GENEROVANYCH - naMazanie.Count == tree.Count);
+			sw.Stop();
+			Console.WriteLine("==========================================================================");
+			Console.WriteLine("Pocet sekund: " + sw.Elapsed.TotalSeconds);
+			Console.WriteLine("Po vsetkych operaciach: ");
+			Console.WriteLine("Pocet vkladani: " + pocetVkladani);
+			Console.WriteLine("Pocet chyb pri vkladani: " + pocetChybPriVkladani);
+			for (int i = 0; i < chybyPriVkladani.Count; i++)
+			{
+				var testData = chybyPriVkladani[i];
+				Console.WriteLine(i + " " + testData.ToString());
+			}
+			Console.WriteLine("Pocet hladani: " + pocetHladani);
+			Console.WriteLine("Pocet chyb pri hladani: " + pocetChybPriHladani);
+			for (int i = 0; i < chybyPriHladani.Count; i++)
+			{
+				var testData = chybyPriHladani[i];
+				Console.WriteLine(i + " " + testData.ToString());
+			}
+			Console.WriteLine("Pocet mazani: " + pocetMazani);
+			Console.WriteLine("Pocet chyb pri mazani: " + pocetChybPriMazani);
+			for (int i = 0; i < chybyPriMazani.Count; i++)
+			{
+				var testData = chybyPriMazani[i];
+				Console.WriteLine(i + " " + testData.ToString());
+			}
+
+			var allPrvky = tree.GetAll();
+			var pocetRealne = allPrvky.Count;
+			Console.WriteLine("Strom zacinal s potom prvkov: " + POCET_GENEROVANYCH);
+			Console.WriteLine("Pocet prvkov v liste uchovavanom: " + vsetkyPrvky.Count);
+			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
+			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
+		}
+
+		private static void TestKontrolaRozpracovania2_NenaplnenaStruktura()
+		{
+			throw new NotImplementedException();
 		}
 
 		private static void TestObjekty()

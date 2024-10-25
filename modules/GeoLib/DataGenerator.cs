@@ -64,7 +64,7 @@ namespace GeoLib
 				Kluce = new TestKey
 				{
 					A = _random.NextDouble() * 10_000,
-					B = GenerateString(_random.Next(0,100)),
+					B = GenerateString(_random.Next(1,10)),
 					C = _random.Next(),
 					D = _random.NextDouble() * 10_000
 				},
@@ -77,6 +77,16 @@ namespace GeoLib
 		public bool GenerateBool()
 		{
 			return _random.Next(0, 2) == 0;
+		}
+
+		public double GenerateDouble()
+		{
+			return _random.NextDouble();
+		}
+
+		public int GenerateInt(int v1, int v2)
+		{
+			return _random.Next(v1, v2);
 		}
 		#endregion //Public methods
 
@@ -102,6 +112,7 @@ namespace GeoLib
 				int index = _random.Next(chars.Length);
 				stringBuilder.Append(chars[index]);
 			}
+
 			return stringBuilder.ToString();
 		}
 		#endregion //Private methods

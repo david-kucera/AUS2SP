@@ -29,6 +29,7 @@ namespace DataStructures.Data
 			sb.Append(Popis);
 			sb.Append(" Cislo: ");
 			sb.Append(Cislo);
+			sb.Append(Kluce.ToString());
 			return sb.ToString();
 		}
 		#endregion //Public methods
