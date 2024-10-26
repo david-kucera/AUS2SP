@@ -11,7 +11,7 @@ namespace TestApp
 		private const int BASE_SEED = 0;
 		private const int POCET_GENEROVANYCH = 1_000;
 		private const int POCET_OPERACII = 1_000_000;
-		private const double SANCA_DUPLICIT = 0.3;
+		private const double SANCA_DUPLICIT = 0.05;
 		#endregion //Constants
 
 		static void Main()
