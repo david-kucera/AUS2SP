@@ -3,7 +3,7 @@
     public class GpsPos : IComparable
     {
 		#region Constants
-        public const double ROUNDING_ERROR = 0.1;
+        public const double ROUNDING_ERROR = 0.001;
 		#endregion //Constants
 
 		#region Properties

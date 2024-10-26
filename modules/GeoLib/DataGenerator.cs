@@ -57,6 +57,15 @@ namespace GeoLib
 			return parcela;
 		}
 
+		public GeoObjekt GenerateGeoObjekt(int i)
+		{
+			if (GenerateBool())
+			{
+				return GenerateNehnutelnost(i);
+			}
+			return GenerateParcela(i);
+		}
+
 		public TestData GenerateTestData(int i)
 		{
 			TestData testData = new TestData
