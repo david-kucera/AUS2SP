@@ -3,7 +3,7 @@
     public class Nehnutelnost : GeoObjekt
     {
         #region Properties
-        public List<Parcela> Parcely { get; set; } = new List<Parcela>();           // iba referencie
+        public List<Parcela> Parcely { get; set; } = [];           // iba referencie
         #endregion //Properties
 
         #region Constructor

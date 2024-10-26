@@ -13,7 +13,7 @@ namespace GeoLib
 		private readonly KdTree<GpsPos, Parcela> _parcely = new(2);				// Strom parciel
 		private readonly KdTree<GpsPos, GeoObjekt> _objekty = new(2);			// Strom oboch objektov
 
-		private DataGenerator _generator = new(0);      // Generátor dát
+		private readonly DataGenerator _generator = new(0);      // Generátor dát
 		#endregion //Class members
 
 		#region Constructors
@@ -208,25 +208,22 @@ namespace GeoLib
 		/// <returns></returns>
 		public IEnumerable<GeoObjekt> GetAllObjects()
 		{
-			var ret = new List<GeoObjekt>();
-			ret = _objekty.GetAll();
-
-			return ret.Distinct();
+			return _objekty.GetAll().Distinct();
 		}
 
 		public string ZobrazTotalInfo()
 		{
 			return $"STROM PARCIEL\n" +
 				$"Počet prvkov: {_parcely.Count}\n" +
-				$"Pvky: {_parcely.ToString()}" +
+				$"Pvky: {_parcely}" +
 				$"\n" +
 				$"STROM NEHNUTELNOSTI\n" +
 				$"Počet prvkov: {_nehnutelnosti.Count}\n" +
-				$"Prvky: {_nehnutelnosti.ToString()}" +
+				$"Prvky: {_nehnutelnosti}" +
 				$"\n" +
 				$"STROM OBOCH\n" +
 				$"Počet prvkov: {_objekty.Count}\n" +
-				$"Prvky: {_objekty.ToString()}" +
+				$"Prvky: {_objekty}" +
 				$"\n";
 		}
 

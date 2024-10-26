@@ -53,7 +53,7 @@
 			};
 		}
 
-		public bool Equals(object obj)
+		public override bool Equals(object obj)
 		{
 			return obj is TestKey key &&
 					Math.Abs(A - key.A) < ROUNDING_ERROR &&

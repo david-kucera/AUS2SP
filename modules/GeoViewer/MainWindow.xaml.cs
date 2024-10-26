@@ -10,7 +10,7 @@ namespace GeoViewer
 	{
 		#region Class members
 		private KatSys _katSys = new();
-		private List<GeoObjekt> _currentlyDisplayedObjects = new();
+		private List<GeoObjekt> _currentlyDisplayedObjects = [];
 		#endregion //Class members
 
 		#region Constructor
@@ -38,7 +38,7 @@ namespace GeoViewer
 			};
 			fileDialog.ShowDialog();
 
-			if (!fileDialog.FileName.Any())
+			if (fileDialog.FileName.Length == 0)
 			{
 				return;
 			}
@@ -70,7 +70,7 @@ namespace GeoViewer
 			};
 			fileDialog.ShowDialog();
 
-			if (!fileDialog.FileName.Any())
+			if (fileDialog.FileName.Length == 0)
 			{
 				return;
 			}
@@ -103,11 +103,11 @@ namespace GeoViewer
 				
 			var lat1 = GpsFirstLatitude.Text.Split(" ");
 			var lon1 = GpsFirstLongitude.Text.Split(" ");
-			GpsPos pozicia1 = new GpsPos(lat1[0].First(), double.Parse(lat1[1]), lon1[0].First(), double.Parse(lon1[1]));
+			GpsPos pozicia1 = new(lat1[0].First(), double.Parse(lat1[1]), lon1[0].First(), double.Parse(lon1[1]));
 
 			var lat2 = GpsSecondLatitude.Text.Split(" ");
 			var lon2 = GpsSecondLongitude.Text.Split(" ");
-			GpsPos pozicia2 = new GpsPos(lat2[0].First(), double.Parse(lat2[1]), lon2[0].First(), double.Parse(lon2[1]));
+			GpsPos pozicia2 = new(lat2[0].First(), double.Parse(lat2[1]), lon2[0].First(), double.Parse(lon2[1]));
 
 			var ret = _katSys.Vyhladaj(pozicia1, pozicia2);
 			if (!ret.Any())
@@ -127,7 +127,7 @@ namespace GeoViewer
 		{
 			var lat = GpsFirstLatitude.Text.Split(" ");
 			var lon = GpsFirstLongitude.Text.Split(" ");
-			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
+			GpsPos pozicia = new(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
 
 			var ret = _katSys.VyhladajParcely(pozicia);
 			if (!ret.Any())
@@ -147,7 +147,7 @@ namespace GeoViewer
 		{
 			var lat = GpsFirstLatitude.Text.Split(" ");
 			var lon = GpsFirstLongitude.Text.Split(" ");
-			GpsPos pozicia = new GpsPos(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
+			GpsPos pozicia = new(lat[0].First(), double.Parse(lat[1]), lon[0].First(), double.Parse(lon[1]));
 
 			var ret = _katSys.VyhladajNehnutelnosti(pozicia);
 			if (!ret.Any())
@@ -265,9 +265,8 @@ namespace GeoViewer
 				var secondLongitudeValues = editObjektWindow.GpsSecondLongitude.Text.Split(" ");
 				GpsPos gpsDruhaNova = new(secondLatitudeValues[0].First(), double.Parse(secondLatitudeValues[1]), secondLongitudeValues[0].First(), double.Parse(secondLongitudeValues[1]));
 
-				if (selectedObject is Nehnutelnost)
+				if (selectedObject is Nehnutelnost nehnutelnost)
 				{
-					var nehnutelnost = (Nehnutelnost)selectedObject;
 					_katSys.EditNehnutelnost(nehnutelnost, newCislo, newPopis, gpsPrvaNova, gpsDruhaNova);
 				}
 				else

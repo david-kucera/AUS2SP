@@ -24,7 +24,7 @@ namespace DataStructures.Data
 		#region Public methods
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = new();
 			sb.Append("Popis: ");
 			sb.Append(Popis);
 			sb.Append(" Cislo: ");

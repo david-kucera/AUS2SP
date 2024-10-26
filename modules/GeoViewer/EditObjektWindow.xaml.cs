@@ -8,7 +8,7 @@ namespace GeoViewer
 		public EditObjektWindow(GeoObjekt objekt)
 		{
 			InitializeComponent();
-			Title = $"Upravuješ objekt {objekt.ToString()}";
+			Title = $"Upravuješ objekt {objekt}";
 			CisloInput.Text = objekt.SupisneCislo.ToString();
 			PopisInput.Text = objekt.Popis;
 

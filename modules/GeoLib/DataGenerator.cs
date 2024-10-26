@@ -29,7 +29,7 @@ namespace GeoLib
 
 		public Nehnutelnost GenerateNehnutelnost(int i)
 		{
-			Nehnutelnost nehnutelnost = new Nehnutelnost
+			Nehnutelnost nehnutelnost = new()
 			{
 				SupisneCislo = i,
 				Popis = "Nehnutelnost " + i,
@@ -44,7 +44,7 @@ namespace GeoLib
 
 		public Parcela GenerateParcela(int i)
 		{
-			Parcela parcela = new Parcela
+			Parcela parcela = new()
 			{
 				SupisneCislo = i,
 				Popis = "Parcela " + i,
@@ -68,7 +68,7 @@ namespace GeoLib
 
 		public TestData GenerateTestData(int i)
 		{
-			TestData testData = new TestData
+			TestData testData = new()
 			{
 				Kluce = new TestKey
 				{

@@ -11,6 +11,7 @@ namespace TestApp
 		private const int BASE_SEED = 0;
 		private const int POCET_GENEROVANYCH = 1_000;
 		private const int POCET_OPERACII = 1_000_000;
+		private const double SANCA_DUPLICIT = 0.3;
 		#endregion //Constants
 
 		static void Main()
@@ -51,7 +52,7 @@ namespace TestApp
 						TestKontrolaRozpracovania2_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 4:
-						TestKontrolaRozpracovania2_PrazdnaStruktura(BASE_SEED, vypis, lenStatistikaBehu);
+						TestKontrolaRozpracovania2_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					default:
 						Console.WriteLine("Neznáma voľba");
@@ -64,12 +65,22 @@ namespace TestApp
 		{
 			KdTree<TestKey, TestData> tree = new(4);
 			DataGenerator generator = new(seed);
-			List<TestData> vsetkyPrvky = new();
+			List<TestData> vsetkyPrvky = [];
+			int pocetDuplicit = 0;
 			if (!lenStatistikaBehu) Console.WriteLine("Vkladam " + POCET_GENEROVANYCH + " prvkov do stromu.");
 
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
 			{
 				TestData data = generator.GenerateTestData(i);
+				if (generator.GenerateDouble() < SANCA_DUPLICIT)
+				{
+					if (vsetkyPrvky.Count == 0)
+					{
+						continue;
+					}
+					data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+					pocetDuplicit++;
+				}
 				vsetkyPrvky.Add(data);
 				tree.Insert(data.Kluce, data);
 			}
@@ -78,13 +89,13 @@ namespace TestApp
 			/////// Testovanie /////////
 			int pocetHladani = 0;
 			int pocetChybPriHladani = 0;
-			List<TestData> chybyPriHladani = new();
+			List<TestData> chybyPriHladani = [];
 			int pocetMazani = 0;
 			int pocetChybPriMazani = 0;
-			List<TestData> chybyPriMazani = new();
+			List<TestData> chybyPriMazani = [];
 			int pocetVkladani = 0;
 			int pocetChybPriVkladani = 0;
-			List<TestData> chybyPriVkladani = new();
+			List<TestData> chybyPriVkladani = [];
 			Stopwatch sw = new();
 			for (int i = 0; i < POCET_OPERACII; i++)
 			{
@@ -97,6 +108,15 @@ namespace TestApp
 						// Vkladanie
 						pocetVkladani++;
 						TestData data = generator.GenerateTestData(i);
+						if (generator.GenerateDouble() < SANCA_DUPLICIT)
+						{
+							if (vsetkyPrvky.Count == 0)
+							{
+								continue;
+							}
+							data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+							pocetDuplicit++;
+						}
 						if (vypis) Console.WriteLine("Vkladam novy prvok " + data);
 						vsetkyPrvky.Add(data);
 						tree.Insert(data.Kluce, data);
@@ -198,24 +218,26 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v liste uchovavanom: " + vsetkyPrvky.Count);
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
+			Console.WriteLine("Duplicit bolo: " + pocetDuplicit);
 		}
 
 		private static void TestKontrolaRozpracovania2_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<TestKey, TestData> tree = new(4);
 			DataGenerator generator = new(seed);
-			List<TestData> vsetkyPrvky = new();
+			List<TestData> vsetkyPrvky = [];
+			int pocetDuplicit = 0;
 
 			/////// Testovanie /////////
 			int pocetHladani = 0;
 			int pocetChybPriHladani = 0;
-			List<TestData> chybyPriHladani = new();
+			List<TestData> chybyPriHladani = [];
 			int pocetMazani = 0;
 			int pocetChybPriMazani = 0;
-			List<TestData> chybyPriMazani = new();
+			List<TestData> chybyPriMazani = [];
 			int pocetVkladani = 0;
 			int pocetChybPriVkladani = 0;
-			List<TestData> chybyPriVkladani = new();
+			List<TestData> chybyPriVkladani = [];
 			Stopwatch sw = new();
 			for (int i = 0; i < POCET_OPERACII; i++)
 			{
@@ -228,6 +250,15 @@ namespace TestApp
 						// Vkladanie
 						pocetVkladani++;
 						TestData data = generator.GenerateTestData(i);
+						if (generator.GenerateDouble() < SANCA_DUPLICIT)
+						{
+							if (vsetkyPrvky.Count == 0)
+							{
+								continue;
+							}
+							data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+							pocetDuplicit++;
+						}
 						if (vypis) Console.WriteLine("Vkladam novy prvok " + data);
 						vsetkyPrvky.Add(data);
 						tree.Insert(data.Kluce, data);
@@ -334,12 +365,22 @@ namespace TestApp
 		{
 			KdTree<GpsPos, GeoObjekt> tree = new(2);
 			DataGenerator generator = new(seed);
-			List<GeoObjekt> vsetkyPrvky = new();
+			List<GeoObjekt> vsetkyPrvky = [];
+			int pocetDuplicit = 0;
 			if (!lenStatistikaBehu) Console.WriteLine("Vkladam " + POCET_GENEROVANYCH + " prvkov do stromu.");
 
 			for (int i = 0; i < POCET_GENEROVANYCH; i++)
 			{
 				GeoObjekt data = generator.GenerateGeoObjekt(i);
+				if (generator.GenerateDouble() < SANCA_DUPLICIT)
+				{
+					if (vsetkyPrvky.Count == 0)
+					{
+						continue;
+					}
+					data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+					pocetDuplicit++;
+				}
 				vsetkyPrvky.Add(data);
 				tree.Insert(data.Pozicie[0], data);
 				tree.Insert(data.Pozicie[1], data);
@@ -349,13 +390,13 @@ namespace TestApp
 			/////// Testovanie /////////
 			int pocetHladani = 0;
 			int pocetChybPriHladani = 0;
-			List<GeoObjekt> chybyPriHladani = new();
+			List<GeoObjekt> chybyPriHladani = [];
 			int pocetMazani = 0;
 			int pocetChybPriMazani = 0;
-			List<GeoObjekt> chybyPriMazani = new();
+			List<GeoObjekt> chybyPriMazani = [];
 			int pocetVkladani = 0;
 			int pocetChybPriVkladani = 0;
-			List<GeoObjekt> chybyPriVkladani = new();
+			List<GeoObjekt> chybyPriVkladani = [];
 			Stopwatch sw = new();
 			for (int i = 0; i < POCET_OPERACII; i++)
 			{
@@ -368,6 +409,15 @@ namespace TestApp
 						// Vkladanie
 						pocetVkladani++;
 						GeoObjekt data = generator.GenerateGeoObjekt(i);
+						if (generator.GenerateDouble() < SANCA_DUPLICIT)
+						{
+							if (vsetkyPrvky.Count == 0)
+							{
+								continue;
+							}
+							data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+							pocetDuplicit++;
+						}
 						if (vypis) Console.WriteLine("Vkladam novy prvok " + data);
 						vsetkyPrvky.Add(data);
 						tree.Insert(data.Pozicie[0], data);
@@ -472,24 +522,26 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v liste uchovavanom: " + vsetkyPrvky.Count);
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
+			Console.WriteLine("Pocet duplicit: " + pocetDuplicit);
 		}
 
 		private static void TestObjekty_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<GpsPos, GeoObjekt> tree = new(2);
 			DataGenerator generator = new(seed);
-			List<GeoObjekt> vsetkyPrvky = new();
+			List<GeoObjekt> vsetkyPrvky = [];
+			int pocetDuplicit = 0;
 
 			/////// Testovanie /////////
 			int pocetHladani = 0;
 			int pocetChybPriHladani = 0;
-			List<GeoObjekt> chybyPriHladani = new();
+			List<GeoObjekt> chybyPriHladani = [];
 			int pocetMazani = 0;
 			int pocetChybPriMazani = 0;
-			List<GeoObjekt> chybyPriMazani = new();
+			List<GeoObjekt> chybyPriMazani = [];
 			int pocetVkladani = 0;
 			int pocetChybPriVkladani = 0;
-			List<GeoObjekt> chybyPriVkladani = new();
+			List<GeoObjekt> chybyPriVkladani = [];
 			Stopwatch sw = new();
 			for (int i = 0; i < POCET_OPERACII; i++)
 			{
@@ -502,6 +554,15 @@ namespace TestApp
 						// Vkladanie
 						pocetVkladani++;
 						GeoObjekt data = generator.GenerateGeoObjekt(i);
+						if (generator.GenerateDouble() < SANCA_DUPLICIT)
+						{
+							if (vsetkyPrvky.Count == 0)
+							{
+								continue;
+							}
+							data = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
+							pocetDuplicit++;
+						}
 						if (vypis) Console.WriteLine("Vkladam novy prvok " + data);
 						vsetkyPrvky.Add(data);
 						tree.Insert(data.Pozicie[0], data);
