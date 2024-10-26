@@ -30,7 +30,7 @@
         #region Public functions
         public override string ToString()
 		{
-			return "[" + Sirka + PoziciaSirky.ToString("F2") + "; " + Dlzka + PoziciaDlzky.ToString("F2") + "]"; 
+			return "[" + Sirka + PoziciaSirky.ToString("F3") + "; " + Dlzka + PoziciaDlzky.ToString("F3") + "]"; 
 		}
 
         public double GetValue(int dimension)

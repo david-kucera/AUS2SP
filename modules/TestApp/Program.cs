@@ -11,7 +11,7 @@ namespace TestApp
 		private const int BASE_SEED = 0;
 		private const int POCET_GENEROVANYCH = 1_000;
 		private const int POCET_OPERACII = 1_000_000;
-		private const double SANCA_DUPLICIT = 0.05;
+		private const double SANCA_DUPLICIT = 0.7;
 		#endregion //Constants
 
 		static void Main()
@@ -359,6 +359,7 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v liste uchovavanom: " + vsetkyPrvky.Count);
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
+			Console.WriteLine("Pocet duplicit " + pocetDuplicit);
 		}
 
 		private static void TestObjekty_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = true)
