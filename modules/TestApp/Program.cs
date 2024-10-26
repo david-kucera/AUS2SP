@@ -15,26 +15,49 @@ namespace TestApp
 
 		static void Main()
 		{
-			//for (int i = 1; i <= 10; i++)
-			//{
-			//	TestObjekty_NaplnenaStruktura(i, false, true);
-			//}
+			Console.WriteLine("TESTER OPERACIÍ");
+			Console.WriteLine("MENU:");
+			Console.WriteLine("\t1 - GeoObjekty : Naplnená štruktúra");
+			Console.WriteLine("\t2 - GeoObjekty : Prázdna štruktúra");
+			Console.WriteLine("\t3 - TestovacieData : Naplnená štruktúra");
+			Console.WriteLine("\t4 - TestovacieData : Prázdna štruktúra");
+			Console.WriteLine("Prepínače:");
+			Console.WriteLine("\t-v s výpisom");
+			Console.WriteLine("\t-s len štatistika behov");
 
-			for (int i = 1; i <= 10; i++)
+			string input = Console.ReadLine()!;
+			string[] args = input.Split(' ');
+
+			int volba = int.Parse(args[0]);
+			bool vypis = args.Contains("-v");
+			bool lenStatistikaBehu = args.Contains("-s");
+
+			Console.WriteLine("Zadaj počet behov: ");
+			string pocStr = Console.ReadLine()!;
+			int pocetBehov = int.Parse(pocStr);
+
+
+			for (int i = 0; i < pocetBehov; i++)
 			{
-				TestObjekty_NenaplnenaStruktura(i, false, true);
+				switch (volba)
+				{
+					case 1:
+						TestObjekty_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
+						break;
+					case 2:
+						TestObjekty_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
+						break;
+					case 3:
+						TestKontrolaRozpracovania2_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
+						break;
+					case 4:
+						TestKontrolaRozpracovania2_PrazdnaStruktura(BASE_SEED, vypis, lenStatistikaBehu);
+						break;
+					default:
+						Console.WriteLine("Neznáma voľba");
+						break;
+				}
 			}
-
-			//for (int i = 1; i <= 10; i++)
-			//{
-			//	TestKontrolaRozpracovania2_NaplnenaStruktura(i, false, true);
-			//}
-
-
-			//for (int i = 1; i <= 10; i++)
-			//{
-			//	TestKontrolaRozpracovania2_NenaplnenaStruktura(i, false, true);
-			//}
 		}
 
 		private static void TestKontrolaRozpracovania2_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
@@ -177,7 +200,7 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
 		}
 
-		private static void TestKontrolaRozpracovania2_NenaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static void TestKontrolaRozpracovania2_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<TestKey, TestData> tree = new(4);
 			DataGenerator generator = new(seed);
@@ -451,7 +474,7 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
 		}
 
-		private static void TestObjekty_NenaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static void TestObjekty_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<GpsPos, GeoObjekt> tree = new(2);
 			DataGenerator generator = new(seed);
