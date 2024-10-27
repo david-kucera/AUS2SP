@@ -340,7 +340,6 @@ namespace DataStructures
 
 			while (currentNode != null && currentNode != node)
 			{
-				//depth++;
 				var comp = currentNode.CompareTo(node.Key, depth % _treeDimension);
 				currentNode = comp < 0 ? currentNode.Left : currentNode.Right;
 				if (currentNode != null) depth++;
