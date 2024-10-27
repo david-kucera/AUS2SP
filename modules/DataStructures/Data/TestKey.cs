@@ -3,7 +3,7 @@
 	public class TestKey : IComparable
 	{
 		#region Constants
-		public const double ROUNDING_ERROR = 0.001;
+		private const double ROUNDING_ERROR = 0.001;
 		#endregion //Constants
 
 		#region Properties
@@ -46,7 +46,7 @@
 			return dimension switch
 			{
 				0 => A,
-				1 => B.Length,
+				1 => GetVal(B),
 				2 => C,
 				3 => D,
 				_ => throw new ArgumentOutOfRangeException(),
@@ -57,7 +57,7 @@
 		{
 			return obj is TestKey key &&
 					Math.Abs(A - key.A) < ROUNDING_ERROR &&
-				   B.Length == key.B.Length &&
+				   Math.Abs(GetVal(B) - GetVal(key.B)) < ROUNDING_ERROR &&
 				   C == key.C &&
 				   Math.Abs(D - key.D) < ROUNDING_ERROR;
 		}
@@ -77,9 +77,9 @@
 			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
 			{
 				// Rovnake, porovnavame podla atributu B
-				valueThis = B.Length;
-				valueOther = key.B.Length;
-				if (valueThis == valueOther)
+				valueThis = GetVal(B);
+				valueOther = GetVal(key.B);
+				if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
 				{
 					return -1; // Dolava, kedze rovnake
 				}
@@ -125,7 +125,7 @@
 		{
 			var valueThis = D;
 			var valueOther = key.D;
-			if (valueThis == valueOther)
+			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
 			{
 				return -1; // Dolava, kedze rovnake
 			}
@@ -141,15 +141,15 @@
 
 		private int Compare4(TestKey key)
 		{
-			var valueThis = B.Length;
-			var valueOther = key.B.Length;
-			if (valueThis == valueOther)
+			var valueThis = GetVal(B);
+			var valueOther = GetVal(key.B);
+			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
 			{
 				// Rovnake, porovnavame atribut C
 				valueThis = C;
 				valueOther = key.C;
 
-				if (valueThis == valueOther)
+				if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
 				{
 					return -1; // Dolava, kedze rovnake
 				}
@@ -170,6 +170,16 @@
 			{
 				return 1; // Doprava
 			}
+		}
+
+		private double GetVal(string chars)
+		{
+			double ret = 0.0;
+			foreach (var c in chars)
+			{
+				ret += c;
+			}
+			return ret;
 		}
 		#endregion //Private functions
 	}
