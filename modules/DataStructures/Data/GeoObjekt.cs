@@ -20,6 +20,11 @@
 		{
 			return SupisneCislo + " " + Popis + " " + Pozicie[0].ToString() + " " + Pozicie[1].ToString();
 		}
+
+		public string ToFile()
+		{
+			return Typ + ";" + SupisneCislo + ";" + Popis + ";" + Pozicie[0].ToFile() + ";" + Pozicie[1].ToFile();
+		}
 		#endregion //Public functions
 	}
 }

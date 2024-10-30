@@ -33,6 +33,11 @@
 			return "[" + Sirka + PoziciaSirky.ToString("F3") + "; " + Dlzka + PoziciaDlzky.ToString("F3") + "]"; 
 		}
 
+        public string ToFile()
+        {
+            return Sirka + ";" + PoziciaSirky.ToString() + ";" + Dlzka + ";" + PoziciaDlzky.ToString();
+		}
+
         public double GetValue(int dimension)
         {
 			int multiplier = 1;

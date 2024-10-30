@@ -12,8 +12,7 @@ namespace GeoLib
 		private readonly KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);	// Strom nehnuteľností
 		private readonly KdTree<GpsPos, Parcela> _parcely = new(2);				// Strom parciel
 		private readonly KdTree<GpsPos, GeoObjekt> _objekty = new(2);			// Strom oboch objektov
-
-		private readonly DataGenerator _generator = new(0);      // Generátor dát
+		private readonly DataGenerator _generator = new(0);						// Generátor dát
 		#endregion //Class members
 
 		#region Constructors
@@ -198,8 +197,23 @@ namespace GeoLib
 		/// <returns></returns>
 		public bool SaveFile(string path)
 		{
-			// TODO ulozenie dat do csv
-			return false;
+			var allObjects = GetAllObjects();
+			string saveData = string.Empty;
+			foreach (var obj in allObjects)
+			{
+				if (obj == null) continue;
+				saveData += obj.ToFile() + "\n";
+			}
+
+			try
+			{
+				File.WriteAllText(path, saveData);
+				return true;
+			}
+			catch (Exception e)
+			{
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -214,16 +228,13 @@ namespace GeoLib
 		public string ZobrazTotalInfo()
 		{
 			return $"STROM PARCIEL\n" +
-				$"Počet prvkov: {_parcely.Count}\n" +
-				$"Pvky: {_parcely}" +
+				$"Počet prvkov: {_parcely.Count}" +
 				$"\n" +
 				$"STROM NEHNUTELNOSTI\n" +
-				$"Počet prvkov: {_nehnutelnosti.Count}\n" +
-				$"Prvky: {_nehnutelnosti}" +
+				$"Počet prvkov: {_nehnutelnosti.Count}" +
 				$"\n" +
 				$"STROM OBOCH\n" +
-				$"Počet prvkov: {_objekty.Count}\n" +
-				$"Prvky: {_objekty}" +
+				$"Počet prvkov: {_objekty.Count}" +
 				$"\n";
 		}
 
