@@ -9,7 +9,7 @@ namespace GeoLib
 	public class KatSys : IKatSys
     {
 		#region Constants
-		public const string HLAVICKA_CSV = "TYP;SUPISNE_CISLO;POPIS;GPS[0]SIRKA;GPS[0]POZICIA_SIRKY;GPS[0]DLZKA;GPS[0]POZICIA_DLZKY;GPS[1]SIRKA;GPS[1]POZICIA_SIRKY;GPS[1]DLZKA;GPS[1]POZICIA_DLZKY\n";
+		public const string HLAVICKA_CSV = "TYP;SUPISNE_CISLO;POPIS;GPS[0]SIRKA;GPS[0]POZICIA_SIRKY;GPS[0]DLZKA;GPS[0]POZICIA_DLZKY;GPS[1]SIRKA;GPS[1]POZICIA_SIRKY;GPS[1]DLZKA;GPS[1]POZICIA_DLZKY";
 		#endregion //Constants
 
 		#region Class members
@@ -190,8 +190,39 @@ namespace GeoLib
 		/// <returns></returns>
 		public bool ReadFile(string path)
 		{
-			// TODO nacitanie dat z csv
-			return false;
+			var lines = File.ReadAllLines(path);
+			if (lines.Length == 0) return false;
+			if (lines[0] != HLAVICKA_CSV) return false;
+
+			for (int i = 1; i < lines.Length; i++)
+			{
+				var line = lines[i];
+				var parts = line.Split(';');
+				if (parts.Length != 11) return false;
+
+				var typ = parts[0];
+				var supisneCislo = int.Parse(parts[1]);
+				var popis = parts[2];
+				var gps0 = new GpsPos(parts[3].First(), double.Parse(parts[4]), parts[5].First(), double.Parse(parts[6]));
+				var gps1 = new GpsPos(parts[7].First(), double.Parse(parts[8]), parts[9].First(), double.Parse(parts[10]));
+
+				if (typ == "N")
+				{
+					var nehnutelnost = new Nehnutelnost(supisneCislo, popis, gps0, gps1);
+					PridajNehnutelnost(nehnutelnost);
+				}
+				else if (typ == "P")
+				{
+					var parcela = new Parcela(supisneCislo, popis, gps0, gps1);
+					PridajParcelu(parcela);
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -203,7 +234,7 @@ namespace GeoLib
 		{
 			var allObjects = GetAllObjects();
 			string saveData = string.Empty;
-			saveData += HLAVICKA_CSV;
+			saveData += HLAVICKA_CSV + "\n";
 			foreach (var obj in allObjects)
 			{
 				if (obj == null) continue;
