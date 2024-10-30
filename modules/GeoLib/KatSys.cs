@@ -8,6 +8,10 @@ namespace GeoLib
 	/// </summary>
 	public class KatSys : IKatSys
     {
+		#region Constants
+		public const string HLAVICKA_CSV = "TYP;SUPISNE_CISLO;POPIS;GPS[0]SIRKA;GPS[0]POZICIA_SIRKY;GPS[0]DLZKA;GPS[0]POZICIA_DLZKY;GPS[1]SIRKA;GPS[1]POZICIA_SIRKY;GPS[1]DLZKA;GPS[1]POZICIA_DLZKY\n";
+		#endregion //Constants
+
 		#region Class members
 		private readonly KdTree<GpsPos, Nehnutelnost> _nehnutelnosti = new(2);	// Strom nehnuteľností
 		private readonly KdTree<GpsPos, Parcela> _parcely = new(2);				// Strom parciel
@@ -199,6 +203,7 @@ namespace GeoLib
 		{
 			var allObjects = GetAllObjects();
 			string saveData = string.Empty;
+			saveData += HLAVICKA_CSV;
 			foreach (var obj in allObjects)
 			{
 				if (obj == null) continue;
