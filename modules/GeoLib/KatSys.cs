@@ -125,9 +125,17 @@ namespace GeoLib
 		/// <param name="novaGpsDruha"></param>
 		public void EditNehnutelnost(Nehnutelnost nehnutelnost, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			VymazNehnutelnost(nehnutelnost);
-			var novaNehnutelnost = new Nehnutelnost(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
-			PridajNehnutelnost(novaNehnutelnost);
+			if (nehnutelnost.Pozicie[0].Equals(novaGpsPrva) && nehnutelnost.Pozicie[1].Equals(novaGpsDruha))
+			{
+				nehnutelnost.SupisneCislo = noveCislo;
+				nehnutelnost.Popis = novyPopis;
+			}
+			else
+			{
+				VymazNehnutelnost(nehnutelnost);
+				var novaNehnutelnost = new Nehnutelnost(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
+				PridajNehnutelnost(novaNehnutelnost);
+			}
 		}
 
 		/// <summary>
@@ -140,9 +148,17 @@ namespace GeoLib
 		/// <param name="novaGpsDruha"></param>
 		public void EditParcela(Parcela parcela, int noveCislo, string novyPopis, GpsPos novaGpsPrva, GpsPos novaGpsDruha)
 	    {
-			VymazParcelu(parcela);
-			var novaParcela = new Parcela(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
-			PridajParcelu(novaParcela);
+			if (parcela.Pozicie[0].Equals(novaGpsPrva) && parcela.Pozicie[1].Equals(novaGpsDruha))
+			{
+				parcela.SupisneCislo = noveCislo;
+				parcela.Popis = novyPopis;
+			}
+			else
+			{
+				VymazParcelu(parcela);
+				var novaParcela = new Parcela(noveCislo, novyPopis, novaGpsPrva, novaGpsDruha);
+				PridajParcelu(novaParcela);
+			}
 		}
 
 		/// <summary>
@@ -190,7 +206,16 @@ namespace GeoLib
 		/// <returns></returns>
 		public bool ReadFile(string path)
 		{
-			var lines = File.ReadAllLines(path);
+			string[] lines;
+			try
+			{
+				lines = File.ReadAllLines(path);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+			
 			if (lines.Length == 0) return false;
 			if (lines[0] != HLAVICKA_CSV) return false;
 

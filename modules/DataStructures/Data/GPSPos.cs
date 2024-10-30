@@ -3,7 +3,7 @@
     public class GpsPos : IComparable
     {
 		#region Constants
-        public const double ROUNDING_ERROR = 0.001;
+        public const double ROUNDING_ERROR = 0.000001;
 		#endregion //Constants
 
 		#region Properties
@@ -30,7 +30,7 @@
         #region Public functions
         public override string ToString()
 		{
-			return "[" + Sirka + PoziciaSirky.ToString("F3") + "; " + Dlzka + PoziciaDlzky.ToString("F3") + "]"; 
+			return "[" + Sirka + PoziciaSirky.ToString("F6") + "; " + Dlzka + PoziciaDlzky.ToString("F6") + "]"; 
 		}
 
         public string ToFile()
