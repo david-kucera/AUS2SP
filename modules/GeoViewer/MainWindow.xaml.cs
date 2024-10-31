@@ -309,8 +309,8 @@ namespace GeoViewer
 			{
 				int countNehn = Int32.Parse(inputWindow.TextBoxNehn.Text);
 				int countParc = Int32.Parse(inputWindow.TextBoxParc.Text);
-				_katSys.GenerujNehnutelnosti(countNehn);
-				_katSys.GenerujParcely(countParc);
+				int perc = Int32.Parse(inputWindow.TextBoxPerc.Text);
+				_katSys.GenerujData(countNehn, countParc, perc);
 				MessageBox.Show("Dáta boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 				RefreshData();
 			}

@@ -23,12 +23,6 @@ namespace GeoLib
 		public KatSys()
 		{
 		}
-
-		public KatSys(string path)
-		{
-			// TODO load data from external file
-			throw new System.NotImplementedException();
-		}
 		#endregion //Constructors
 
 		#region Public functions
@@ -116,7 +110,7 @@ namespace GeoLib
 		}
 
 		/// <summary>
-		/// Edituje zvolenú nehnuteľnosť => vymaže ju a pridá novú s novými dátami.
+		/// Edituje zvolenú nehnuteľnosť => vymaže ju a pridá novú s novými dátami => alebo len upraví dáta zvolenej nehnuteľnosti ak neboli menené kľúčové prvky.
 		/// </summary>
 		/// <param name="nehnutelnost"></param>
 		/// <param name="noveCislo"></param>
@@ -139,7 +133,7 @@ namespace GeoLib
 		}
 
 		/// <summary>
-		/// Edituje zvolenú parcelu => vymaže ju a pridá novú s novými dátami.
+		/// Edituje zvolenú parcelu => vymaže ju a pridá novú s novými dátami => alebo len upraví dáta zvolenej parcely ak neboli menené kľúčové prvky.
 		/// </summary>
 		/// <param name="parcela"></param>
 		/// <param name="noveCislo"></param>
@@ -202,8 +196,8 @@ namespace GeoLib
 		/// <summary>
 		/// Metóda na načítanie dát zo súboru.
 		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
+		/// <param name="path">Cesta k súboru na načítanie</param>
+		/// <returns>True, ak boli dáta úspšene načítané</returns>
 		public bool ReadFile(string path)
 		{
 			string[] lines;
@@ -253,8 +247,8 @@ namespace GeoLib
 		/// <summary>
 		/// Metóda na uloženie dát do súboru.
 		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
+		/// <param name="path">Cesta k súbpru</param>
+		/// <returns>True, ak sa úspešne dáta uložia</returns>
 		public bool SaveFile(string path)
 		{
 			var allObjects = GetAllObjects();
@@ -262,7 +256,7 @@ namespace GeoLib
 			saveData += HLAVICKA_CSV + "\n";
 			foreach (var obj in allObjects)
 			{
-				if (obj == null) continue;
+				if (obj == null!) continue;
 				saveData += obj.ToFile() + "\n";
 			}
 
@@ -271,7 +265,7 @@ namespace GeoLib
 				File.WriteAllText(path, saveData);
 				return true;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return false;
 			}
@@ -286,6 +280,10 @@ namespace GeoLib
 			return _objekty.GetAll().Distinct();
 		}
 
+		/// <summary>
+		/// Vráti reťazec s informáciami o strome.
+		/// </summary>
+		/// <returns></returns>
 		public string ZobrazTotalInfo()
 		{
 			return $"STROM PARCIEL\n" +
@@ -299,6 +297,10 @@ namespace GeoLib
 				$"\n";
 		}
 
+		/// <summary>
+		/// Vygeneruje zadaný počet parciel a vloží ich do stromu.
+		/// </summary>
+		/// <param name="count">Počet parciel na vygenerovanie</param>
 		public void GenerujParcely(int count)
 		{
 			for (int i = 0; i < count; i++)
@@ -308,11 +310,56 @@ namespace GeoLib
 			}
 		}
 
+		/// <summary>
+		/// Vygeneruje zadaný počet nehnuteľností a vloží ich do stromu.
+		/// </summary>
+		/// <param name="count">Počet nehnuteľností na vygenerovanie</param>
 		public void GenerujNehnutelnosti(int count)
 		{
 			for (int i = 0; i < count; i++)
 			{
 				var nehnutelnost = _generator.GenerateNehnutelnost(i);
+				PridajNehnutelnost(nehnutelnost);
+			}
+		}
+
+		/// <summary>
+		/// Vygeneruje zadaný počet nehnuteľností a parciel a vloží ich do stromu.
+		/// </summary>
+		/// <param name="countNehn">Počet nehnuteľností na vygenerovanie</param>
+		/// <param name="countParc">Počet parciel na vygenerovanie</param>
+		/// <param name="perc">Percentuálny prekryv nehnuteľností a parciel</param>
+		public void GenerujData(int countNehn, int countParc, int perc = 0)
+		{
+			List<Parcela> parcely = [];
+			List<Nehnutelnost> nehnutelnosti = [];
+			for (int i = 0; i < countParc; i++)
+			{
+				parcely.Add(_generator.GenerateParcela(i));
+			}
+
+			// Generujem nehnutelnosti, ktore sa budu nachadzat na nejakej parcele
+			for (int i = 0; i < countNehn*(perc/100); i++)
+			{
+				var nahodnaGpsParcely = parcely[i % countParc].Pozicie[i % 2];
+				var nehnutelnost = _generator.GenerateNehnutelnost(i);
+				nehnutelnost.Pozicie[i % 2] = nahodnaGpsParcely;
+				nehnutelnosti.Add(nehnutelnost);
+			}
+
+			// Generujem ostatne nehnutelnosti
+			for (int i = 0; i < countNehn * (1 - (perc / 100)); i++)
+			{
+				nehnutelnosti.Add(_generator.GenerateNehnutelnost(i));
+			}
+
+			foreach (var parcela in parcely)
+			{
+				PridajParcelu(parcela);
+			}
+
+			foreach (var nehnutelnost in nehnutelnosti)
+			{
 				PridajNehnutelnost(nehnutelnost);
 			}
 		}

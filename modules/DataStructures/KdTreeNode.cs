@@ -1,7 +1,7 @@
 ﻿namespace DataStructures
 {
 	/// <summary>
-	/// Trieda representujúca vrchol stromu.
+	/// Trieda reprezentujúca vrchol stromu.
 	/// </summary>
 	/// <typeparam name="TKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>

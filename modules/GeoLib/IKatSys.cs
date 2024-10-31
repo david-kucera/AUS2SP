@@ -2,7 +2,10 @@
 
 namespace GeoLib
 {
-    public interface IKatSys
+	/// <summary>
+	/// Rozhranie hlavnej triedy pre prácu s údajmi.
+	/// </summary>
+	public interface IKatSys
 	{
 		IEnumerable<Nehnutelnost> VyhladajNehnutelnosti(GpsPos pozicia);
 		IEnumerable<Parcela> VyhladajParcely(GpsPos pozicia);

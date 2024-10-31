@@ -11,7 +11,7 @@ namespace GeoViewer
 
 		private void Ok(object sender, RoutedEventArgs e)
 		{
-			if (string.IsNullOrEmpty(TextBoxNehn.Text) || string.IsNullOrEmpty(TextBoxParc.Text))
+			if (string.IsNullOrEmpty(TextBoxNehn.Text) || string.IsNullOrEmpty(TextBoxParc.Text) || string.IsNullOrEmpty(TextBoxPerc.Text))
 			{
 				MessageBox.Show("Prosím vyplň počet!", "Prázdny počet!", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;

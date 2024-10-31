@@ -11,6 +11,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
 
         <GroupBox Header="Input nehnuteľnosti" Grid.Row="0">
@@ -25,7 +26,14 @@
                 <TextBox Name="TextBoxParc"  Text="100" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
         </GroupBox>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+        <GroupBox Header="Input prekryv" Grid.Row="2">
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                <Label Name="LabelZadajPerc" Content="Zadaj pravdepodobnosť prekryvu:               "></Label>
+                <TextBox Name="TextBoxPerc"  Text="30" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
+                <Label>%</Label>
+            </StackPanel>
+        </GroupBox>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
             <Button Content="OK" Margin="5" Padding="5" MinWidth="60" Click="Ok"></Button>
             <Button Content="Cancel" Margin="5" Padding="5" MinWidth="60" Click="Cancel"></Button>
         </StackPanel>
