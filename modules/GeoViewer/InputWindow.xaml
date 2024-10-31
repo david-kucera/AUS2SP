@@ -5,20 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GeoViewer"
         mc:Ignorable="d"
-        Title="Počet na generovanie" Height="150" Width="400">
+        Title="Generovanie dát" Height="250" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <GroupBox Header="Input" Grid.Row="0">
+        <GroupBox Header="Input nehnuteľnosti" Grid.Row="0">
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
-                <Label Name="LabelZadaj" Content="Zadaj počet nehnuteľností na generovanie: "></Label>
-                <TextBox Name="TextBoxCountToGenerate"  Text="1000" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
+                <Label Name="LabelZadajNehn" Content="Zadaj počet nehnuteľností na generovanie: "></Label>
+                <TextBox Name="TextBoxNehn"  Text="100" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
         </GroupBox>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+        <GroupBox Header="Input parcely" Grid.Row="1">
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                <Label Name="LabelZadajParc" Content="Zadaj počet parciel na generovanie:             "></Label>
+                <TextBox Name="TextBoxParc"  Text="100" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
+            </StackPanel>
+        </GroupBox>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
             <Button Content="OK" Margin="5" Padding="5" MinWidth="60" Click="Ok"></Button>
             <Button Content="Cancel" Margin="5" Padding="5" MinWidth="60" Click="Cancel"></Button>
         </StackPanel>

@@ -302,27 +302,17 @@ namespace GeoViewer
 			MessageBox.Show(msg, "Info o dátach", MessageBoxButton.OK);
 		}
 
-		private void GenerateParcely_OnClick(object sender, RoutedEventArgs e)
+		private void GenerateData_OnClick(object sender, RoutedEventArgs e)
 		{
 			InputWindowCount inputWindow = new('P');
 			if (inputWindow.ShowDialog() == true)
 			{
-				int count = Int32.Parse(inputWindow.TextBoxCountToGenerate.Text);
-				_katSys.GenerujParcely(count);
-				MessageBox.Show("Parcely boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				int countNehn = Int32.Parse(inputWindow.TextBoxNehn.Text);
+				int countParc = Int32.Parse(inputWindow.TextBoxParc.Text);
+				_katSys.GenerujNehnutelnosti(countNehn);
+				_katSys.GenerujParcely(countParc);
+				MessageBox.Show("Dáta boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 				RefreshData();
-			}
-		}
-
-		private void GenerateNehnutelnosti_OnClick(object sender, RoutedEventArgs e)
-		{
-			InputWindowCount inputWindow = new('N');
-			if (inputWindow.ShowDialog() == true)
-			{
-				int count = Int32.Parse(inputWindow.TextBoxCountToGenerate.Text);
-				_katSys.GenerujNehnutelnosti(count);
-				MessageBox.Show("Nehnutelnosti boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
-				_currentlyDisplayedObjects.Clear();
 			}
 		}
 		#endregion //Button handlers
