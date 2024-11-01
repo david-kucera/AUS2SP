@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Xml.Linq;
 
 namespace DataStructures
 {
@@ -96,16 +95,18 @@ namespace DataStructures
 			if (nodeToDelete == null!) return;
 
 			List<KdTreeNode<TKey, TValue>> duplikaty = [];
+			List<KdTreeNode<TKey, TValue>> nodesToReinsert = [];
 			while (nodeToDelete.Left != null! || nodeToDelete.Right != null!)
 			{
 				KdTreeNode<TKey, TValue> newNode;
+				int dimension = GetDimension(nodeToDelete);
 				if (nodeToDelete.Left != null!)
 				{
-					newNode = SearchMax((KdTreeNode<TKey, TValue>)nodeToDelete.Left!, GetDimension(nodeToDelete), double.MinValue);
+					newNode = SearchMax((KdTreeNode<TKey, TValue>)nodeToDelete.Left!, dimension, double.MinValue);
 				}
 				else
 				{
-					newNode = SearchMin((KdTreeNode<TKey, TValue>)nodeToDelete.Right!, GetDimension(nodeToDelete), double.MaxValue);
+					newNode = SearchMin((KdTreeNode<TKey, TValue>)nodeToDelete.Right!, dimension, double.MaxValue);
 
 					// Ak som vybral vrchol, ktory je v pravom podstrome, tak musim skontrolovat, ci sa vpravo nenachadzaju duplicity podla daneho kluca
 					var stack = new Stack<KdTreeNode<TKey, TValue>>();
@@ -114,13 +115,26 @@ namespace DataStructures
 					while (stack.Count > 0)
 					{
 						var currentNode = stack.Pop();
-						if (currentNode.CompareTo(nodeToDelete.Key, GetDimension(nodeToDelete)) == 0)
+						if (currentNode != newNode) nodesToReinsert.Add(currentNode);
+						if (currentNode.CompareTo(newNode.Key, dimension) == 0)
 						{
 							duplikaty.Add(currentNode);
 						}
 
 						if (currentNode.Right != null!) stack.Push((KdTreeNode<TKey, TValue>)currentNode.Right);
 						if (currentNode.Left != null!) stack.Push((KdTreeNode<TKey, TValue>)currentNode.Left);
+					}
+
+					// Ak som nasiel nejake duplicity, tak ich musim odstranit
+					// Odstranim cely pravy podstrom, pretoze pomocou metody Find by som sa k prvkom po presunuti uz nedostal
+					if (duplikaty.Count > 0)
+					{
+						nodeToDelete.Right = null!;
+						Count -= nodesToReinsert.Count;
+						nodeToDelete.Key = newNode.Key;
+						nodeToDelete.Data = newNode.Data;
+						Count--; // Odstranujem newNode, ktory je uz nahradeny za nodeToDelete
+						break;
 					}
 				}
 
@@ -134,13 +148,17 @@ namespace DataStructures
 			}
 
 			// Ak je vrchol list, tak ho len odstranim
-			RemoveLeaf(nodeToDelete);
-			Count--;
-
-			foreach (var duplicate in duplikaty)
+			if (duplikaty.Count == 0)
 			{
-				Remove(duplicate.Key, duplicate.Data);
-				Insert(duplicate.Key, duplicate.Data);
+				RemoveLeaf(nodeToDelete);
+				Count--;
+			}
+
+			// Nasledne znovu vkladam pravy podstrom do stromu aby mali dobru poziciu a boli dohladatelne
+			if (duplikaty.Count == 0) return;
+			foreach (var node in nodesToReinsert)
+			{
+				Insert(node.Key, node.Data);
 			}
 		}
 
@@ -276,7 +294,7 @@ namespace DataStructures
 				nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
 				var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
-				if (compareValue < minimumKeyValue)
+				if (compareValue <= minimumKeyValue)
 				{
 					minimumKeyValue = compareValue;
 					newNode = currentNode;
@@ -299,7 +317,7 @@ namespace DataStructures
 				nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
 				var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
-				if (compareValue > maximumKeyValue)
+				if (compareValue >= maximumKeyValue)
 				{
 					maximumKeyValue = compareValue;
 					newNode = currentNode;

@@ -11,11 +11,13 @@ namespace TestApp
 		private const int BASE_SEED = 0;
 		private const int POCET_GENEROVANYCH = 1_000;
 		private const int POCET_OPERACII = 1_000;
-		private const double SANCA_DUPLICIT = 0.0;
+		private const double SANCA_DUPLICIT = 0.3;
 		#endregion //Constants
 
 		static void Main()
 		{
+			//TestingDuplicates();
+			//return;
 			Console.WriteLine("TESTER OPERACIÍ");
 			Console.WriteLine("MENU:");
 			Console.WriteLine("\t1 - GeoObjekty : Naplnená štruktúra");
@@ -59,6 +61,99 @@ namespace TestApp
 						break;
 				}
 			}
+		}
+
+		private static void TestingDuplicates()
+		{
+			KdTree<GpsPos, Mesto> tree = new(2);
+			Mesto o1 = new( "Senica", new GpsPos('N', 22,'E', 39));
+			Mesto o2 = new( "Tlmace - urad", new GpsPos('N', 24, 'E', 36));
+			Mesto o3 = new( "Tlmace", new GpsPos('N', 24, 'E', 34));
+			Mesto o4 = new("Tlmace - nem.", new GpsPos('N', 24, 'E', 35));
+			Mesto o5 = new("Levice", new GpsPos('N', 30, 'E', 33));
+			Mesto o6 = new("Tlmace - parkovisko", new GpsPos('N', 24, 'E', 40));
+			Mesto o7 = new("Bojnice", new GpsPos('N', 29, 'E', 46));
+			Mesto o8 = new("Novaky", new GpsPos('N', 27, 'E', 43));
+			tree.Insert(o1.Pozicia, o1);
+			tree.Insert(o2.Pozicia, o2);
+			tree.Insert(o3.Pozicia, o3);
+			tree.Insert(o4.Pozicia, o4);
+			tree.Insert(o5.Pozicia, o5);
+			tree.Insert(o6.Pozicia, o6);
+			tree.Insert(o7.Pozicia, o7);
+			tree.Insert(o8.Pozicia, o8);
+			Console.WriteLine(tree.ToString());
+			Console.WriteLine(tree.Count);
+			Console.WriteLine("Idem vymazat prvok: " + o1.ToString());
+			tree.Remove(o1.Pozicia, o1);
+			Console.WriteLine(tree.ToString());
+			Console.WriteLine(tree.Count);
+		}
+
+		private static void Test()
+		{
+			KdTree<GpsPos, Nehnutelnost> objekty = new(2);
+
+			Console.WriteLine("Generované nehnutelnosti");
+			Random rnd = new(BASE_SEED);
+			DataGenerator generator = new(BASE_SEED);
+
+			int pocetNehnutelnosti = 0;
+			Nehnutelnost objektToFind = null!;
+			for (int i = 0; i < POCET_GENEROVANYCH; i++)
+			{
+				Nehnutelnost objekt;
+				objekt = generator.GenerateNehnutelnost(i);
+				pocetNehnutelnosti++;
+
+				if (i == generator.GenerateInt(0,POCET_GENEROVANYCH))
+				{
+					objektToFind = objekt;
+				}
+				objekty.Insert(objekt.Pozicie[0], objekt);
+				objekty.Insert(objekt.Pozicie[1], objekt);
+			}
+			Console.WriteLine("POCET CELKOVO: " + objekty.Count);
+			//Console.WriteLine(objekty.ToString());
+
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
+			var objs = objekty.Find(objektToFind.Pozicie[0]);
+			//foreach (var obj in objs)
+			//{
+			//	Console.WriteLine(obj.ToString());
+			//}
+			Console.WriteLine("----------------");
+
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[1]}");
+			var objss = objekty.Find(objektToFind.Pozicie[1]);
+			//foreach (var obj in objss)
+			//{
+			//	Console.WriteLine(obj.ToString());
+			//}
+			Console.WriteLine("----------------");
+
+			Console.WriteLine($"Objekty po vymazaní objektu {objektToFind}");
+			objekty.Remove(objektToFind.Pozicie[0], objektToFind);
+			objekty.Remove(objektToFind.Pozicie[1], objektToFind);
+
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[0]}");
+			objs = objekty.Find(objektToFind.Pozicie[0]);
+			//foreach (var obj in objs)
+			//{
+			//	Console.WriteLine(obj.ToString());
+			//}
+			Console.WriteLine("----------------");
+
+			Console.WriteLine($"Nájdené objekty na pozícií {objektToFind.Pozicie[1]}");
+			objs = objekty.Find(objektToFind.Pozicie[1]);
+			//foreach (var obj in objs)
+			//{
+			//	Console.WriteLine(obj.ToString());
+			//}
+			Console.WriteLine("----------------");
+
+			Console.WriteLine("Celkový počet objektov v strome: " + objekty.Count);
+			//Console.WriteLine(objekty.ToString());
 		}
 
 		private static void TestKontrolaRozpracovania2_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
