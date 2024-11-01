@@ -7,10 +7,8 @@
 		#endregion //Constants
 
 		#region Properties
-		public double A { get; set; } = 0.0;
-		public string B { get; set; } = string.Empty;
-		public int C { get; set; } = 0;
-		public double D { get; set; } = 0.0;
+		public int X { get; set; } = 0;
+		public int Y { get; set; } = 0;
 		#endregion //Properties
 
 		#region Constructor
@@ -18,12 +16,10 @@
 		{
 		}
 
-		public TestKey(double a, string b, int c, double d)
+		public TestKey(int x, int y)
 		{
-			A = a;
-			B = b;
-			C = c;
-			D = d;
+			X = x;
+			Y = y;
 		}
 		#endregion //Constructor
 
@@ -33,10 +29,8 @@
 			var key = obj as TestKey;
 			return dimension switch
 			{
-				0 => Compare1(key!),
-				1 => Compare2(key!),
-				2 => Compare3(key!),
-				3 => Compare4(key!),
+				0 => CompareX(key!),
+				1 => CompareY(key!),
 				_ => throw new ArgumentOutOfRangeException(),
 			};
 		}
@@ -45,10 +39,8 @@
 		{
 			return dimension switch
 			{
-				0 => A,
-				1 => GetVal(B),
-				2 => C,
-				3 => D,
+				0 => X,
+				1 => Y,
 				_ => throw new ArgumentOutOfRangeException(),
 			};
 		}
@@ -56,60 +48,25 @@
 		public override bool Equals(object obj)
 		{
 			return obj is TestKey key &&
-					Math.Abs(A - key.A) < ROUNDING_ERROR &&
-				   Math.Abs(GetVal(B) - GetVal(key.B)) < ROUNDING_ERROR &&
-				   C == key.C &&
-				   Math.Abs(D - key.D) < ROUNDING_ERROR;
+					Math.Abs(X - key.X) < ROUNDING_ERROR &&
+				   Math.Abs(Y - key.Y) < ROUNDING_ERROR;
 		}
 
 		public override string ToString()
 		{
-			return $"\nA: {A}\nB: {B}\nC: {C}\nD: {D}\n";
+			return $"\nX: {X}\nY: {Y}\n";
 		}
 		#endregion //Public functions
 
 		#region Private functions
-		private int Compare1(TestKey key)
+		private int CompareX(TestKey key)
 		{
-			var valueThis = A;
-			var valueOther = key.A;
-
-			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
-			{
-				// Rovnake, porovnavame podla atributu B
-				valueThis = GetVal(B);
-				valueOther = GetVal(key.B);
-				if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
-				{
-					return -1; // Dolava, kedze rovnake
-				}
-				if (valueThis > valueOther)
-				{
-					return -1; // Dolava
-				}
-				else
-				{
-					return 1; // Doprava
-				}
-			}
-			if (valueThis > valueOther)
-			{
-				return -1; // Dolava
-			}
-			else
-			{
-				return 1; // Doprava
-			}
-		}
-
-		private int Compare2(TestKey key)
-		{
-			var valueThis = C;
-			var valueOther = key.C;
+			var valueThis = X;
+			var valueOther = key.X;
 
 			if (valueThis == valueOther)
 			{
-				return -1; // Dolava, kedze rovnake
+				return 0; // Rovnake - dolava
 			}
 			if (valueThis > valueOther)
 			{
@@ -121,13 +78,14 @@
 			}
 		}
 
-		private int Compare3(TestKey key)
+		private int CompareY(TestKey key)
 		{
-			var valueThis = D;
-			var valueOther = key.D;
-			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
+			var valueThis = Y;
+			var valueOther = key.Y;
+
+			if (valueThis == valueOther)
 			{
-				return -1; // Dolava, kedze rovnake
+				return 0; // Dolava, kedze rovnake
 			}
 			if (valueThis > valueOther)
 			{
@@ -137,49 +95,6 @@
 			{
 				return 1; // Doprava
 			}
-		}
-
-		private int Compare4(TestKey key)
-		{
-			var valueThis = GetVal(B);
-			var valueOther = GetVal(key.B);
-			if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
-			{
-				// Rovnake, porovnavame atribut C
-				valueThis = C;
-				valueOther = key.C;
-
-				if (Math.Abs(valueThis - valueOther) < ROUNDING_ERROR)
-				{
-					return -1; // Dolava, kedze rovnake
-				}
-				if (valueThis > valueOther)
-				{
-					return -1; // Dolava
-				}
-				else
-				{
-					return 1; // Doprava
-				}
-			}
-			if (valueThis > valueOther)
-			{
-				return -1; // Dolava
-			}
-			else
-			{
-				return 1; // Doprava
-			}
-		}
-
-		private double GetVal(string chars)
-		{
-			double ret = 0.0;
-			foreach (var c in chars)
-			{
-				ret += c;
-			}
-			return ret;
 		}
 		#endregion //Private functions
 	}

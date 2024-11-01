@@ -9,7 +9,7 @@ namespace TestApp
 	{
 		#region Constants
 		private const int BASE_SEED = 0;
-		private const int POCET_GENEROVANYCH = 1_000;
+		private const int POCET_GENEROVANYCH = 20_000;
 		private const int POCET_OPERACII = 100_000;
 		private const double SANCA_DUPLICIT = 0.01;
 		#endregion //Constants
@@ -49,10 +49,10 @@ namespace TestApp
 						TestObjekty_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 3:
-						TestKontrolaRozpracovania2_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
+						Test_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 4:
-						TestKontrolaRozpracovania2_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
+						Test_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					default:
 						Console.WriteLine("Neznáma voľba");
@@ -61,36 +61,9 @@ namespace TestApp
 			}
 		}
 
-		private static void TestingDuplicates()
+		private static void Test_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
-			KdTree<GpsPos, Mesto> tree = new(2);
-			Mesto o1 = new( "Senica", new GpsPos('N', 22,'E', 39));
-			Mesto o2 = new( "Tlmace - urad", new GpsPos('N', 24, 'E', 36));
-			Mesto o3 = new( "Tlmace", new GpsPos('N', 24, 'E', 34));
-			Mesto o4 = new("Tlmace - nem.", new GpsPos('N', 24, 'E', 35));
-			Mesto o5 = new("Levice", new GpsPos('N', 30, 'E', 33));
-			Mesto o6 = new("Tlmace - parkovisko", new GpsPos('N', 24, 'E', 40));
-			Mesto o7 = new("Bojnice", new GpsPos('N', 29, 'E', 46));
-			Mesto o8 = new("Novaky", new GpsPos('N', 27, 'E', 43));
-			tree.Insert(o1.Pozicia, o1);
-			tree.Insert(o2.Pozicia, o2);
-			tree.Insert(o3.Pozicia, o3);
-			tree.Insert(o4.Pozicia, o4);
-			tree.Insert(o5.Pozicia, o5);
-			tree.Insert(o6.Pozicia, o6);
-			tree.Insert(o7.Pozicia, o7);
-			tree.Insert(o8.Pozicia, o8);
-			Console.WriteLine(tree.ToString());
-			Console.WriteLine(tree.Count);
-			Console.WriteLine("Idem vymazat prvok: " + o1.ToString());
-			tree.Remove(o1.Pozicia, o1);
-			Console.WriteLine(tree.ToString());
-			Console.WriteLine(tree.Count);
-		}
-
-		private static void TestKontrolaRozpracovania2_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
-		{
-			KdTree<TestKey, TestData> tree = new(4);
+			KdTree<TestKey, TestData> tree = new(2);
 			DataGenerator generator = new(seed);
 			List<TestData> vsetkyPrvky = [];
 			int pocetDuplicit = 0;
@@ -248,9 +221,9 @@ namespace TestApp
 			Console.WriteLine("Duplicit bolo: " + pocetDuplicit);
 		}
 
-		private static void TestKontrolaRozpracovania2_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static void Test_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
-			KdTree<TestKey, TestData> tree = new(4);
+			KdTree<TestKey, TestData> tree = new(2);
 			DataGenerator generator = new(seed);
 			List<TestData> vsetkyPrvky = [];
 			int pocetDuplicit = 0;

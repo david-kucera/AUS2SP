@@ -94,13 +94,10 @@ namespace GeoLib
 			{
 				Kluce = new TestKey
 				{
-					A = _random.NextDouble() * 10_000,
-					B = GenerateString(_random.Next(1,10)),
-					C = _random.Next(),
-					D = _random.NextDouble() * 10_000
+					X = GenerateInt(1,50),
+					Y = GenerateInt(1,50)
 				},
-				Popis = "TestData " + i,
-				Cislo = i
+				Popis = GenerateString(10),
 			};
 			return testData;
 		}
