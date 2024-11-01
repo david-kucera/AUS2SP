@@ -262,6 +262,10 @@ namespace DataStructures
 			return null;
 		}
 
+		/// <summary>
+		/// Method to remove leaf node from the tree.
+		/// </summary>
+		/// <param name="nodeToDelete"></param>
 		private void RemoveLeaf(KdTreeNode<TKey, TValue> nodeToDelete)
 		{
 			var parentNode = nodeToDelete.Parent;
@@ -283,6 +287,12 @@ namespace DataStructures
 			}
 		}
 
+		/// <summary>
+		/// Looks for the node with the minimum value in the given dimension.
+		/// </summary>
+		/// <param name="node"></param>
+		/// <param name="dimensionNodeToDelete"></param>
+		/// <returns></returns>
 		private static KdTreeNode<TKey, TValue> SearchMin(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
 			double minimumKeyValue = double.MaxValue;
@@ -307,6 +317,12 @@ namespace DataStructures
 			return newNode;
 		}
 
+		/// <summary>
+		/// Looks for the node with the maximum value in the given dimension.
+		/// </summary>
+		/// <param name="node"></param>
+		/// <param name="dimensionNodeToDelete"></param>
+		/// <returns></returns>
 		private static KdTreeNode<TKey, TValue> SearchMax(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
 			double maximumKeyValue = double.MinValue;
