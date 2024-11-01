@@ -65,7 +65,7 @@
             <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
                             <Label>
                                 <Label.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -74,9 +74,9 @@
                                     </StackPanel>
                                 </Label.Content>
                             </Label>
-                            <Label Content="{Binding Typ}" FontSize="14"/>
-                            <Label Content="{Binding SupisneCislo}" FontSize="12"/>
-                            <Label Content="{Binding Popis}" FontSize="10"/>
+                            <Label Content="{Binding Typ}" FontSize="12" VerticalAlignment="Center"/>
+                            <Label Content="{Binding SupisneCislo}" FontSize="12" VerticalAlignment="Center"/>
+                            <Label Content="{Binding Popis}" FontSize="12" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
