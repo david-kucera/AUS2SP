@@ -92,21 +92,22 @@ namespace DataStructures
 		public override void Remove(TKey key, TValue data)
 		{
 			var nodeToDelete = Find(key, data);
-			if (nodeToDelete == null!) return;
+			if (nodeToDelete == null!) 
+				throw new Exception("Node to delete not found!");
 
-			List<KdTreeNode<TKey, TValue>> duplikaty = [];
+			bool duplikaty = false;
+			int dimension = GetDimension(nodeToDelete);
 			List<KdTreeNode<TKey, TValue>> nodesToReinsert = [];
 			while (nodeToDelete.Left != null! || nodeToDelete.Right != null!)
 			{
 				KdTreeNode<TKey, TValue> newNode;
-				int dimension = GetDimension(nodeToDelete);
 				if (nodeToDelete.Left != null!)
 				{
-					newNode = SearchMax((KdTreeNode<TKey, TValue>)nodeToDelete.Left!, dimension, double.MinValue);
+					newNode = SearchMax((KdTreeNode<TKey, TValue>)nodeToDelete.Left!, dimension);
 				}
 				else
 				{
-					newNode = SearchMin((KdTreeNode<TKey, TValue>)nodeToDelete.Right!, dimension, double.MaxValue);
+					newNode = SearchMin((KdTreeNode<TKey, TValue>)nodeToDelete.Right!, dimension);
 
 					// Ak som vybral vrchol, ktory je v pravom podstrome, tak musim skontrolovat, ci sa vpravo nenachadzaju duplicity podla daneho kluca
 					var stack = new Stack<KdTreeNode<TKey, TValue>>();
@@ -116,9 +117,9 @@ namespace DataStructures
 					{
 						var currentNode = stack.Pop();
 						if (currentNode != newNode) nodesToReinsert.Add(currentNode);
-						if (currentNode.CompareTo(newNode.Key, dimension) == 0)
+						if (currentNode.CompareTo(newNode.Key, dimension) == 0 && currentNode != newNode)
 						{
-							duplikaty.Add(currentNode);
+							duplikaty = true;
 						}
 
 						if (currentNode.Right != null!) stack.Push((KdTreeNode<TKey, TValue>)currentNode.Right);
@@ -127,39 +128,37 @@ namespace DataStructures
 
 					// Ak som nasiel nejake duplicity, tak ich musim odstranit
 					// Odstranim cely pravy podstrom, pretoze pomocou metody Find by som sa k prvkom po presunuti uz nedostal
-					if (duplikaty.Count > 0)
+					if (duplikaty)
 					{
 						nodeToDelete.Right = null!;
-						Count -= nodesToReinsert.Count;
 						nodeToDelete.Key = newNode.Key;
 						nodeToDelete.Data = newNode.Data;
 						Count--; // Odstranujem newNode, ktory je uz nahradeny za nodeToDelete
-						break;
+
+						// Nasledne znovu vkladam pravy podstrom do stromu aby mali dobru poziciu a boli dohladatelne
+						foreach (var node in nodesToReinsert)
+						{
+							Count--;
+							Insert(node.Key, node.Data);
+						}
+						return;
 					}
+					nodesToReinsert.Clear();
+					// Ak sa duplikaty nenasli, tak sa pokracuje cyklicky dalej
 				}
 
 				// Nahradzam vrchol za jeho nasledovnika
-				if (newNode == null!) throw new Exception("NewNode is null!");
+				dimension = GetDimension(newNode);
 				nodeToDelete.Key = newNode.Key;
 				nodeToDelete.Data = newNode.Data;
 
-				// Opakujem proces pre naslednika
+				// Opakujem proces pre naslednika, kym nie je listom
 				nodeToDelete = newNode;
 			}
 
 			// Ak je vrchol list, tak ho len odstranim
-			if (duplikaty.Count == 0)
-			{
-				RemoveLeaf(nodeToDelete);
-				Count--;
-			}
-
-			// Nasledne znovu vkladam pravy podstrom do stromu aby mali dobru poziciu a boli dohladatelne
-			if (duplikaty.Count == 0) return;
-			foreach (var node in nodesToReinsert)
-			{
-				Insert(node.Key, node.Data);
-			}
+			RemoveLeaf(nodeToDelete);
+			Count--;
 		}
 
 		/// <summary>
@@ -284,8 +283,9 @@ namespace DataStructures
 			}
 		}
 
-		private static KdTreeNode<TKey, TValue> SearchMin(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete, double minimumKeyValue)
+		private static KdTreeNode<TKey, TValue> SearchMin(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
+			double minimumKeyValue = double.MaxValue;
 			List<KdTreeNode<TKey, TValue>> nodesToSearch = [node];
 			KdTreeNode<TKey, TValue> newNode = null!;
 			while (nodesToSearch.Count > 0)
@@ -307,8 +307,9 @@ namespace DataStructures
 			return newNode;
 		}
 
-		private static KdTreeNode<TKey, TValue> SearchMax(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete, double maximumKeyValue)
+		private static KdTreeNode<TKey, TValue> SearchMax(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
+			double maximumKeyValue = double.MinValue;
 			List<KdTreeNode<TKey, TValue>> nodesToSearch = [node];
 			KdTreeNode<TKey, TValue> newNode = null!;
 			while (nodesToSearch.Count > 0)
@@ -343,8 +344,8 @@ namespace DataStructures
 			while (currentNode != null && currentNode != node)
 			{
 				var comp = currentNode.CompareTo(node.Key, depth % _treeDimension);
-				currentNode = comp < 0 ? currentNode.Left : currentNode.Right;
-				if (currentNode != null) depth++;
+				currentNode = comp <= 0 ? currentNode.Left : currentNode.Right;
+				if (currentNode != null!) depth++;
 			}
 
 			return depth % _treeDimension;
