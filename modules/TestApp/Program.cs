@@ -37,31 +37,40 @@ namespace TestApp
 			string pocStr = Console.ReadLine()!;
 			int pocetBehov = int.Parse(pocStr);
 
-
+			int pocetOk = 0;
+			int pocetChyb = 0;
 			for (int i = 0; i < pocetBehov; i++)
 			{
+				var ret = false;
 				switch (volba)
 				{
 					case 1:
-						TestObjekty_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
+						ret = TestObjekty_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 2:
-						TestObjekty_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
+						ret = TestObjekty_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 3:
-						Test_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
+						ret = Test_NaplnenaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					case 4:
-						Test_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
+						ret = Test_PrazdnaStruktura(i, vypis, lenStatistikaBehu);
 						break;
 					default:
 						Console.WriteLine("Neznáma voľba");
 						break;
 				}
+
+				if (ret) pocetOk++;
+				else pocetChyb++;
 			}
+
+			Console.WriteLine("VYHODNOTENIE SIMULACNEHO EXPERIMENTU");
+			Console.WriteLine($"POCET KOREKTNYCH BEHOV: {pocetOk}");
+			Console.WriteLine($"POCET NEKOREKTNYCH BEHOV: {pocetChyb}");
 		}
 
-		private static void Test_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static bool Test_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<TestKey, TestData> tree = new(2);
 			DataGenerator generator = new(seed);
@@ -219,9 +228,10 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
 			Console.WriteLine("Duplicit bolo: " + pocetDuplicit);
+			return pocetChybPriHladani == 0 && pocetChybPriMazani == 0 && pocetChybPriVkladani == 0 && tree.Count == pocetRealne;
 		}
 
-		private static void Test_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static bool Test_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<TestKey, TestData> tree = new(2);
 			DataGenerator generator = new(seed);
@@ -360,9 +370,10 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
 			Console.WriteLine("Pocet duplicit " + pocetDuplicit);
+			return pocetChybPriHladani == 0 && pocetChybPriMazani == 0 && pocetChybPriVkladani == 0 && tree.Count == pocetRealne;
 		}
 
-		private static void TestObjekty_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = true)
+		private static bool TestObjekty_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = true)
 		{
 			KdTree<GpsPos, GeoObjekt> tree = new(2);
 			DataGenerator generator = new(seed);
@@ -524,9 +535,10 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
 			Console.WriteLine("Pocet duplicit: " + pocetDuplicit);
+			return pocetChybPriHladani == 0 && pocetChybPriMazani == 0 && pocetChybPriVkladani == 0 && tree.Count == pocetRealne;
 		}
 
-		private static void TestObjekty_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
+		private static bool TestObjekty_PrazdnaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
 		{
 			KdTree<GpsPos, GeoObjekt> tree = new(2);
 			DataGenerator generator = new(seed);
@@ -668,6 +680,7 @@ namespace TestApp
 			Console.WriteLine("Pocet prvkov v liste uchovavanom: " + vsetkyPrvky.Count);
 			Console.WriteLine("Pocet prvkov v strome v atribute Count: " + tree.Count);
 			Console.WriteLine("Pocet prvkov v strome realne: " + pocetRealne);
+			return pocetChybPriHladani == 0 && pocetChybPriMazani == 0 && pocetChybPriVkladani == 0 && tree.Count == pocetRealne;
 		}
 	}
 }
