@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GeoViewer"
         mc:Ignorable="d"
-        Title="EditObjektWindow" Height="200" Width="600">
+        Title="EditObjektWindow" Height="200" Width="650">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -17,21 +17,21 @@
                 <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                     <Label Name="CisloLabel" Content="Súpisné číslo:" Margin="0,0,50,0"></Label>
                     <!--cislo-->
-                    <TextBox Name="CisloInput" MinWidth="400"></TextBox>
+                    <TextBox Name="CisloInput" MinWidth="450"></TextBox>
                 </StackPanel>
                 <StackPanel  FlowDirection="LeftToRight" Orientation="Horizontal">
                     <Label Content="            Popis:" Margin="0,0,50,0"></Label>
                     <!--popis-->
-                    <TextBox Name="PopisInput" MinWidth="400"></TextBox>
+                    <TextBox Name="PopisInput" MinWidth="450"></TextBox>
                 </StackPanel>
                 <StackPanel  FlowDirection="LeftToRight" Orientation="Horizontal">
                     <Label Content="  GPS Pozície:" Margin="0,0,50,0"></Label>
                     <!--prva gps-->
-                    <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                    <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsFirstLatitude" MinWidth="100" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsFirstLongitude" MinWidth="100" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                     <!--druha gps-->
-                    <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="40,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                    <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsSecondLatitude" MinWidth="100" Margin="40,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    <TextBox Name="GpsSecondLongitude" MinWidth="100" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

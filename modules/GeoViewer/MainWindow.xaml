@@ -44,12 +44,12 @@
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                 <!--prva gps-->
                 <Label Margin="10,0,0,0">GPS 1:</Label>
-                <TextBox Name="GpsFirstLatitude" MinWidth="50" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                <TextBox Name="GpsFirstLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsFirstLatitude" MinWidth="100" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsFirstLongitude" MinWidth="100" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--druha gps-->
                 <Label Margin="10,0,0,0">GPS 2:</Label>
-                <TextBox Name="GpsSecondLatitude" MinWidth="50" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                <TextBox Name="GpsSecondLongitude" MinWidth="50" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsSecondLatitude" MinWidth="100" Margin="0,0,0,0" Text="N 21,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox Name="GpsSecondLongitude" MinWidth="100" Margin="5,0,0,0" Text="E 58,123456" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--buttony-->
                 <!--hladanie-->
                 <Button Name="FindAllButton" Margin="30,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi všetko" Click="FindAllButton_OnClick"></Button>
