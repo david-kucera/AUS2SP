@@ -54,7 +54,7 @@
 
 		public override string ToString()
 		{
-			return $"\nX: {X}\nY: {Y}\n";
+			return $"X: {X}, Y: {Y}";
 		}
 		#endregion //Public functions
 
