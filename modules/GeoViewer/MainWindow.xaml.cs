@@ -50,6 +50,11 @@ namespace GeoViewer
 				return;
 			}
 			MessageBox.Show("Dáta úspešne načítané!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+			_currentlyDisplayedObjects.Clear();
+			foreach (var objekt in _katSys.GetAllObjects())
+			{
+				_currentlyDisplayedObjects.Add(objekt);
+			}
 			RefreshData();
 			
 		}
@@ -97,7 +102,7 @@ namespace GeoViewer
 			    || string.IsNullOrEmpty(GpsSecondLongitude.Text)
 			    || string.IsNullOrEmpty(GpsSecondLatitude.Text))
 			{
-				MessageBox.Show("Je potrbné zadať oboje GPS súradnice!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show("Je potrebné zadať oboje GPS súradnice!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 				
@@ -112,6 +117,8 @@ namespace GeoViewer
 			var ret = _katSys.Vyhladaj(pozicia1, pozicia2);
 			if (!ret.Any())
 			{
+				_currentlyDisplayedObjects.Clear();
+				RefreshData();
 				MessageBox.Show("Neboli nájdené žiadne objekty na zadaných súradniciach!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
@@ -132,6 +139,8 @@ namespace GeoViewer
 			var ret = _katSys.VyhladajParcely(pozicia);
 			if (!ret.Any())
 			{
+				_currentlyDisplayedObjects.Clear();
+				RefreshData();
 				MessageBox.Show("Neboli nájdené žiadne parcely na zadanej súradnici!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
@@ -152,6 +161,8 @@ namespace GeoViewer
 			var ret = _katSys.VyhladajNehnutelnosti(pozicia);
 			if (!ret.Any())
 			{
+				_currentlyDisplayedObjects.Clear();
+				RefreshData();
 				MessageBox.Show("Neboli nájdené žiadne nehnuteľnosti na zadanej súradnici!", "Informácia", MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
@@ -274,7 +285,12 @@ namespace GeoViewer
 					var parcela = (Parcela)selectedObject;
 					_katSys.EditParcela(parcela, newCislo, newPopis, gpsPrvaNova, gpsDruhaNova);
 				}
-
+				_currentlyDisplayedObjects.Clear();
+				foreach (var objekt in _katSys.GetAllObjects())
+				{
+					_currentlyDisplayedObjects.Add(objekt);
+				}
+				RefreshData();
 				MessageBox.Show("Objekt bol úspešne editovaný!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			else
@@ -311,8 +327,13 @@ namespace GeoViewer
 				int countParc = Int32.Parse(inputWindow.TextBoxParc.Text);
 				int perc = Int32.Parse(inputWindow.TextBoxPerc.Text);
 				_katSys.GenerujData(countNehn, countParc, perc);
-				MessageBox.Show("Dáta boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
+				_currentlyDisplayedObjects.Clear();
+				foreach (var objekt in _katSys.GetAllObjects())
+				{
+					_currentlyDisplayedObjects.Add(objekt);
+				}
 				RefreshData();
+				MessageBox.Show("Dáta boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 		}
 		#endregion //Button handlers
