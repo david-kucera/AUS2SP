@@ -66,8 +66,11 @@ namespace TestApp
 			}
 
 			Console.WriteLine("VYHODNOTENIE SIMULACNEHO EXPERIMENTU");
+			Console.ForegroundColor = ConsoleColor.Green;
 			Console.WriteLine($"POCET KOREKTNYCH BEHOV: {pocetOk}");
+			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"POCET NEKOREKTNYCH BEHOV: {pocetChyb}");
+			Console.ForegroundColor = ConsoleColor.White;
 		}
 
 		private static bool Test_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
@@ -145,17 +148,31 @@ namespace TestApp
 						pocetHladani++;
 						var hladanyPrvok = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
 						if (vypis) Console.WriteLine("Hladam prvok " + hladanyPrvok.ToString());
-						var res = tree.Find(hladanyPrvok.Kluce);
 
-						bool najdeny = false;
+						var res = tree.Find(hladanyPrvok.Kluce);
+						var r = vsetkyPrvky.FindAll(testData => testData.Kluce.Equals(hladanyPrvok.Kluce));
+
+						int por = 0;
+						int[] poradie = new int[res.Count];
 						foreach (var found in res)
 						{
-							if (found.Kluce.Equals(hladanyPrvok.Kluce))
+							foreach (var testData in r)
 							{
-								najdeny = true;
-								break;
+								if (found.Kluce.Equals(hladanyPrvok.Kluce))
+								{
+									poradie[por] = 1;
+									break;
+								}
 							}
+							por++;
 						}
+						int sum = 0;
+						foreach (var i1 in poradie)
+						{
+							sum += i1;
+						}
+						bool najdeny = sum == r.Count;
+
 						if (vypis) Console.WriteLine(!najdeny ? "Nenasiel som dany prvok!" : "Nasiel som dany prvok!");
 						if (!najdeny)
 						{
@@ -288,17 +305,31 @@ namespace TestApp
 						pocetHladani++;
 						var hladanyPrvok = vsetkyPrvky[generator.GenerateInt(0, vsetkyPrvky.Count)];
 						if (vypis) Console.WriteLine("Hladam prvok " + hladanyPrvok.ToString());
-						var res = tree.Find(hladanyPrvok.Kluce);
 
-						bool najdeny = false;
+						var res = tree.Find(hladanyPrvok.Kluce);
+						var r = vsetkyPrvky.FindAll(testData => testData.Kluce.Equals(hladanyPrvok.Kluce));
+
+						int por = 0;
+						int[] poradie = new int[res.Count];
 						foreach (var found in res)
 						{
-							if (found.Kluce.Equals(hladanyPrvok.Kluce))
+							foreach (var testData in r)
 							{
-								najdeny = true;
-								break;
+								if (found.Kluce.Equals(hladanyPrvok.Kluce))
+								{
+									poradie[por] = 1;
+									break;
+								}
 							}
+							por++;
 						}
+						int sum = 0;
+						foreach (var i1 in poradie)
+						{
+							sum += i1;
+						}
+						bool najdeny = sum == r.Count;
+
 						if (vypis) Console.WriteLine(!najdeny ? "Nenasiel som dany prvok!" : "Nasiel som dany prvok!");
 						if (!najdeny)
 						{
