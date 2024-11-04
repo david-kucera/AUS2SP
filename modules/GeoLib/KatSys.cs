@@ -329,7 +329,7 @@ namespace GeoLib
 		/// <param name="countNehn">Počet nehnuteľností na vygenerovanie</param>
 		/// <param name="countParc">Počet parciel na vygenerovanie</param>
 		/// <param name="perc">Percentuálny prekryv nehnuteľností a parciel</param>
-		public void GenerujData(int countNehn, int countParc, int perc = 0)
+		public void GenerujData(int countNehn, int countParc, double perc)
 		{
 			List<Parcela> parcely = [];
 			List<Nehnutelnost> nehnutelnosti = [];
@@ -339,7 +339,8 @@ namespace GeoLib
 			}
 
 			// Generujem nehnutelnosti, ktore sa budu nachadzat na nejakej parcele
-			for (int i = 0; i < countNehn*(perc/100); i++)
+			double pocet = countNehn * (perc / 100);
+			for (int i = 0; i < (int)pocet; i++)
 			{
 				var nahodnaGpsParcely = parcely[i % countParc].Pozicie[i % 2];
 				var nehnutelnost = _generator.GenerateNehnutelnost(i);

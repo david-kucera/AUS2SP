@@ -62,7 +62,7 @@
         </GroupBox>
         
         <GroupBox Grid.Row="2" Margin="5" Header="Data">
-            <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged">
+            <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged" MouseDoubleClick="OpenData_OnClick">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
