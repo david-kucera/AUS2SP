@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
 namespace DataStructures
 {
@@ -293,25 +294,33 @@ namespace DataStructures
 		/// <param name="node"></param>
 		/// <param name="dimensionNodeToDelete"></param>
 		/// <returns></returns>
-		private static KdTreeNode<TKey, TValue> SearchMin(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
+		private KdTreeNode<TKey, TValue> SearchMin(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
 			double minimumKeyValue = double.MaxValue;
 			List<KdTreeNode<TKey, TValue>> nodesToSearch = [node];
-			KdTreeNode<TKey, TValue> newNode = null!;
+			KdTreeNode<TKey, TValue> newNode = node;
+
 			while (nodesToSearch.Count > 0)
 			{
 				var currentNode = nodesToSearch[^1];
+				int currDimension = GetDimension(currentNode);
 				nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
-				var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
-				if (compareValue <= minimumKeyValue)
+				if (currentNode.GetKeyValue(dimensionNodeToDelete) <= minimumKeyValue)
 				{
-					minimumKeyValue = compareValue;
+					minimumKeyValue = currentNode.GetKeyValue(dimensionNodeToDelete);
 					newNode = currentNode;
 				}
 
-				if (currentNode.Right != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
-				if (currentNode.Left != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+				if (currDimension == dimensionNodeToDelete && currentNode.Left != null!)
+				{
+					nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+				}
+				else
+				{
+					if (currentNode.Left != null!) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+					if (currentNode.Right != null!) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
+				}
 			}
 
 			return newNode;
@@ -323,25 +332,33 @@ namespace DataStructures
 		/// <param name="node"></param>
 		/// <param name="dimensionNodeToDelete"></param>
 		/// <returns></returns>
-		private static KdTreeNode<TKey, TValue> SearchMax(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
+		private KdTreeNode<TKey, TValue> SearchMax(KdTreeNode<TKey, TValue> node, int dimensionNodeToDelete)
 		{
 			double maximumKeyValue = double.MinValue;
 			List<KdTreeNode<TKey, TValue>> nodesToSearch = [node];
-			KdTreeNode<TKey, TValue> newNode = null!;
+			KdTreeNode<TKey, TValue> newNode = node;
+
 			while (nodesToSearch.Count > 0)
 			{
 				var currentNode = nodesToSearch[^1];
+				int currDimension = GetDimension(currentNode);
 				nodesToSearch.RemoveAt(nodesToSearch.Count - 1);
 
-				var compareValue = currentNode.GetKeyValue(dimensionNodeToDelete);
-				if (compareValue >= maximumKeyValue)
+				if (currentNode.GetKeyValue(dimensionNodeToDelete) >= maximumKeyValue)
 				{
-					maximumKeyValue = compareValue;
+					maximumKeyValue = currentNode.GetKeyValue(dimensionNodeToDelete);
 					newNode = currentNode;
 				}
 
-				if (currentNode.Right != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
-				if (currentNode.Left != null) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+				if (currDimension == dimensionNodeToDelete && currentNode.Right != null!)
+				{
+					nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
+				}
+				else
+				{
+					if (currentNode.Left != null!) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Left);
+					if (currentNode.Right != null!) nodesToSearch.Add((KdTreeNode<TKey, TValue>)currentNode.Right);
+				}
 			}
 
 			return newNode;
