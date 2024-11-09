@@ -352,14 +352,30 @@ namespace GeoViewer
 				EditButton.IsEnabled = false;
 			}
 		}
+
+		private void OpenData_OnClick(object sender, RoutedEventArgs e)
+		{
+			var selectedObject = (GeoObjekt)ObjectListBox.SelectedItem;
+			if (selectedObject is Nehnutelnost nehnutelnost)
+			{
+				DetailWindow detailWindow = new(nehnutelnost);
+				detailWindow.ShowDialog();
+			}
+			else
+			{
+				var parcela = (Parcela)selectedObject;
+				DetailWindow detailWindow = new(parcela);
+				detailWindow.ShowDialog();
+			}
+		}
 		#endregion //Action handlers
 
-		#region Private functions
-		/// <summary>
-		/// Method that refreshes current data in the application window that user sees
-		/// </summary>
-		/// <exception cref="NotImplementedException"></exception>
-		private void RefreshData()
+			#region Private functions
+			/// <summary>
+			/// Method that refreshes current data in the application window that user sees
+			/// </summary>
+			/// <exception cref="NotImplementedException"></exception>
+			private void RefreshData()
 		{
 			ObjectListBox.Items.Clear();
 			foreach (var obj in _currentlyDisplayedObjects)

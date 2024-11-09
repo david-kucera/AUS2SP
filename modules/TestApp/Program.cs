@@ -71,6 +71,7 @@ namespace TestApp
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"POCET NEKOREKTNYCH BEHOV: {pocetChyb}");
 			Console.ForegroundColor = ConsoleColor.White;
+			Console.ReadLine();
 		}
 
 		private static bool Test_NaplnenaStruktura(int seed, bool vypis = false, bool lenStatistikaBehu = false)
