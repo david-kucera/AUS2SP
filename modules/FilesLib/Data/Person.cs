@@ -1,6 +1,6 @@
 ﻿namespace FilesLib.Data
 {
-	public class Person
+	public class Person : IData<Person>
 	{
 		#region Constants
 		private const int MAX_VISITS = 5;
@@ -11,11 +11,15 @@
 		#region Properties
 		public string Name { get; set; } = string.Empty;
 		public string Surname { get; set; } = string.Empty;
-		public int Id { get; set; } = int.MinValue;
+		public int Id { get; set; } = -1;
 		public Visit[] Zaznamy { get; set; } = new Visit[MAX_VISITS];
 		#endregion // Properties
 
 		#region Constructors
+		public Person()
+		{
+		}
+
 		public Person(int id, string name, string surname)
 		{
 			if (name.Length > MAX_NAME_LENGTH)
@@ -39,5 +43,36 @@
 			return $"[{Id}] {Name} {Surname} ";
 		}
 		#endregion // Public functions
+
+		public byte[] ToByteArray()
+		{
+			throw new NotImplementedException();
+		}
+
+		public Person FromByteArray(byte[] byteArray)
+		{
+			throw new NotImplementedException();
+		}
+
+		public int GetSize()
+		{
+			int ret = 0;
+			ret += sizeof(int);
+			ret += sizeof(char) * MAX_NAME_LENGTH;
+			ret += sizeof(char) * MAX_SURNAME_LENGTH;
+			//ret += sizeof(Visit) * MAX_VISITS;
+			return ret;
+		}
+
+		public Person CreateClass()
+		{
+			return new Person();
+		}
+
+		public bool Equals(Person data)
+		{
+			// TODO implement equals
+			throw new NotImplementedException();
+		}
 	}
 }
