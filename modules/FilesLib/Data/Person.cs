@@ -1,4 +1,5 @@
-﻿using FilesLib.Helpers;
+﻿using System.Text;
+using FilesLib.Helpers;
 
 namespace FilesLib.Data
 {
@@ -47,7 +48,21 @@ namespace FilesLib.Data
 
         public byte[] ToByteArray()
         {
-            return Serializator.Serialize(this);
+			byte[] bytes = new byte[GetSize()];
+			int offset = 0;
+			
+			bytes.CopyTo(BitConverter.GetBytes(Id), offset);
+            offset += sizeof(int);
+            bytes.CopyTo(Encoding.ASCII.GetBytes(Name), offset);
+            offset += sizeof(char) * MAX_NAME_LENGTH;
+			bytes.CopyTo(Encoding.ASCII.GetBytes(Surname), offset);
+            offset += sizeof(char) * MAX_SURNAME_LENGTH;
+            
+			for (int i = 0; i < MAX_VISITS; i++)
+			{
+				bytes.CopyTo(Zaznamy[i].ToByteArray(), offset);
+            }
+            return bytes;
         }
 
         public Person FromByteArray(byte[] byteArray)

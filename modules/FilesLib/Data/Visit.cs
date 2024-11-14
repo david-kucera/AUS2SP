@@ -1,6 +1,8 @@
-﻿namespace FilesLib.Data
+﻿using System.Text;
+
+namespace FilesLib.Data
 {
-	public class Visit
+	public class Visit : IData<Visit>
 	{
 		#region Constants
 		private const int MAX_NOTE_LENGTH = 20;
@@ -13,7 +15,12 @@
 		#endregion // Properties
 
 		#region Constructors
-		public Visit(DateOnly date, double price, string note)
+		public Visit()
+        {
+
+        }
+
+        public Visit(DateOnly date, double price, string note)
 		{
 			if (note.Length > MAX_NOTE_LENGTH)
 			{
@@ -36,9 +43,44 @@
         {
             int ret = 0;
             ret += sizeof(double);	// Price
-            ret += 2 * sizeof(int); // DateOnly - 8 bytes ... (2 integers)
+            ret += 3 * sizeof(int); // Date
             ret += MAX_NOTE_LENGTH * sizeof(char); // Note
             return ret;
+        }
+
+        public Visit CreateClass()
+        {
+			return new Visit();
+        }
+
+        public bool Equals(Visit data)
+        {
+            return Date == data.Date && Price == data.Price && Note == data.Note;
+        }
+
+        public byte[] ToByteArray()
+        {
+			byte[] bytes = new byte[GetSize()];
+            int offset = 0;
+
+            // TODO check dateonly size
+            bytes.CopyTo(BitConverter.GetBytes(Price), offset);
+            offset += sizeof(double);
+            bytes.CopyTo(BitConverter.GetBytes(Date.Year), offset);
+            offset += sizeof(int);
+            bytes.CopyTo(BitConverter.GetBytes(Date.Month), offset);
+            offset += sizeof(int);
+            bytes.CopyTo(BitConverter.GetBytes(Date.Day), offset);
+            offset += sizeof(int);
+            bytes.CopyTo(Encoding.ASCII.GetBytes(Note), offset);
+            offset += MAX_NOTE_LENGTH * sizeof(char);
+
+            return bytes;
+        }
+
+        public Visit FromByteArray(byte[] byteArray)
+        {
+            throw new NotImplementedException();
         }
         #endregion // Public functions
     }
