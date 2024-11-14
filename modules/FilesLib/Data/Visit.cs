@@ -7,13 +7,13 @@
 		#endregion // Constants
 
 		#region Properties
-		public DateTime Date { get; set; } = DateTime.Now;
+		public DateOnly Date { get; set; } = DateOnly.MinValue;
 		public double Price { get; set; } = double.MinValue;
 		public string Note { get; set; } = string.Empty;
 		#endregion // Properties
 
 		#region Constructors
-		public Visit(DateTime date, double price, string note)
+		public Visit(DateOnly date, double price, string note)
 		{
 			if (note.Length > MAX_NOTE_LENGTH)
 			{
@@ -36,7 +36,7 @@
         {
             int ret = 0;
             ret += sizeof(double);	// Price
-            ret += 2 * sizeof(int); // DateTime - 8 bytes ... (2 integers)
+            ret += 2 * sizeof(int); // DateOnly - 8 bytes ... (2 integers)
             ret += MAX_NOTE_LENGTH * sizeof(char); // Note
             return ret;
         }
