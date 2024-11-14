@@ -1,4 +1,6 @@
-﻿namespace FilesLib.Data
+﻿using FilesLib.Helpers;
+
+namespace FilesLib.Data
 {
 	public class Person : IData<Person>
 	{
@@ -42,37 +44,36 @@
 		{
 			return $"[{Id}] {Name} {Surname} ";
 		}
-		#endregion // Public functions
 
-		public byte[] ToByteArray()
-		{
-			throw new NotImplementedException();
-		}
+        public byte[] ToByteArray()
+        {
+            return Serializator.Serialize(this);
+        }
 
-		public Person FromByteArray(byte[] byteArray)
-		{
-			throw new NotImplementedException();
-		}
+        public Person FromByteArray(byte[] byteArray)
+        {
+            return Serializator.Deserialize<Person>(byteArray);
+        }
 
-		public int GetSize()
-		{
-			int ret = 0;
-			ret += sizeof(int);
-			ret += sizeof(char) * MAX_NAME_LENGTH;
-			ret += sizeof(char) * MAX_SURNAME_LENGTH;
-			//ret += sizeof(Visit) * MAX_VISITS;
-			return ret;
-		}
+        public int GetSize()
+        {
+            int ret = 0;
+            ret += sizeof(int);
+            ret += sizeof(char) * MAX_NAME_LENGTH;
+            ret += sizeof(char) * MAX_SURNAME_LENGTH;
+            ret += Zaznamy[0].GetSize() * MAX_VISITS;
+            return ret;
+        }
 
-		public Person CreateClass()
-		{
-			return new Person();
-		}
+        public Person CreateClass()
+        {
+            return new Person();
+        }
 
-		public bool Equals(Person data)
-		{
-			// TODO implement equals
-			throw new NotImplementedException();
-		}
-	}
+        public bool Equals(Person data)
+        {
+            return Id == data.Id && Name == data.Name && Surname == data.Surname && Zaznamy.Equals(data.Zaznamy);
+        }
+        #endregion // Public functions
+    }
 }

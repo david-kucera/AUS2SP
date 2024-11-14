@@ -31,7 +31,15 @@
 		{
 			return $"Date: {Date}, Price: {Price}, Note: {Note}";
 		}
-		#endregion // Public functions
 
-	}
+		public int GetSize()
+        {
+            int ret = 0;
+            ret += sizeof(double);	// Price
+            ret += 2 * sizeof(int); // DateTime - 8 bytes ... (2 integers)
+            ret += MAX_NOTE_LENGTH * sizeof(char); // Note
+            return ret;
+        }
+        #endregion // Public functions
+    }
 }

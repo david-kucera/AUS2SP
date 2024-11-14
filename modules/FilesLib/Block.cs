@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using FilesLib.Helpers;
 
 namespace FilesLib
 {
@@ -51,20 +52,19 @@ namespace FilesLib
 
 		public byte[] ToByteArray()
 		{
-			throw new NotImplementedException();
-		}
+			return Serializator.Serialize(this);
+        }
 
 		public T FromByteArray(byte[] byteArray)
 		{
-			throw new NotImplementedException();
-		}
+			return Serializator.Deserialize<T>(byteArray);
+        }
 
 		public int GetSize()
 		{
 			try
 			{
-				int integerSize = Marshal.SizeOf(typeof(int));
-				return Marshal.SizeOf(ClassType) * BlockSize + integerSize * 3; // 3 lebo pamatame 3 integer hodnoty
+				return Marshal.SizeOf(ClassType) * BlockSize + sizeof(int) * 3; // 3 lebo pamatame 3 integer hodnoty
 			}
 			catch (Exception e)
 			{
