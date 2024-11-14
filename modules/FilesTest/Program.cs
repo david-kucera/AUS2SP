@@ -9,7 +9,7 @@ namespace FilesTest
         static void Main(string[] args)
         {
             Console.WriteLine("Test heap file");
-            Heap<Person> heapFile = new("../userdata/person.aus", BLOCK_SIZE);
+            HeapFile<Person> heapFile = new("../userdata/person.aus", BLOCK_SIZE);
         }
     }
 }
