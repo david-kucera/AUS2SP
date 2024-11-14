@@ -43,12 +43,43 @@
         #endregion // Constructors
 
         #region Public functions
-        public int Insert(T data) // vraciame adresu, kde sa zaznam nachadza
+        public int Insert(T data)
 		{
-			Block<T> block = new Block<T>(BlockSize, TType);
-			return 0;
-			// TODO insert operation
-		}
+            if (_nextFreeBlockAddress != -1)
+            {
+                SetCurrentBlock(_nextFreeBlockAddress);
+
+                if (_currentBlock.ValidCount >= _currentBlock.BlockFactor)
+                {
+                    // TODO
+                }
+            }
+            else if (_nextEmptyBlockAddress != -1)
+            {
+                SetCurrentBlock(_nextEmptyBlockAddress);
+                if (_currentBlock.ValidCount != 0)
+                {
+                    // TODO
+                }
+                if (!(_currentBlock.ValidCount >= _currentBlock.BlockFactor))
+                {
+                    // TODO
+                }
+            }
+            else
+            {
+                _nextEmptyBlockAddress = (int)_file.Length;
+                SetCurrentBlock(_nextEmptyBlockAddress);
+                if (!(_currentBlock.ValidCount >= _currentBlock.BlockFactor))
+                {
+                    // TODO
+                }
+            }
+
+            _currentBlock.AddRecord(data);
+
+            return _currentBlockAddress;
+        }
 
         public T Find(int address, T data)
         {
