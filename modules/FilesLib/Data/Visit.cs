@@ -8,11 +8,14 @@ namespace FilesLib.Data
 		private const int MAX_NOTE_LENGTH = 20;
 		private const double TOLERANCE = 0.0001;
 		#endregion // Constants
+		
+		#region Class members
+		private string _note = string.Empty;
+		#endregion // Class members
 
 		#region Properties
 		public DateOnly Date { get; set; } = DateOnly.MinValue;
 		public double Price { get; set; } = double.MinValue;
-		private string _note = string.Empty;
 		public string Note
 		{
 			get => _note;
@@ -35,11 +38,6 @@ namespace FilesLib.Data
 
         public Visit(DateOnly date, double price, string note)
 		{
-			if (note.Length > MAX_NOTE_LENGTH)
-			{
-				throw new ArgumentException($"Note length must be less than {MAX_NOTE_LENGTH} characters.");
-			}
-
 			Date = date;
 			Price = price;
 			_note = note;

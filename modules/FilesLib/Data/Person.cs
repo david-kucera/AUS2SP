@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using FilesLib.Helpers;
 
 namespace FilesLib.Data
 {
@@ -10,9 +9,14 @@ namespace FilesLib.Data
 		private const int MAX_NAME_LENGTH = 15;
 		private const int MAX_SURNAME_LENGTH = 20;
 		#endregion // Constants
+		
+		#region Class members
+		private string _name = string.Empty;
+		private string _surname = string.Empty;
+		private Visit[] _zaznamy = new Visit[MAX_VISITS];
+		#endregion // Class members
 
 		#region Properties
-		private string _name = string.Empty;
 		public string Name
 		{
 			get => _name;
@@ -25,7 +29,6 @@ namespace FilesLib.Data
 				_name = value;
 			}
 		}
-		private string _surname = string.Empty;
 		public string Surname
 		{
 			get => _surname;
@@ -39,8 +42,6 @@ namespace FilesLib.Data
 			}
 		}
 		public int Id { get; set; } = -1;
-		private Visit[] _zaznamy = new Visit[MAX_VISITS];
-
 		public Visit[] Zaznamy
 		{
 			get => _zaznamy;
@@ -58,19 +59,11 @@ namespace FilesLib.Data
 		#region Constructors
 		public Person()
 		{
+			
 		}
 
 		public Person(int id, string name, string surname)
 		{
-			if (name.Length > MAX_NAME_LENGTH)
-			{
-				throw new ArgumentException($"Name is too long. Max length is {MAX_NAME_LENGTH}.");
-			}
-			if (surname.Length > MAX_SURNAME_LENGTH)
-			{
-				throw new ArgumentException($"Surname is too long. Max length is {MAX_SURNAME_LENGTH}.");
-			}
-			
 			Name = name;
 			Surname = surname;
 			Id = id;
