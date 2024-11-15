@@ -13,7 +13,7 @@ namespace FilesLib.Data
 		#region Class members
 		private string _name = string.Empty;
 		private string _surname = string.Empty;
-		private Visit[] _zaznamy = new Visit[MAX_VISITS];
+		private List<Visit> _zaznamy = new List<Visit>(MAX_VISITS);
 		#endregion // Class members
 
 		#region Properties
@@ -42,12 +42,12 @@ namespace FilesLib.Data
 			}
 		}
 		public int Id { get; set; } = -1;
-		public Visit[] Zaznamy
+		public List<Visit> Zaznamy
 		{
 			get => _zaznamy;
 			set
 			{
-				if (value.Length != MAX_VISITS)
+				if (value.Count != MAX_VISITS)
 				{
 					throw new ArgumentException($"Number of visits must be less than {MAX_VISITS}.");
 				}
@@ -67,18 +67,29 @@ namespace FilesLib.Data
 			Name = name;
 			Surname = surname;
 			Id = id;
-			Zaznamy = new Visit[MAX_VISITS];
-			for (int i = 0; i < MAX_VISITS; i++)
-			{
-				Zaznamy[i] = new Visit();
-			}
+			Zaznamy = new List<Visit>(MAX_VISITS);
 		}
 		#endregion // Constructors
 
 		#region Public functions
 		public override string ToString()
 		{
-			return $"[{Id}] {Name} {Surname} ";
+			return $"[{Id}] {Name} {Surname} {Zaznamy.Count}";
+		}
+
+		public void Add(Visit visit)
+		{
+			Zaznamy.Add(visit);
+		}
+
+		public Visit Get(int i)
+		{
+			return Zaznamy.ElementAt(i);
+		}
+
+		public void Remove(Visit visit)
+		{
+			Zaznamy.Remove(visit);
 		}
 
         public byte[] ToByteArray()
@@ -116,15 +127,24 @@ namespace FilesLib.Data
 			bytes.CopyTo(Encoding.ASCII.GetBytes(Surname), offset);
             offset += sizeof(char) * MAX_SURNAME_LENGTH;
 
-			// Zaznamy length
-			bytes.CopyTo(BitConverter.GetBytes(Zaznamy.Length), offset);
+			// Zaznamy count
+			int zaznamyCount = Zaznamy.Count;
+			bytes.CopyTo(BitConverter.GetBytes(zaznamyCount), offset);
 			offset += sizeof(int);
 
 			// Zaznamy
 			int zaznamSize = new Visit().GetSize();
 			for (int i = 0; i < MAX_VISITS; i++)
 			{
-				bytes.CopyTo(Zaznamy[i].ToByteArray(), offset);
+				if (i < zaznamyCount)
+				{
+					bytes.CopyTo(Zaznamy[i].ToByteArray(), offset);
+				}
+				else
+				{
+					bytes.CopyTo(new Visit().ToByteArray(), offset); // dummy data
+				}
+				
 				offset += zaznamSize;
 			}
             return bytes;
@@ -154,18 +174,19 @@ namespace FilesLib.Data
 			Surname = Encoding.ASCII.GetString(byteArray, offset, surnameLength);
 			offset += sizeof(char) * MAX_SURNAME_LENGTH;
 
-			// Zaznamy length
-			int zaznamyLength = BitConverter.ToInt32(byteArray, offset);
+			// Zaznamy count
+			int zaznamyCount = BitConverter.ToInt32(byteArray, offset);
 			offset += sizeof(int);
 
 			// Zaznamy
-			Zaznamy = new Visit[MAX_VISITS];
+			Zaznamy = new List<Visit>(MAX_VISITS);
 			int zaznamSize = new Visit().GetSize();
-			for (int i = 0; i < MAX_VISITS; i++)
+			for (int i = 0; i < zaznamyCount; i++)
 			{
 				Zaznamy[i] = new Visit().FromByteArray(byteArray[offset..(offset + zaznamSize)]);
 				offset += zaznamSize;
 			}
+			
 			return this;
 		}
 
