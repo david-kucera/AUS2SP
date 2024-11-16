@@ -133,6 +133,25 @@
 			_file.SetLength(BlockSize);
             _file.Flush();
         }
+
+        public List<Block<T>> GetBlocks()
+        {
+	        var ret = new List<Block<T>>();
+	        for (int i = 0; i < BlockCount; i++)
+	        {
+		        Block<T> block = new Block<T>(BlockSize, TType);
+		        
+		        int offset = i * BlockSize;
+		        _file.Seek(offset, SeekOrigin.Begin);
+		        byte[] bytes = new byte[BlockSize];
+		        _file.Read(bytes, offset, BlockSize);
+		        block.FromByteArray(bytes);
+		        
+		        ret.Add(block);
+	        }
+
+	        return ret;
+        }
         #endregion // Public functions
 
         #region Private functions
