@@ -4,6 +4,7 @@
 	{
 		#region Class members
 		private FileStream _file;
+		private string _initFilePath;
 		private Block<T> _currentBlock = null!;
         private int _currentBlockAddress = 0;
 		private int _nextFreeBlockAddress = -1;
@@ -17,10 +18,11 @@
 		#endregion // Properties
 
 		#region Constructors
-		public HeapFile(string filePath, int blockSize)
+		public HeapFile(string initFilePath, string filePath, int blockSize)
 		{
 			BlockSize = blockSize;
 			TType = typeof(T);
+			_initFilePath = initFilePath;
 			try
 			{
 				_file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -83,43 +85,48 @@
 
         public T Find(int address, T data)
         {
+	        if (address % BlockSize != 0) throw new ArgumentException("Invalid address");
+	        
             SetCurrentBlock(address);
             return _currentBlock.GetRecord(data);
         }
 
         public bool Delete(int adress)
 		{
+			if (adress % BlockSize != 0) throw new ArgumentException("Invalid address");
+			
 			// TODO delete operation
-			Block<T> block = new Block<T>(BlockSize, TType);
 			return false;
 		}
 
         private void SaveInitData()
         {
+	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+	        
             byte[] buffer = new byte[BlockSize];
             int offset = 0;
-
             BitConverter.GetBytes(_nextFreeBlockAddress).CopyTo(buffer, offset);
             offset += sizeof(int);
             BitConverter.GetBytes(_nextEmptyBlockAddress).CopyTo(buffer, offset);
-            offset += sizeof(int);
 
-			_file.Seek(0, SeekOrigin.Begin);
-            _file.Write(buffer, 0, buffer.Length);
-            _file.Flush();
+			initFile.Seek(0, SeekOrigin.Begin);
+            initFile.Write(buffer, 0, BlockSize);
+            initFile.Flush();
+            initFile.Close();
         }
 
         private void LoadInitData()
         {
+	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+	        
             byte[] buffer = new byte[BlockSize];
-            _file.Seek(0, SeekOrigin.Begin);
-            _file.Read(buffer, 0, BlockSize);
-
             int offset = 0;
+            initFile.Seek(offset, SeekOrigin.Begin);
+            initFile.Read(buffer, offset, BlockSize);
+            
             _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
             offset += sizeof(int);
             _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
-            offset += sizeof(int);
         }
 
         public void Clear()
@@ -151,6 +158,12 @@
 	        }
 
 	        return ret;
+        }
+
+        public void Close()
+        {
+	        SaveInitData();
+	        _file.Close();
         }
         #endregion // Public functions
 

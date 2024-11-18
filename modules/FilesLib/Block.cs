@@ -168,6 +168,12 @@ namespace FilesLib
                 Records[i] = null!;
             }
         }
+
+		public override string ToString()
+		{
+			return ValidCount + " record(s): " + string.Join(", ", Records);
+		}
+
 		#endregion // Public functions
 	}
 }

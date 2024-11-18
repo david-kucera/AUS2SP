@@ -74,7 +74,7 @@ namespace FilesLib.Data
 		#region Public functions
 		public override string ToString()
 		{
-			return $"[{Id}] {Name} {Surname} {Zaznamy.Count}";
+			return $"[{Id}] {Name} {Surname} {Zaznamy.Count}: {Zaznamy}";
 		}
 
 		public void Add(Visit visit)
