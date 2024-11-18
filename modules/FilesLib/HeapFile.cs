@@ -163,6 +163,11 @@
         public void Close()
         {
 	        SaveInitData();
+	        
+	        _currentBlockAddress = 0;
+	        _nextFreeBlockAddress = -1;
+	        _nextEmptyBlockAddress = -1;
+	        _file.Flush();
 	        _file.Close();
         }
         #endregion // Public functions
