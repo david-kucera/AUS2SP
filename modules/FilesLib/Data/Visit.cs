@@ -75,7 +75,7 @@ namespace FilesLib.Data
             int offset = 0;
 
 			// 8 bytes for double
-			bytes.CopyTo(BitConverter.GetBytes(Price), offset);
+			BitConverter.GetBytes(Price).CopyTo(bytes, offset);
             offset += sizeof(double);
 
             // 2 bytes for Year
@@ -92,14 +92,14 @@ namespace FilesLib.Data
 
 			// 4 bytes for note length and 20 bytes for note chars
 			int noteLength = Note.Length;
-			bytes.CopyTo(BitConverter.GetBytes(noteLength), offset);
+			BitConverter.GetBytes(noteLength).CopyTo(bytes, offset);
 			offset += sizeof(int);
 
 			if (noteLength < MAX_NOTE_LENGTH)
 			{
 				Note = Note.PadRight(MAX_NOTE_LENGTH, ' ');
 			}
-			bytes.CopyTo(Encoding.ASCII.GetBytes(Note), offset);
+			Encoding.ASCII.GetBytes(Note).CopyTo(bytes, offset);
 
             return bytes;
         }

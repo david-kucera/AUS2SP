@@ -15,7 +15,7 @@ namespace FilesLib
         /// <summary>
         /// Pocet udajov, ktore sa mozu uchovat v bloku
         /// </summary>
-        public int BlockFactor { get; set; }
+        public int BlockFactor => _size / _dataSize;
 		/// <summary>
 		/// Zoznam udajov v danom bloku
 		/// </summary>
@@ -39,12 +39,13 @@ namespace FilesLib
 		#endregion // Properties
 
 		#region Constructors
-		public Block(int blockSize, Type classType)
+		public Block(int blockSize, T cls)
 		{
             _size = blockSize;
-			_dataSize = Marshal.SizeOf(classType);
-            BlockFactor = blockSize / _dataSize;
-            ClassType = classType;
+			_dataSize = cls.CreateClass().GetSize();
+			_dataSize -= sizeof(int) * 3;
+			
+            ClassType = cls.GetType();
 			Records = new List<T>(BlockFactor);
 			for (int i = 0; i < BlockFactor; i++)
 			{

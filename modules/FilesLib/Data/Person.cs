@@ -47,7 +47,7 @@ namespace FilesLib.Data
 			get => _zaznamy;
 			set
 			{
-				if (value.Count != MAX_VISITS)
+				if (value.Count > MAX_VISITS)
 				{
 					throw new ArgumentException($"Number of visits must be less than {MAX_VISITS}.");
 				}
@@ -98,12 +98,12 @@ namespace FilesLib.Data
 			int offset = 0;
 			
 			// Id
-			bytes.CopyTo(BitConverter.GetBytes(Id), offset);
+			BitConverter.GetBytes(Id).CopyTo(bytes, offset);
             offset += sizeof(int);
 
 			// Name length
 			int nameLength = Name.Length;
-			bytes.CopyTo(BitConverter.GetBytes(nameLength), offset);
+			BitConverter.GetBytes(nameLength).CopyTo(bytes, offset);
 			offset += sizeof(int);
 
 			// Name
@@ -111,12 +111,12 @@ namespace FilesLib.Data
 			{
 				Name = Name.PadRight(MAX_NAME_LENGTH, ' ');
 			}
-			bytes.CopyTo(Encoding.ASCII.GetBytes(Name), offset);
+			Encoding.ASCII.GetBytes(Name).CopyTo(bytes, offset);
             offset += sizeof(char) * MAX_NAME_LENGTH;
 
 			// Surname length
 			int surnameLength = Surname.Length;
-			bytes.CopyTo(BitConverter.GetBytes(surnameLength), offset);
+			BitConverter.GetBytes(surnameLength).CopyTo(bytes, offset);
 			offset += sizeof(int);
 
 			// Surname
@@ -124,27 +124,19 @@ namespace FilesLib.Data
 			{
 				Surname = Surname.PadRight(MAX_SURNAME_LENGTH, ' ');
 			}
-			bytes.CopyTo(Encoding.ASCII.GetBytes(Surname), offset);
+			Encoding.ASCII.GetBytes(Surname).CopyTo(bytes, offset);
             offset += sizeof(char) * MAX_SURNAME_LENGTH;
 
 			// Zaznamy count
 			int zaznamyCount = Zaznamy.Count;
-			bytes.CopyTo(BitConverter.GetBytes(zaznamyCount), offset);
+			BitConverter.GetBytes(zaznamyCount).CopyTo(bytes, offset);
 			offset += sizeof(int);
 
 			// Zaznamy
 			int zaznamSize = new Visit().GetSize();
-			for (int i = 0; i < MAX_VISITS; i++)
+			for (int i = 0; i < zaznamyCount; i++)
 			{
-				if (i < zaznamyCount)
-				{
-					bytes.CopyTo(Zaznamy[i].ToByteArray(), offset);
-				}
-				else
-				{
-					bytes.CopyTo(new Visit().ToByteArray(), offset); // dummy data
-				}
-				
+				Zaznamy[i].ToByteArray().CopyTo(bytes, offset);
 				offset += zaznamSize;
 			}
             return bytes;
@@ -183,7 +175,8 @@ namespace FilesLib.Data
 			int zaznamSize = new Visit().GetSize();
 			for (int i = 0; i < zaznamyCount; i++)
 			{
-				Zaznamy[i] = new Visit().FromByteArray(byteArray[offset..(offset + zaznamSize)]);
+				var bytes = byteArray.Skip(offset).Take(zaznamSize).ToArray();
+				Zaznamy.Add(new Visit().FromByteArray(bytes));
 				offset += zaznamSize;
 			}
 			
@@ -199,7 +192,8 @@ namespace FilesLib.Data
 			ret += sizeof(int); // Surname length
 			ret += sizeof(char) * MAX_SURNAME_LENGTH;
 			ret += sizeof(int); // Zaznamy length
-			ret += Zaznamy[0].GetSize() * MAX_VISITS;
+			var visit = new Visit();
+			ret += visit.GetSize() * MAX_VISITS;
             return ret;
         }
 

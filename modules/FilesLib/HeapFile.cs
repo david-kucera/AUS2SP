@@ -14,14 +14,12 @@
         #region Properties
         public int BlockSize { get; set; }
 		public int BlockCount => (int)(_file.Length / BlockSize);
-        public Type TType { get; set; }
 		#endregion // Properties
 
 		#region Constructors
 		public HeapFile(string initFilePath, string filePath, int blockSize)
 		{
 			BlockSize = blockSize;
-			TType = typeof(T);
 
 			if (!File.Exists(initFilePath))
 			{
@@ -45,7 +43,6 @@
 
             if (_file.Length == 0)
             {
-                _nextEmptyBlockAddress = 0;
 				SaveInitData();
             }
 			else
@@ -103,15 +100,15 @@
 
         public T Find(int address, T data)
         {
-	        if (address % BlockSize != 0) throw new ArgumentException("Invalid address");
+	        if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
 	        
             SetCurrentBlock(address);
             return _currentBlock.GetRecord(data);
         }
 
-        public bool Delete(int adress)
+        public bool Delete(int address)
 		{
-			if (adress % BlockSize != 0) throw new ArgumentException("Invalid address");
+			if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
 			
 			// TODO delete operation
 			return false;
@@ -164,8 +161,7 @@
 	        var ret = new List<Block<T>>();
 	        for (int i = 0; i < BlockCount; i++)
 	        {
-		        Block<T> block = new Block<T>(BlockSize, TType);
-		        
+		        Block<T> block = new Block<T>(BlockSize, new T());
 		        int offset = i * BlockSize;
 		        _file.Seek(offset, SeekOrigin.Begin);
 		        byte[] bytes = new byte[BlockSize];
@@ -193,6 +189,12 @@
         #region Private functions
         private void SetCurrentBlock(int address)
         {
+	        if (_currentBlock == null)
+	        {
+		        _currentBlock = new Block<T>(BlockSize, new T());
+		        _currentBlockAddress = address;
+		        return;
+	        }
             if (_currentBlockAddress == address)
             {
                 return;

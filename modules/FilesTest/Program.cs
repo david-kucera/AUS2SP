@@ -34,8 +34,8 @@ namespace FilesTest
             var adresa = heapFile.Insert(person);
             Console.WriteLine("Inserted person");
             Console.WriteLine("Get person");
-            var p = heapFile.Find(adresa, new Person());
-            Console.WriteLine($"Found person: {p}");
+            var pers = heapFile.Find(adresa, person);
+            Console.WriteLine($"Found person: {pers.ToString()}");
             var allBlocks = heapFile.GetBlocks();
             Console.WriteLine("All Blocks");
             foreach (var b in allBlocks)
