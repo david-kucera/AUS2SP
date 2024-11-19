@@ -15,25 +15,8 @@ namespace FilesTest
             if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
             
             HeapFile<Person> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
-            Random rnd = new(0);
-            var zaznamy = new List<Visit>();
-            for (int i = 0; i < 5; i++)
-            {
-                var visit = new Visit
-                {
-                    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(rnd.Next(-20, 20))),
-                    Price = rnd.Next(0, 100),
-                    Note = "note" + rnd.Next(0, 100)
-                };
-                zaznamy.Add(visit);
-            }
-            Person person = new()
-            {
-                Id = 1,
-                Name = "John",
-                Surname = "Doe",
-                Zaznamy = zaznamy
-            };
+            DataGenerator generator = new DataGenerator(0);
+            Person person = generator.GeneratePerson();
 
             var adresa = heapFile.Insert(person);
             Console.WriteLine("Inserted person");
