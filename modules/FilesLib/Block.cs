@@ -5,6 +5,7 @@ namespace FilesLib
 	public class Block<T> : IRecord<T> where T : class, IData<T>, new()
 	{
         #region Class members
+        private readonly int _blockSize;
         private readonly int _size;
 		private readonly int _dataSize;
         private int _prevBlock = -1;
@@ -41,9 +42,10 @@ namespace FilesLib
 		#region Constructors
 		public Block(int blockSize, T cls)
 		{
+			_blockSize = blockSize;
             _size = blockSize;
+            _size -= sizeof(int) * 3;
 			_dataSize = cls.CreateClass().GetSize();
-			_dataSize -= sizeof(int) * 3;
 			
             ClassType = cls.GetType();
 			Records = new List<T>(BlockFactor);
@@ -113,7 +115,7 @@ namespace FilesLib
 
         public byte[] ToByteArray()
 		{
-			byte[] bytes = new byte[_size];
+			byte[] bytes = new byte[_blockSize];
 			int offset = 0;
 
 			BitConverter.GetBytes(ValidCount).CopyTo(bytes, offset);
@@ -127,7 +129,7 @@ namespace FilesLib
             {
                 byte[] recordBytes = Records[i].ToByteArray();
                 recordBytes.CopyTo(bytes, offset);
-                offset += _dataSize;
+                offset += recordBytes.Length;
             }
 
             return bytes;
@@ -148,7 +150,7 @@ namespace FilesLib
                 byte[] recordBytes = new byte[_dataSize];
                 Array.Copy(byteArray, offset, recordBytes, 0, _dataSize);
                 Records[i].FromByteArray(recordBytes);
-                offset += _dataSize;
+                offset += recordBytes.Length;
             }
 
 			return this as T;

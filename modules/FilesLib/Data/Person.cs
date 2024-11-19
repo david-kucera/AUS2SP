@@ -13,7 +13,7 @@ namespace FilesLib.Data
 		#region Class members
 		private string _name = string.Empty;
 		private string _surname = string.Empty;
-		private List<Visit> _zaznamy = new List<Visit>(MAX_VISITS);
+		private List<Visit> _zaznamy = new(MAX_VISITS);
 		#endregion // Class members
 
 		#region Properties
@@ -74,7 +74,14 @@ namespace FilesLib.Data
 		#region Public functions
 		public override string ToString()
 		{
-			return $"[{Id}] {Name} {Surname} {Zaznamy.Count}: {Zaznamy}";
+			var zaznamy = string.Empty;
+			int i = 1;
+			foreach (var visit in Zaznamy)
+			{
+				zaznamy += $"{i}. {visit.ToString()}\n";
+				i++;
+			}
+			return $"[{Id}] {Name} {Surname} ({Zaznamy.Count}):\n{zaznamy}";
 		}
 
 		public void Add(Visit visit)
