@@ -5,9 +5,10 @@ namespace FilesTest
 {
     public class Program
     {
-        public static int BLOCK_SIZE = 512;
+        public static int BLOCK_SIZE = 4096;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
+        public static int NUMBER_OF_PEOPLE = 5;
         static void Main()
         {
             Console.WriteLine("Test heap file");
@@ -16,13 +17,24 @@ namespace FilesTest
             
             HeapFile<Person> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
             DataGenerator generator = new DataGenerator(0);
-            Person person = generator.GeneratePerson();
+            List<int> adresses = new(NUMBER_OF_PEOPLE);
+            List<Person> people = new(NUMBER_OF_PEOPLE);
+            for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
+            {
+                Person person = generator.GeneratePerson();
+                var adresa = heapFile.Insert(person);
+                Console.WriteLine("Inserted person");
+                people.Add(person);
+                adresses.Add(adresa);
+            }
 
-            var adresa = heapFile.Insert(person);
-            Console.WriteLine("Inserted person");
-            Console.WriteLine("Get person");
-            var pers = heapFile.Find(adresa, person);
-            Console.WriteLine($"Found person: {pers.ToString()}");
+            for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
+            {
+                var pers = heapFile.Find(adresses[i], people[i]);
+                Console.WriteLine("Get person");
+                Console.WriteLine($"Found person: {pers.ToString()}");
+            }
+            
             var allBlocks = heapFile.GetBlocks();
             Console.WriteLine("All Blocks");
             foreach (var b in allBlocks)
