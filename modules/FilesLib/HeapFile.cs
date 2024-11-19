@@ -22,6 +22,17 @@
 		{
 			BlockSize = blockSize;
 			TType = typeof(T);
+
+			if (!File.Exists(initFilePath))
+			{
+				File.Create(initFilePath).Close();
+			}
+
+			if (!File.Exists(filePath))
+			{
+				File.Create(filePath).Close();
+			}
+			
 			_initFilePath = initFilePath;
 			try
 			{
@@ -53,32 +64,39 @@
 
                 if (_currentBlock.ValidCount >= _currentBlock.BlockFactor)
                 {
-                    // TODO
+	                _nextFreeBlockAddress = _currentBlock.Next;
+	                _currentBlock.Next = -1;
                 }
             }
             else if (_nextEmptyBlockAddress != -1)
             {
                 SetCurrentBlock(_nextEmptyBlockAddress);
-                if (_currentBlock.ValidCount != 0)
-                {
-                    // TODO
-                }
-                if (!(_currentBlock.ValidCount >= _currentBlock.BlockFactor))
-                {
-                    // TODO
-                }
             }
             else
             {
                 _nextEmptyBlockAddress = (int)_file.Length;
                 SetCurrentBlock(_nextEmptyBlockAddress);
-                if (!(_currentBlock.ValidCount >= _currentBlock.BlockFactor))
-                {
-                    // TODO
-                }
+                _nextEmptyBlockAddress += BlockSize;
             }
 
             _currentBlock.AddRecord(data);
+            
+            if (_currentBlock.ValidCount >= _currentBlock.BlockFactor)
+            {
+	            _currentBlock.Next = -1;
+	            _nextFreeBlockAddress = -1;
+            }
+            else
+            {
+	            if (_nextFreeBlockAddress == -1)
+	            {
+		            _nextFreeBlockAddress = _currentBlockAddress;
+	            }
+            }
+            
+            byte[] bytes = _currentBlock.ToByteArray();
+            _file.Seek(_currentBlockAddress, SeekOrigin.Begin);
+            _file.Write(bytes, 0, BlockSize);
 
             return _currentBlockAddress;
         }

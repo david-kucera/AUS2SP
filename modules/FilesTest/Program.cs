@@ -9,7 +9,7 @@ namespace FilesTest
         static void Main()
         {
             Console.WriteLine("Test heap file");
-            HeapFile<Person> heapFile = new("../userdata/person_init.aus", "../userdata/person.aus", BLOCK_SIZE);
+            HeapFile<Person> heapFile = new("../../userdata/person_init.aus", "../../userdata/person.aus", BLOCK_SIZE);
             
             Random rnd = new(0);
             var zaznamy = new List<Visit>();

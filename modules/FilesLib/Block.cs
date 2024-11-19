@@ -28,6 +28,14 @@ namespace FilesLib
 		/// Typ dat ulozenych v bloku
 		/// </summary>
 		public Type ClassType { get; set; }
+		/// <summary>
+		/// Dalsi blok v zretazeni
+		/// </summary>
+		public int Next { get { return _nextBlock; } set => _nextBlock = value; }
+		/// <summary>
+		/// Predosly blok v zretazeni
+		/// </summary>
+		public int Previous { get { return _prevBlock; } set => _prevBlock = value; }
 		#endregion // Properties
 
 		#region Constructors
