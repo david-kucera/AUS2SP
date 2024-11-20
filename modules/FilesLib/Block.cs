@@ -87,16 +87,17 @@ namespace FilesLib
             ValidCount--;
         }
 
-		public void RemoveRecord(T record)
+		public bool RemoveRecord(T record)
 		{
             for (int i = 0; i < ValidCount; i++)
             {
                 if (Records[i].Equals(record))
                 {
                     RemoveRecord(i);
-                    return;
+                    return true;
                 }
             }
+            return false;
         }
 
 		public T GetRecord(int index)

@@ -34,6 +34,18 @@ public class DataGenerator
         };
         return ret;
     }
+    
+    public TestRP1 GenerateTestRP1()
+    {
+        TestRP1 ret = new()
+        {
+            Id = _rand.Next(1,1000000),
+            Name = GenerateString(_rand.Next(1,15)),
+            Surname = GenerateString(_rand.Next(1,20)),
+            Ecv = GenerateString(_rand.Next(1,10)),
+        };
+        return ret;
+    }
 
     public List<Visit> GenerateVisits(int count)
     {

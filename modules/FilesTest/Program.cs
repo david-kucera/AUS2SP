@@ -5,7 +5,7 @@ namespace FilesTest
 {
     public class Program
     {
-        public static int BLOCK_SIZE = 8192;
+        public static int BLOCK_SIZE = 1024;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 20;
@@ -15,20 +15,20 @@ namespace FilesTest
             if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
             if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
             
-            HeapFile<Person> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
+            HeapFile<TestRP1> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
             DataGenerator generator = new DataGenerator(0);
             List<int> adresses = new(NUMBER_OF_PEOPLE);
-            List<Person> people = new(NUMBER_OF_PEOPLE);
+            List<TestRP1> people = new(NUMBER_OF_PEOPLE);
             for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
             {
-                if (i == 3)
+                TestRP1 person = generator.GenerateTestRP1();
+                if (i == 9) // 17
                 {
-                    Console.WriteLine("jjj");
+                    Console.WriteLine("trtr");
                 }
-                Person person = generator.GeneratePerson();
                 var adresa = heapFile.Insert(person);
-                Console.WriteLine("Inserted person");
-                people.Add(new Person(person));
+                Console.WriteLine($"{i}. Inserted person");
+                people.Add(new TestRP1(person));
                 adresses.Add(adresa);
             }
 
@@ -41,6 +41,17 @@ namespace FilesTest
                 var pers = heapFile.Find(adresses[i], people[i]);
                 Console.WriteLine("Get person");
                 Console.WriteLine($"Found person: {pers.ToString()}");
+            }
+
+            for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
+            {
+                if (i == 19)
+                {
+                    Console.WriteLine("hdsds");
+                }
+                heapFile.Delete(adresses[i], people[i]);
+                Console.WriteLine($"{i}. Deleted person");
+                Console.WriteLine(heapFile.GetBlocks().Count);
             }
             
             var allBlocks = heapFile.GetBlocks();

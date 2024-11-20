@@ -55,45 +55,78 @@
         #region Public functions
         public int Insert(T data)
 		{
+			Console.WriteLine(_nextFreeBlockAddress);
             if (_nextFreeBlockAddress != -1)
             {
                 SetCurrentBlock(_nextFreeBlockAddress);
+                _currentBlock.AddRecord(data);
+
+                if (_currentBlock.ValidCount == _currentBlock.BlockFactor)
+                {
+	                if (_currentBlock.Next != -1)
+	                {
+		                var nextBlock = GetBlock(_currentBlock.Next);
+		                nextBlock.Previous = -1;
+		                WriteBlock(nextBlock, _currentBlock.Next);
+	                }
+	                
+	                _nextFreeBlockAddress = _currentBlock.Next;
+	                _currentBlock.Next = -1;
+                }
             }
             else if (_nextEmptyBlockAddress != -1)
             {
                 SetCurrentBlock(_nextEmptyBlockAddress);
+                _currentBlock.AddRecord(data);
+
+                if (_currentBlock.ValidCount == _currentBlock.BlockFactor)
+                {
+	                if (_currentBlock.Next != -1)
+	                {
+		                var nextBlock = GetBlock(_currentBlock.Next);
+		                nextBlock.Previous = -1;
+		                WriteBlock(nextBlock, _currentBlock.Next);
+	                }
+	                
+	                _nextEmptyBlockAddress = _currentBlock.Next;
+	                _currentBlock.Next = -1;
+                }
+                else
+                {
+	                _nextEmptyBlockAddress = _currentBlock.Next;
+	                if (_currentBlock.Next != -1)
+	                {
+		                var nextBlock = GetBlock(_currentBlock.Next);
+		                nextBlock.Previous = -1;
+		                WriteBlock(nextBlock, _currentBlock.Next);
+	                }
+	                
+	                _currentBlock.Next = _nextFreeBlockAddress;
+	                _nextFreeBlockAddress = _currentBlockAddress;
+                }
             }
             else
             {
                 SetCurrentBlock((int)_file.Length);
-            }
-            
-            _currentBlock.AddRecord(data);
-            
-            if (_currentBlock.ValidCount < _currentBlock.BlockFactor)
-            {
-	            _nextFreeBlockAddress = _currentBlockAddress;
-	            _currentBlock.Next = -1;
-	            
-	            // if (_nextFreeBlockAddress != -1)
-	            // {
-		           //  var nextBlock = GetBlock(_nextFreeBlockAddress) as Block<T>;
-		           //  nextBlock!.Previous = -1;
-		           //  WriteBlock(nextBlock, _nextFreeBlockAddress);   
-	            // }
-            }
-            else 
-            {
-	            var newBlockAddress = (int)_file.Length;
-	            var newBlock = new Block<T>(BlockSize, new T())
-	            {
-		            Previous = _currentBlockAddress, 
-		            Next = -1 
-	            };
+                _currentBlock.AddRecord(data);
 
-	            _currentBlock.Next = newBlockAddress;
-	            WriteBlock(newBlock, newBlockAddress);
-	            _nextFreeBlockAddress = newBlockAddress;
+                if (_currentBlock.ValidCount < _currentBlock.BlockFactor)
+                {
+	                if (_nextFreeBlockAddress != -1)
+	                {
+		                var nextBlock = GetBlock(_nextFreeBlockAddress);
+		                nextBlock.Previous = _currentBlockAddress;
+		                WriteBlock(nextBlock, _nextFreeBlockAddress);
+		                
+		                
+		                _currentBlock.Next = _nextFreeBlockAddress;
+		                _nextFreeBlockAddress = _currentBlockAddress;
+	                }
+	                else
+	                {
+		                _nextFreeBlockAddress = _currentBlockAddress;
+	                }
+                }
             }
             
             WriteBlock(_currentBlock, _currentBlockAddress);
@@ -108,15 +141,44 @@
             return _currentBlock.GetRecord(data);
         }
 
-        public bool Delete(int address)
+        public bool Delete(int address, T data)
 		{
 			if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
+
+			var blockToDeleteFrom = GetBlock(address);
+			if (!blockToDeleteFrom.RemoveRecord(data)) return false;
+
+			if (blockToDeleteFrom.ValidCount < blockToDeleteFrom.BlockFactor)
+			{
+				if (blockToDeleteFrom.ValidCount > 0)
+				{
+					if (_nextFreeBlockAddress != -1)
+					{
+						var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
+						nextFreeBlock.Previous = address;
+						WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
+					}
+					_nextFreeBlockAddress = address;
+				}
+				else
+				{
+					if (_nextEmptyBlockAddress != -1)
+					{
+						var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
+						nextEmptyBlock.Previous = address;
+						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
+					}
+					_nextEmptyBlockAddress = address;
+				}
+			}
 			
-			// TODO delete operation
-			return false;
+			WriteBlock(blockToDeleteFrom, address);
+			CheckFileEnding();
+			
+			return true;
 		}
-        
-        public void Clear()
+
+		public void Clear()
 		{
 			_currentBlock.ResetBlock();
             _currentBlockAddress = 0;
@@ -208,6 +270,11 @@
 
             _currentBlock.FromByteArray(bytes);
             _currentBlockAddress = address;
+            if (address == _file.Length)
+            {
+	            _currentBlock.Next = -1;
+	            _currentBlock.Previous = -1;
+            }
         }
         
         private void WriteBlock(Block<T> currentBlock, int currentBlockAddress)
@@ -226,6 +293,29 @@
 	        var block = new Block<T>(BlockSize, new T());
 	        block.FromByteArray(bytes);
 	        return block;
+        }
+        
+        private void CheckFileEnding()
+        {
+	        while (_file.Length > 0)
+	        {
+		        int lastBlockAddress = (int)_file.Length - BlockSize;
+		        var lastBlock = GetBlock(lastBlockAddress);
+
+		        if (lastBlock.ValidCount > 0) break;
+
+		        if (lastBlock.Previous != -1)
+		        {
+			        var previousBlock = GetBlock(lastBlock.Previous);
+			        previousBlock.Next = -1;
+			        WriteBlock(previousBlock, lastBlock.Previous);
+		        }
+
+		        if (_nextEmptyBlockAddress == lastBlockAddress) _nextEmptyBlockAddress = lastBlock.Next;
+		        if (_nextFreeBlockAddress == lastBlockAddress) _nextFreeBlockAddress = lastBlock.Next;
+		        
+		        _file.SetLength(_file.Length - BlockSize);
+	        }
         }
         #endregion // Private functions
     }
