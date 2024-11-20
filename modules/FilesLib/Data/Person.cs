@@ -8,15 +8,21 @@ namespace FilesLib.Data
 		private const int MAX_VISITS = 5;
 		private const int MAX_NAME_LENGTH = 15;
 		private const int MAX_SURNAME_LENGTH = 20;
+		private const int MAX_ECV_LENGTH = 10;
 		#endregion // Constants
 		
 		#region Class members
 		private string _name = string.Empty;
 		private string _surname = string.Empty;
+		private string _ecv = string.Empty;
 		private List<Visit> _zaznamy = new(MAX_VISITS);
 		#endregion // Class members
 
 		#region Properties
+		/// <summary>
+		/// Name of the person.
+		/// </summary>
+		/// <exception cref="ArgumentException">If name is too long.</exception>
 		public string Name
 		{
 			get => _name;
@@ -29,6 +35,10 @@ namespace FilesLib.Data
 				_name = value;
 			}
 		}
+		/// <summary>
+		/// Surname of the person.
+		/// </summary>
+		/// <exception cref="ArgumentException">If surname is too long.</exception>
 		public string Surname
 		{
 			get => _surname;
@@ -41,7 +51,30 @@ namespace FilesLib.Data
 				_surname = value;
 			}
 		}
+		/// <summary>
+		/// ECV of person's car.
+		/// </summary>
+		/// <exception cref="ArgumentException">If ecv is too long.</exception>
+		public string Ecv
+		{
+			get => _ecv;
+			set
+			{
+				if (value.Length > MAX_ECV_LENGTH)
+				{
+					throw new ArgumentException($"ECV is too long. Max length is {MAX_ECV_LENGTH}.");
+				}
+				_ecv = value;
+			}
+		}
+		/// <summary>
+		/// ID of the person.
+		/// </summary>
 		public int Id { get; set; } = -1;
+		/// <summary>
+		/// Car repair visits.
+		/// </summary>
+		/// <exception cref="ArgumentException">If list is too long.</exception>
 		public List<Visit> Zaznamy
 		{
 			get => _zaznamy;
@@ -62,10 +95,11 @@ namespace FilesLib.Data
 			
 		}
 
-		public Person(int id, string name, string surname)
+		public Person(int id, string ecv, string name, string surname)
 		{
 			Name = name;
 			Surname = surname;
+			Ecv = ecv;
 			Id = id;
 			Zaznamy = new List<Visit>(MAX_VISITS);
 		}
@@ -81,7 +115,7 @@ namespace FilesLib.Data
 				zaznamy += $"{i}. {visit.ToString()}\n";
 				i++;
 			}
-			return $"[{Id}] {Name} {Surname} ({Zaznamy.Count}):\n{zaznamy}";
+			return $"[{Id}, {Ecv}] {Name} {Surname} ({Zaznamy.Count}):\n{zaznamy}";
 		}
 
 		public void Add(Visit visit)
@@ -114,11 +148,12 @@ namespace FilesLib.Data
 			offset += sizeof(int);
 
 			// Name
+			var nameToFile = string.Empty;
 			if (Name.Length < MAX_NAME_LENGTH)
 			{
-				Name = Name.PadRight(MAX_NAME_LENGTH, ' ');
+				nameToFile = Name.PadRight(MAX_NAME_LENGTH, ' ');
 			}
-			Encoding.ASCII.GetBytes(Name).CopyTo(bytes, offset);
+			Encoding.ASCII.GetBytes(nameToFile).CopyTo(bytes, offset);
             offset += sizeof(char) * MAX_NAME_LENGTH;
 
 			// Surname length
@@ -127,12 +162,27 @@ namespace FilesLib.Data
 			offset += sizeof(int);
 
 			// Surname
+			var surnameToFile = string.Empty;
 			if (Surname.Length < MAX_SURNAME_LENGTH)
 			{
-				Surname = Surname.PadRight(MAX_SURNAME_LENGTH, ' ');
+				surnameToFile = Surname.PadRight(MAX_SURNAME_LENGTH, ' ');
 			}
-			Encoding.ASCII.GetBytes(Surname).CopyTo(bytes, offset);
+			Encoding.ASCII.GetBytes(surnameToFile).CopyTo(bytes, offset);
             offset += sizeof(char) * MAX_SURNAME_LENGTH;
+            
+            // ECV length
+            var ecvLength = Ecv.Length;
+            BitConverter.GetBytes(ecvLength).CopyTo(bytes, offset);
+            offset += sizeof(int);
+            
+            // ECV
+            var ecvToFile = string.Empty;
+            if (Ecv.Length < MAX_ECV_LENGTH)
+            {
+	            ecvToFile = Ecv.PadRight(MAX_ECV_LENGTH, ' ');
+            }
+            Encoding.ASCII.GetBytes(ecvToFile).CopyTo(bytes, offset);
+            offset += sizeof(char) * MAX_ECV_LENGTH;
 
 			// Zaznamy count
 			int zaznamyCount = Zaznamy.Count;
@@ -172,6 +222,14 @@ namespace FilesLib.Data
 			// Surname
 			Surname = Encoding.ASCII.GetString(byteArray, offset, surnameLength);
 			offset += sizeof(char) * MAX_SURNAME_LENGTH;
+			
+			// ECV length
+			int ecvLength = BitConverter.ToInt32(byteArray, offset);
+			offset += sizeof(int);
+			
+			// ECV
+			Ecv = Encoding.ASCII.GetString(byteArray, offset, ecvLength);
+			offset += sizeof(char) * MAX_ECV_LENGTH;
 
 			// Zaznamy count
 			int zaznamyCount = BitConverter.ToInt32(byteArray, offset);
@@ -198,9 +256,11 @@ namespace FilesLib.Data
             ret += sizeof(char) * MAX_NAME_LENGTH;
 			ret += sizeof(int); // Surname length
 			ret += sizeof(char) * MAX_SURNAME_LENGTH;
+			ret += sizeof(int); // ECV length
+			ret += sizeof(char) * MAX_ECV_LENGTH;
 			ret += sizeof(int); // Zaznamy length
-			var visit = new Visit();
-			ret += visit.GetSize() * MAX_VISITS;
+			var visitLength = new Visit().GetSize();
+			ret += visitLength * MAX_VISITS;
             return ret;
         }
 
@@ -211,7 +271,7 @@ namespace FilesLib.Data
 
         public bool Equals(Person data)
         {
-            return Id == data.Id && Name == data.Name && Surname == data.Surname && Zaznamy.Equals(data.Zaznamy);
+            return Id == data.Id && Name == data.Name && Surname == data.Surname && Ecv == data.Ecv && Zaznamy.Equals(data.Zaznamy);
         }
         #endregion // Public functions
     }
