@@ -22,10 +22,6 @@ namespace FilesTest
             for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
             {
                 TestRP1 person = generator.GenerateTestRP1();
-                if (i == 9) // 17
-                {
-                    Console.WriteLine("trtr");
-                }
                 var adresa = heapFile.Insert(person);
                 Console.WriteLine($"{i}. Inserted person");
                 people.Add(new TestRP1(person));
@@ -40,15 +36,11 @@ namespace FilesTest
             {
                 var pers = heapFile.Find(adresses[i], people[i]);
                 Console.WriteLine("Get person");
-                Console.WriteLine($"Found person: {pers.ToString()}");
+                Console.WriteLine($"Found person: {pers}");
             }
 
-            for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
+            for (int i = NUMBER_OF_PEOPLE-1; i >= 0; i--)
             {
-                if (i == 19)
-                {
-                    Console.WriteLine("hdsds");
-                }
                 heapFile.Delete(adresses[i], people[i]);
                 Console.WriteLine($"{i}. Deleted person");
                 Console.WriteLine(heapFile.GetBlocks().Count);

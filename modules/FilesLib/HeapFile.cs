@@ -147,34 +147,32 @@
 
 			var blockToDeleteFrom = GetBlock(address);
 			if (!blockToDeleteFrom.RemoveRecord(data)) return false;
-
-			if (blockToDeleteFrom.ValidCount < blockToDeleteFrom.BlockFactor)
+			
+			if (blockToDeleteFrom.ValidCount > 0)
 			{
-				if (blockToDeleteFrom.ValidCount > 0)
+				if (_nextFreeBlockAddress != -1)
 				{
-					if (_nextFreeBlockAddress != -1)
-					{
-						var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
-						nextFreeBlock.Previous = address;
-						WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
-					}
-					_nextFreeBlockAddress = address;
+					var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
+					nextFreeBlock.Next = address;
+					blockToDeleteFrom.Previous = _nextFreeBlockAddress;
+					WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
 				}
-				else
+				_nextFreeBlockAddress = address;
+			}
+			else
+			{
+				if (_nextEmptyBlockAddress != -1)
 				{
-					if (_nextEmptyBlockAddress != -1)
-					{
-						var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
-						nextEmptyBlock.Previous = address;
-						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
-					}
-					_nextEmptyBlockAddress = address;
+					var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
+					nextEmptyBlock.Next = address;
+					blockToDeleteFrom.Previous = _nextEmptyBlockAddress;
+					WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
 				}
+				_nextEmptyBlockAddress = address;
 			}
 			
 			WriteBlock(blockToDeleteFrom, address);
 			CheckFileEnding();
-			
 			return true;
 		}
 
