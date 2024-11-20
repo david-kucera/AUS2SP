@@ -334,22 +334,22 @@
 
 		        if (lastBlock.ValidCount > 0) break;
 		        
-		        if (lastBlock.Next != -1 && lastBlock.Next < _file.Length)
+		        if (lastBlock.Next != -1 && lastBlock.Next < _file.Length && lastBlock.Previous < _file.Length)
 		        {
 			        var nextBlock = GetBlock(lastBlock.Next);
 			        nextBlock.Previous = lastBlock.Previous;
 			        WriteBlock(nextBlock, lastBlock.Next);
 		        }
 
-		        if (lastBlock.Previous != -1 && lastBlock.Previous < _file.Length)
+		        if (lastBlock.Previous != -1 && lastBlock.Previous < _file.Length && lastBlock.Next < _file.Length)
 		        {
 			        var prevBlock = GetBlock(lastBlock.Previous);
 			        prevBlock.Next = lastBlock.Next;
 			        WriteBlock(prevBlock, lastBlock.Previous);
 		        }
 
-		        //if (_nextFreeBlockAddress == lastBlockAddress) _nextFreeBlockAddress = lastBlock.Next;
-		        //if (_nextEmptyBlockAddress == lastBlockAddress) _nextEmptyBlockAddress = lastBlock.Next;
+		        if (_nextFreeBlockAddress == lastBlockAddress) _nextFreeBlockAddress = lastBlock.Next;
+		        if (_nextEmptyBlockAddress == lastBlockAddress) _nextEmptyBlockAddress = lastBlock.Next;
 		        
 		        _file.SetLength(_file.Length - BlockSize);
 	        }
