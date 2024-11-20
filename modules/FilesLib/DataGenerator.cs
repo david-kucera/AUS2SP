@@ -29,6 +29,7 @@ public class DataGenerator
             Id = _rand.Next(1000000),
             Name = GenerateString(_rand.Next(15)),
             Surname = GenerateString(_rand.Next(20)),
+            Ecv = GenerateString(_rand.Next(10)),
             Zaznamy = GenerateVisits(_rand.Next(5)),
         };
         return ret;
