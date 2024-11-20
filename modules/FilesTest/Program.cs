@@ -5,10 +5,10 @@ namespace FilesTest
 {
     public class Program
     {
-        public static int BLOCK_SIZE = 4096;
+        public static int BLOCK_SIZE = 8192;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 1;
+        public static int NUMBER_OF_PEOPLE = 20;
         static void Main()
         {
             Console.WriteLine("Test heap file");
@@ -21,12 +21,20 @@ namespace FilesTest
             List<Person> people = new(NUMBER_OF_PEOPLE);
             for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
             {
+                if (i == 3)
+                {
+                    Console.WriteLine("jjj");
+                }
                 Person person = generator.GeneratePerson();
                 var adresa = heapFile.Insert(person);
                 Console.WriteLine("Inserted person");
-                people.Add(person);
+                people.Add(new Person(person));
                 adresses.Add(adresa);
             }
+
+            Console.WriteLine("Number of blocks:");
+            Console.WriteLine(heapFile.GetBlocks().Count);
+            Console.WriteLine("------------------------");
 
             for (int i = 0; i < NUMBER_OF_PEOPLE; i++)
             {
@@ -36,10 +44,15 @@ namespace FilesTest
             }
             
             var allBlocks = heapFile.GetBlocks();
+            Console.WriteLine("------------------------");
             Console.WriteLine("All Blocks");
+            int poradie = 1;
             foreach (var b in allBlocks)
             {
-                Console.WriteLine(b);
+                Console.WriteLine("------------------------");
+                Console.WriteLine(poradie + ". block\n" + b);
+                Console.WriteLine("------------------------");
+                poradie++;
             }
             
             heapFile.Close();

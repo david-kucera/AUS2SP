@@ -65,31 +65,35 @@
             }
             else
             {
-                _nextEmptyBlockAddress = (int)_file.Length;
-                SetCurrentBlock(_nextEmptyBlockAddress);
-                _nextEmptyBlockAddress += BlockSize;
+                SetCurrentBlock((int)_file.Length);
             }
-
+            
             _currentBlock.AddRecord(data);
             
-            if (_currentBlock.ValidCount >= _currentBlock.BlockFactor)
+            if (_currentBlock.ValidCount < _currentBlock.BlockFactor)
             {
+	            _nextFreeBlockAddress = _currentBlockAddress;
 	            _currentBlock.Next = -1;
-	            _nextFreeBlockAddress = -1;
-
-	            if (_nextFreeBlockAddress != -1)
-	            {
-		            var nextBlock = GetBlock(_nextFreeBlockAddress) as Block<T>;
-		            nextBlock!.Previous = -1;
-		            WriteBlock(nextBlock, _nextFreeBlockAddress);   
-	            }
+	            
+	            // if (_nextFreeBlockAddress != -1)
+	            // {
+		           //  var nextBlock = GetBlock(_nextFreeBlockAddress) as Block<T>;
+		           //  nextBlock!.Previous = -1;
+		           //  WriteBlock(nextBlock, _nextFreeBlockAddress);   
+	            // }
             }
-            else
+            else 
             {
-	            if (_nextFreeBlockAddress == -1)
+	            var newBlockAddress = (int)_file.Length;
+	            var newBlock = new Block<T>(BlockSize, new T())
 	            {
-		            _nextFreeBlockAddress = _currentBlockAddress;
-	            }
+		            Previous = _currentBlockAddress, 
+		            Next = -1 
+	            };
+
+	            _currentBlock.Next = newBlockAddress;
+	            WriteBlock(newBlock, newBlockAddress);
+	            _nextFreeBlockAddress = newBlockAddress;
             }
             
             WriteBlock(_currentBlock, _currentBlockAddress);
@@ -133,7 +137,7 @@
 		        int offset = i * BlockSize;
 		        _file.Seek(offset, SeekOrigin.Begin);
 		        byte[] bytes = new byte[BlockSize];
-		        _file.Read(bytes, offset, BlockSize);
+		        _file.Read(bytes, 0, BlockSize);
 		        block.FromByteArray(bytes);
 		        
 		        ret.Add(block);
@@ -214,12 +218,14 @@
 	        _file.Flush();
         }
 
-        private T GetBlock(int address)
+        private Block<T> GetBlock(int address)
         {
 	        _file.Seek(address, SeekOrigin.Begin);
 	        byte[] bytes = new byte[BlockSize];
 	        _file.Read(bytes, 0, BlockSize);
-	        return new Block<T>(BlockSize, new T()).FromByteArray(bytes);
+	        var block = new Block<T>(BlockSize, new T());
+	        block.FromByteArray(bytes);
+	        return block;
         }
         #endregion // Private functions
     }

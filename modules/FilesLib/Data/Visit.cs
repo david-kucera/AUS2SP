@@ -180,7 +180,7 @@ namespace FilesLib.Data
 			
 			// Note data
 			var notes = new List<string>();
-			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			for (int i = 0; i < notesCount; i++)
 			{
 				var noteString = Encoding.ASCII.GetString(byteArray, offset, noteLengths[i]);
 				notes.Add(noteString);

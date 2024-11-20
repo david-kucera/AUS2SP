@@ -26,11 +26,11 @@ public class DataGenerator
     {
         Person ret = new()
         {
-            Id = _rand.Next(1000000),
-            Name = GenerateString(_rand.Next(15)),
-            Surname = GenerateString(_rand.Next(20)),
-            Ecv = GenerateString(_rand.Next(10)),
-            Zaznamy = GenerateVisits(_rand.Next(5)),
+            Id = _rand.Next(1,1000000),
+            Name = GenerateString(_rand.Next(1,15)),
+            Surname = GenerateString(_rand.Next(1,20)),
+            Ecv = GenerateString(_rand.Next(1,10)),
+            Zaznamy = GenerateVisits(_rand.Next(1,5)),
         };
         return ret;
     }
@@ -44,7 +44,7 @@ public class DataGenerator
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(_rand.Next(-20, 20))),
                 Price = _rand.Next(0, 100),
-                Notes = GenerateNotes(_rand.Next(MAX_COUNT_VISIT), _rand.Next(MAX_LENGTH_VISIT))
+                Notes = GenerateNotes(_rand.Next(1,MAX_COUNT_VISIT))
             };
             ret.Add(visit);
         }
@@ -52,13 +52,13 @@ public class DataGenerator
         return ret;
     }
 
-    private List<string> GenerateNotes(int count, int length)
+    private List<string> GenerateNotes(int count)
     {
         List<string> ret = new List<string>();
         
         for (int i = 0; i < count; i++)
         {
-            string noteString = GenerateString(length);
+            string noteString = GenerateString(_rand.Next(1,MAX_LENGTH_VISIT));
             ret.Add(noteString);
         }
 

@@ -103,6 +103,15 @@ namespace FilesLib.Data
 			Id = id;
 			Zaznamy = new List<Visit>(MAX_VISITS);
 		}
+
+		public Person(Person p)
+		{
+			Name = p.Name;
+			Surname = p.Surname;
+			Ecv = p.Ecv;
+			Id = p.Id;
+			Zaznamy = p.Zaznamy;
+		}
 		#endregion // Constructors
 
 		#region Public functions
@@ -271,7 +280,22 @@ namespace FilesLib.Data
 
         public bool Equals(Person data)
         {
-            return Id == data.Id && Name == data.Name && Surname == data.Surname && Ecv == data.Ecv && Zaznamy.Equals(data.Zaznamy);
+	        if (Zaznamy.Count != data.Zaznamy.Count) return false;
+	        
+	        bool equal = true;
+	        for (int i = 0; i < Zaznamy.Count; i++)
+	        {
+		        for (int j = 0; j < Zaznamy[i].Notes.Count; j++)
+		        {
+			        if (!Zaznamy[i].Notes[j].Equals(data.Zaznamy[i].Notes[j]))
+			        {
+				        equal = false;
+				        break;
+			        }
+			        
+		        }
+	        }
+	        return Id == data.Id && Name == data.Name && Surname == data.Surname && Ecv == data.Ecv && equal;
         }
         #endregion // Public functions
     }
