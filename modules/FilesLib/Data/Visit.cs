@@ -17,7 +17,6 @@ namespace FilesLib.Data
 		#region Properties
 		public DateOnly Date { get; set; } = DateOnly.MinValue;
 		public double Price { get; set; } = double.MinValue;
-
 		public List<string> Notes
 		{
 			get => _notes;

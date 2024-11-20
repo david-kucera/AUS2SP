@@ -58,12 +58,6 @@
             if (_nextFreeBlockAddress != -1)
             {
                 SetCurrentBlock(_nextFreeBlockAddress);
-
-                if (_currentBlock.ValidCount >= _currentBlock.BlockFactor)
-                {
-	                _nextFreeBlockAddress = _currentBlock.Next;
-	                _currentBlock.Next = -1;
-                }
             }
             else if (_nextEmptyBlockAddress != -1)
             {
@@ -82,6 +76,13 @@
             {
 	            _currentBlock.Next = -1;
 	            _nextFreeBlockAddress = -1;
+
+	            if (_nextFreeBlockAddress != -1)
+	            {
+		            var nextBlock = GetBlock(_nextFreeBlockAddress) as Block<T>;
+		            nextBlock!.Previous = -1;
+		            WriteBlock(nextBlock, _nextFreeBlockAddress);   
+	            }
             }
             else
             {
@@ -91,10 +92,7 @@
 	            }
             }
             
-            byte[] bytes = _currentBlock.ToByteArray();
-            _file.Seek(_currentBlockAddress, SeekOrigin.Begin);
-            _file.Write(bytes, 0, BlockSize);
-
+            WriteBlock(_currentBlock, _currentBlockAddress);
             return _currentBlockAddress;
         }
 
@@ -113,37 +111,7 @@
 			// TODO delete operation
 			return false;
 		}
-
-        private void SaveInitData()
-        {
-	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-	        
-            byte[] buffer = new byte[BlockSize];
-            int offset = 0;
-            BitConverter.GetBytes(_nextFreeBlockAddress).CopyTo(buffer, offset);
-            offset += sizeof(int);
-            BitConverter.GetBytes(_nextEmptyBlockAddress).CopyTo(buffer, offset);
-
-			initFile.Seek(0, SeekOrigin.Begin);
-            initFile.Write(buffer, 0, BlockSize);
-            initFile.Flush();
-            initFile.Close();
-        }
-
-        private void LoadInitData()
-        {
-	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-	        
-            byte[] buffer = new byte[BlockSize];
-            int offset = 0;
-            initFile.Seek(offset, SeekOrigin.Begin);
-            initFile.Read(buffer, offset, BlockSize);
-            
-            _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
-            offset += sizeof(int);
-            _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
-        }
-
+        
         public void Clear()
 		{
 			_currentBlock.ResetBlock();
@@ -187,6 +155,36 @@
         #endregion // Public functions
 
         #region Private functions
+        private void SaveInitData()
+        {
+	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+	        
+	        byte[] buffer = new byte[BlockSize];
+	        int offset = 0;
+	        BitConverter.GetBytes(_nextFreeBlockAddress).CopyTo(buffer, offset);
+	        offset += sizeof(int);
+	        BitConverter.GetBytes(_nextEmptyBlockAddress).CopyTo(buffer, offset);
+
+	        initFile.Seek(0, SeekOrigin.Begin);
+	        initFile.Write(buffer, 0, BlockSize);
+	        initFile.Flush();
+	        initFile.Close();
+        }
+
+        private void LoadInitData()
+        {
+	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+	        
+	        byte[] buffer = new byte[BlockSize];
+	        int offset = 0;
+	        initFile.Seek(offset, SeekOrigin.Begin);
+	        initFile.Read(buffer, offset, BlockSize);
+            
+	        _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
+	        offset += sizeof(int);
+	        _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
+        }
+        
         private void SetCurrentBlock(int address)
         {
 	        if (_currentBlock == null)
@@ -206,6 +204,22 @@
 
             _currentBlock.FromByteArray(bytes);
             _currentBlockAddress = address;
+        }
+        
+        private void WriteBlock(Block<T> currentBlock, int currentBlockAddress)
+        {
+	        byte[] bytes = currentBlock.ToByteArray();
+	        _file.Seek(currentBlockAddress, SeekOrigin.Begin);
+	        _file.Write(bytes, 0, BlockSize);
+	        _file.Flush();
+        }
+
+        private T GetBlock(int address)
+        {
+	        _file.Seek(address, SeekOrigin.Begin);
+	        byte[] bytes = new byte[BlockSize];
+	        _file.Read(bytes, 0, BlockSize);
+	        return new Block<T>(BlockSize, new T()).FromByteArray(bytes);
         }
         #endregion // Private functions
     }
