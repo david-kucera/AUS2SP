@@ -5,27 +5,36 @@ namespace FilesLib.Data
 	public class Visit : IData<Visit>
 	{
 		#region Constants
+		private const int MAX_NOTES_COUNT = 10;
 		private const int MAX_NOTE_LENGTH = 20;
 		private const double TOLERANCE = 0.0001;
 		#endregion // Constants
 		
 		#region Class members
-		private string _note = string.Empty;
+		private List<string> _notes = new(MAX_NOTES_COUNT);
 		#endregion // Class members
 
 		#region Properties
 		public DateOnly Date { get; set; } = DateOnly.MinValue;
 		public double Price { get; set; } = double.MinValue;
-		public string Note
+
+		public List<string> Notes
 		{
-			get => _note;
+			get => _notes;
 			set
 			{
-				if (value.Length > MAX_NOTE_LENGTH)
+				if (value.Count > MAX_NOTES_COUNT)
 				{
-					throw new ArgumentException($"Note length must not exceed {MAX_NOTE_LENGTH} characters.");
+					throw new ArgumentException($"Notes count must not exceed {MAX_NOTES_COUNT} characters.");
 				}
-				_note = value;
+
+				foreach (var note in value)
+				{
+					if (note.Length > MAX_NOTE_LENGTH)
+						throw new ArgumentException($"Note size must not exceed {MAX_NOTE_LENGTH} characters.");
+				}
+
+				_notes = value;
 			}
 		}
 		#endregion // Properties
@@ -33,21 +42,26 @@ namespace FilesLib.Data
 		#region Constructors
 		public Visit()
         {
-
+			Notes = new List<string>();
         }
 
-        public Visit(DateOnly date, double price, string note)
+        public Visit(DateOnly date, double price, List<string> notes)
 		{
 			Date = date;
 			Price = price;
-			_note = note;
+			Notes = notes;
 		}
 		#endregion // Constructors
 
 		#region Public functions
 		public override string ToString()
 		{
-			return $"Date: {Date}, Price: {Price}, Note: {Note}";
+			var notes = "\n";
+			foreach (var note in Notes)
+			{
+				notes += note + "\n";
+			}
+			return $"Date: {Date}, Price: {Price}, Notes({Notes.Count}): {notes}";
 		}
 
 		public int GetSize()
@@ -55,7 +69,9 @@ namespace FilesLib.Data
             int ret = 0;
             ret += sizeof(double);	// Price
             ret += sizeof(ushort) + sizeof(byte) + sizeof(byte); // Date
-			ret += MAX_NOTE_LENGTH * sizeof(char); // Note
+            ret += sizeof(int); // Notes lengths - that are real
+            ret += sizeof(int) * MAX_NOTES_COUNT; // Note length for each individual note - how long is each note
+            ret += sizeof(char) * MAX_NOTE_LENGTH * MAX_NOTES_COUNT; // Note data
             return ret;
         }
 
@@ -66,7 +82,7 @@ namespace FilesLib.Data
 
         public bool Equals(Visit data)
         {
-            return Date == data.Date && Math.Abs(Price - data.Price) < TOLERANCE && Note == data.Note;
+            return Date == data.Date && Math.Abs(Price - data.Price) < TOLERANCE && Notes == data.Notes;
         }
 
         public byte[] ToByteArray()
@@ -90,16 +106,28 @@ namespace FilesLib.Data
 			bytes[offset] = (byte)Date.Day;
 			offset++;
 
-			// 4 bytes for note length and 20 bytes for note chars
-			int noteLength = Note.Length;
-			BitConverter.GetBytes(noteLength).CopyTo(bytes, offset);
+			// Notes length
+			BitConverter.GetBytes(Notes.Count).CopyTo(bytes, offset);
 			offset += sizeof(int);
-
-			if (noteLength < MAX_NOTE_LENGTH)
+			
+			// Inidivudial notes lengths
+			for (int i = 0; i < MAX_NOTES_COUNT; i++)
 			{
-				Note = Note.PadRight(MAX_NOTE_LENGTH, ' ');
+				BitConverter.GetBytes(Notes[i].Length).CopyTo(bytes, offset);
+				offset += sizeof(int);
 			}
-			Encoding.ASCII.GetBytes(Note).CopyTo(bytes, offset);
+			
+			// Note data
+			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			{
+				var noteString = Notes[i];
+				if (noteString.Length < MAX_NOTE_LENGTH)
+				{
+					noteString = noteString.PadRight(MAX_NOTE_LENGTH, ' ');
+				}
+				Encoding.ASCII.GetBytes(noteString).CopyTo(bytes, offset);
+				offset += MAX_NOTE_LENGTH;
+			}
 
             return bytes;
         }
@@ -124,14 +152,28 @@ namespace FilesLib.Data
 			byte day = byteArray[offset];
 			offset++;
 
-			// Note length
-			int noteLength = BitConverter.ToInt32(byteArray, offset);
+			// Notes count
+			int notesCount = BitConverter.ToInt32(byteArray, offset);
 			offset += sizeof(int);
 
-			// Note
-			string note = Encoding.ASCII.GetString(byteArray, offset, noteLength);
+			// Individual note lengths
+			int[] noteLengths = new int[MAX_NOTES_COUNT];
+			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			{
+				noteLengths[i] = BitConverter.ToInt32(byteArray, offset);
+				offset += sizeof(int);
+			}
+			
+			// Note data
+			var notes = new List<string>();
+			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			{
+				var noteString = Encoding.ASCII.GetString(byteArray, offset, noteLengths[i]);
+				notes.Add(noteString);
+				offset += MAX_NOTE_LENGTH;
+			}
 
-			return new Visit(new DateOnly(year, month, day), price, note);
+			return new Visit(new DateOnly(year, month, day), price, notes);
 		}
         #endregion // Public functions
     }
