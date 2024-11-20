@@ -111,20 +111,35 @@ namespace FilesLib.Data
 			offset += sizeof(int);
 			
 			// Inidivudial notes lengths
-			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			var emptyNotes = MAX_NOTES_COUNT - Notes.Count;
+			for (int i = 0; i < Notes.Count; i++)
 			{
 				BitConverter.GetBytes(Notes[i].Length).CopyTo(bytes, offset);
 				offset += sizeof(int);
 			}
+
+			for (int i = 0; i < emptyNotes; i++)
+			{
+				BitConverter.GetBytes(0).CopyTo(bytes, offset);
+				offset += sizeof(int);
+			}
 			
 			// Note data
-			for (int i = 0; i < MAX_NOTES_COUNT; i++)
+			for (int i = 0; i < Notes.Count; i++)
 			{
 				var noteString = Notes[i];
 				if (noteString.Length < MAX_NOTE_LENGTH)
 				{
 					noteString = noteString.PadRight(MAX_NOTE_LENGTH, ' ');
 				}
+				Encoding.ASCII.GetBytes(noteString).CopyTo(bytes, offset);
+				offset += MAX_NOTE_LENGTH;
+			}
+
+			for (int i = 0; i < emptyNotes; i++)
+			{
+				var noteString = string.Empty;
+				noteString = noteString.PadRight(MAX_NOTE_LENGTH, ' ');
 				Encoding.ASCII.GetBytes(noteString).CopyTo(bytes, offset);
 				offset += MAX_NOTE_LENGTH;
 			}

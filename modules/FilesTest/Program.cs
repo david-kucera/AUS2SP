@@ -8,7 +8,7 @@ namespace FilesTest
         public static int BLOCK_SIZE = 4096;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 5;
+        public static int NUMBER_OF_PEOPLE = 1;
         static void Main()
         {
             Console.WriteLine("Test heap file");
