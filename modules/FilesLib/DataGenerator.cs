@@ -21,7 +21,6 @@ public class DataGenerator
     #endregion // Constructors
     
     #region Public methods
-
     public Person GeneratePerson()
     {
         Person ret = new()
@@ -76,7 +75,11 @@ public class DataGenerator
 
         return ret;
     }
-
+    
+    public int GenerateInt(int min, int max)
+    {
+        return _rand.Next(min, max);
+    }
     #endregion // Public methods
     
     #region Private methods

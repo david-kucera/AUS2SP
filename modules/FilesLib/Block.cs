@@ -183,9 +183,7 @@ namespace FilesLib
 
 		public override string ToString()
 		{
-			return ValidCount + " record(s):\n" + string.Join("\n", Records);
+			return "Next,Previous: " + Next + "," + Previous + " ... "+ ValidCount + " record(s):\n" + string.Join("\n", Records);}
 		}
-
 		#endregion // Public functions
-	}
 }
