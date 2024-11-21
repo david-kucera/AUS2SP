@@ -7,6 +7,7 @@ public class DataGenerator
     #region Constants
     private const int MAX_COUNT_VISIT = 10;
     private const int MAX_LENGTH_VISIT = 20;
+    private int NEXT_ID = 0;
     #endregion // Constants
     
     #region Class members   
@@ -25,7 +26,7 @@ public class DataGenerator
     {
         Person ret = new()
         {
-            Id = _rand.Next(1,1000000),
+            Id = NEXT_ID++,
             Name = GenerateString(_rand.Next(1,15)),
             Surname = GenerateString(_rand.Next(1,20)),
             Ecv = GenerateString(_rand.Next(1,10)),
