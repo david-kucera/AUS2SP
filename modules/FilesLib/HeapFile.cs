@@ -229,6 +229,16 @@
             _file.Flush();
         }
 
+		public Block<T> GetBlock(int address)
+		{
+			_file.Seek(address, SeekOrigin.Begin);
+			byte[] bytes = new byte[BlockSize];
+			_file.Read(bytes, 0, BlockSize);
+			var block = new Block<T>(BlockSize, new T());
+			block.FromByteArray(bytes);
+			return block;
+		}
+		
         public List<Block<T>> GetBlocks()
         {
 	        var ret = new List<Block<T>>();
@@ -317,16 +327,6 @@
 	        _file.Seek(currentBlockAddress, SeekOrigin.Begin);
 	        _file.Write(bytes, 0, BlockSize);
 	        _file.Flush();
-        }
-
-        private Block<T> GetBlock(int address)
-        {
-	        _file.Seek(address, SeekOrigin.Begin);
-	        byte[] bytes = new byte[BlockSize];
-	        _file.Read(bytes, 0, BlockSize);
-	        var block = new Block<T>(BlockSize, new T());
-	        block.FromByteArray(bytes);
-	        return block;
         }
         
         private void CheckFileEnding()
