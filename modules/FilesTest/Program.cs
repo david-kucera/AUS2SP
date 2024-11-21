@@ -8,12 +8,12 @@ namespace FilesTest
         public static int BLOCK_SIZE = 1024 * 4;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 0;
-        public static int NUMBER_OF_REPLICATIONS = 10;
+        public static int NUMBER_OF_PEOPLE = 10_000;
+        public static int NUMBER_OF_OPERATIONS = 100_000;
         static void Main()
         {
-            int numberOperations = 100_000;
-            for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
+            int numberOfReplications = 10;
+            for (int r = 0; r < numberOfReplications; r++)
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
@@ -32,19 +32,23 @@ namespace FilesTest
                 }
 
                 // Operations
-                for (int i = 0; i < numberOperations; i++)
+                for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
                     Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
+                            var countBeforeInsert = heapFile.RecordsCount;
                             var newPerson = generator.GenerateTestRP1();
                             var adresa = heapFile.Insert(newPerson);
+                            var countAfterInsert = heapFile.RecordsCount;
+                            if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
                             people.Add(new TestRP1(newPerson));
                             adresses.Add(adresa);
                             break;
                         case OperationType.Delete:
+                            var countBeforeDelete = heapFile.RecordsCount;
                             if (adresses.Count == 0) break;
                             var index = generator.GenerateInt(0, adresses.Count);
                             var person = people[index];
@@ -52,6 +56,8 @@ namespace FilesTest
                             people.RemoveAt(index);
                             adresses.RemoveAt(index);
                             heapFile.Delete(adress, person);
+                            var countAfterDelete = heapFile.RecordsCount;
+                            if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
                             break;
                         case OperationType.Find:
                             if (adresses.Count == 0) break;
@@ -59,7 +65,7 @@ namespace FilesTest
                             var pperson = people[iindex];
                             var aadress = adresses[iindex];
                             var foundPerson = heapFile.Find(aadress, pperson);
-                            if (foundPerson == null)
+                            if (foundPerson.Id != pperson.Id)
                             {
                                 throw new Exception("Person not found!");
                             }

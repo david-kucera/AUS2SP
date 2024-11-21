@@ -12,6 +12,7 @@
         #region Properties
         public int BlockSize { get; set; }
 		public int BlockCount => (int)(_file.Length / BlockSize);
+		public int RecordsCount = 0;
 		#endregion // Properties
 
 		#region Constructors
@@ -111,6 +112,7 @@
 	            }
 	            
 	            WriteBlock(blockToAdd, address);
+	            RecordsCount++;
 	            return address;
             }
             else // vytvaram novy blok na koniec suboru
@@ -131,6 +133,7 @@
 	                _nextFreeBlockAddress = address;
                 }
                 WriteBlock(newBlock, address);
+                RecordsCount++;
                 return address;
             }
         }
@@ -219,6 +222,7 @@
 			}
 			
 			WriteBlock(blockToDeleteFrom, address);
+			RecordsCount--;
 			CheckFileEnding();
 			return true;
 		}
@@ -263,9 +267,9 @@
 		        _file.Read(bytes, 0, BlockSize);
 		        block.FromByteArray(bytes);
 
-		        foreach (var record in block.Records)
+		        for (int j = 0; j < block.ValidCount; j++)
 		        {
-			        ret.Add(record);
+			        ret.Add(block.Records[j]);
 		        }
 	        }
 	        return ret;
