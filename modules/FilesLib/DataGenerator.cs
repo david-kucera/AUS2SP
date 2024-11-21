@@ -80,6 +80,12 @@ public class DataGenerator
     {
         return _rand.Next(min, max);
     }
+    
+    public OperationType GenerateOperation()
+    {
+        var ret = (OperationType)_rand.Next(0, 3);
+        return ret;
+    }
     #endregion // Public methods
     
     #region Private methods
@@ -93,4 +99,13 @@ public class DataGenerator
         return ret;
     }
     #endregion // Private methods
+
+    
+}
+
+public enum OperationType
+{
+    Insert,
+    Find,
+    Delete
 }
