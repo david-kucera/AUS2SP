@@ -3,55 +3,64 @@
 	public class HeapFile<T> where T : class, IData<T>, new()
 	{
 		#region Class members
-		private FileStream _file;
-		private string _initFilePath;
+		private readonly FileStream _file;
+		private readonly string _initFile;
 		private int _nextFreeBlockAddress = -1;
 		private int _nextEmptyBlockAddress = -1;
         #endregion // Class members
 
         #region Properties
+        /// <summary>
+        /// Veľkosť bloku dát.
+        /// </summary>
         public int BlockSize { get; set; }
+        /// <summary>
+        /// Počet blokov v súbore.
+        /// </summary>
 		public int BlockCount => (int)(_file.Length / BlockSize);
+        /// <summary>
+        /// Celkový počet záznamov v súbore.
+        /// </summary>
 		public int RecordsCount = 0;
 		#endregion // Properties
 
-		#region Constructors
+		#region Constructor
+		/// <summary>
+		/// Konštruktor triedy HeapFile.
+		/// </summary>
+		/// <param name="initFilePath">Cesta k inicializačnému súboru.</param>
+		/// <param name="filePath">Cesta k dátovému súboru.</param>
+		/// <param name="blockSize">Veľkosť bloku.</param>
+		/// <exception cref="Exception">Ak nastane chyba pri otváraí súboru.</exception>
 		public HeapFile(string initFilePath, string filePath, int blockSize)
 		{
-			BlockSize = blockSize;
-
-			if (!File.Exists(initFilePath))
-			{
-				File.Create(initFilePath).Close();
-			}
-
-			if (!File.Exists(filePath))
-			{
-				File.Create(filePath).Close();
-			}
+			if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
+			if (!File.Exists(filePath)) File.Create(filePath).Close();
 			
-			_initFilePath = initFilePath;
+			BlockSize = blockSize;
 			try
 			{
 				_file = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+				_initFile = initFilePath;
 			}
 			catch (Exception ex)
 			{
 				throw new Exception("Error while opening file: " + ex.Message);
             }
 
-            if (_file.Length == 0)
-            {
-				SaveInitData();
-            }
-			else
-			{
-				LoadInitData();
-			}
+            if (_file.Length == 0) SaveInitData();
+			else LoadInitData();
         }
-        #endregion // Constructors
+        #endregion // Constructor
 
         #region Public functions
+        /// <summary>
+        /// O(1,1) - jeden prístup do súboru, jeden zápis
+        /// Vloží dáta do súboru.
+        /// </summary>
+        /// <param name="data">Trieda dát</param>
+        /// <returns></returns>
+        /// <exception cref="Exception">Ak nastane chyba pri pridávaní dát.</exception>
         public int Insert(T data)
 		{
 			// Ak mam nejake volne blocky na pridanie dat
@@ -138,12 +147,26 @@
             }
         }
 
+        /// <summary>
+        /// O(1,0) - jeden prístup
+        /// Nájde daný prvok na danej adrese.
+        /// </summary>
+        /// <param name="address">Adresa bloku v ktorom sa prvok nachádza.</param>
+        /// <param name="data">Prvok, ktorý chceme nájsť.</param>
+        /// <returns>Trieda repzerentujúca prvok.</returns>
         public T Find(int address, T data)
         {
 	        CheckAddress(address);
 	        return GetBlock(address).GetRecord(data);
         }
 
+        /// <summary>
+        /// O(1,1) - jeden prístup, jeden zápis
+        /// Daný prvok vymaže zo súboru.
+        /// </summary>
+        /// <param name="address">Adresa bloku, kde sa prvok nachádza.</param>
+        /// <param name="data">Dáta prvku.</param>
+        /// <returns>True - ak sa operácia podarila, inak False.</returns>
         public bool Delete(int address, T data)
         {
 	        CheckAddress(address);
@@ -227,6 +250,11 @@
 			return true;
 		}
         
+        /// <summary>
+        /// Vráti blok na zadanej adrese.
+        /// </summary>
+        /// <param name="address">Adresa vrámci súboru.</param>
+        /// <returns>Blok</returns>
 		public Block<T> GetBlock(int address)
 		{
 			CheckAddress(address);
@@ -238,6 +266,10 @@
 			return block;
 		}
 		
+        /// <summary>
+        /// Vráti všetky bloky.
+        /// </summary>
+        /// <returns>List blokov</returns>
         public List<Block<T>> GetAllBlocks()
         {
 	        var ret = new List<Block<T>>();
@@ -255,6 +287,10 @@
 	        return ret;
         }
 
+        /// <summary>
+        /// Vráti všetky údaje zapísané v blokoch.
+        /// </summary>
+        /// <returns>List údajov</returns>
         public List<T> GetAllRecords()
         {
 	        var ret = new List<T>();
@@ -275,16 +311,21 @@
 	        return ret;
         }
 
+        /// <summary>
+        /// Vyčistí celý súbor.
+        /// </summary>
         public void Clear()
         {
 	        _nextFreeBlockAddress = -1;
 	        _nextEmptyBlockAddress = -1;
-
 	        SaveInitData();
-	        _file.SetLength(BlockSize);
+	        _file.SetLength(0);
 	        _file.Flush();
         }
         
+        /// <summary>
+        /// Metóda nutná pre použitie pri ukočení práce so súborom.
+        /// </summary>
         public void Close()
         {
 	        SaveInitData();
@@ -298,14 +339,14 @@
         #region Private functions
         private void SaveInitData()
         {
-	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-	        
 	        byte[] buffer = new byte[BlockSize];
 	        int offset = 0;
+	        
 	        BitConverter.GetBytes(_nextFreeBlockAddress).CopyTo(buffer, offset);
 	        offset += sizeof(int);
 	        BitConverter.GetBytes(_nextEmptyBlockAddress).CopyTo(buffer, offset);
-
+	        
+	        var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 	        initFile.Seek(0, SeekOrigin.Begin);
 	        initFile.Write(buffer, 0, BlockSize);
 	        initFile.Flush();
@@ -314,10 +355,10 @@
 
         private void LoadInitData()
         {
-	        var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-	        
 	        byte[] buffer = new byte[BlockSize];
 	        int offset = 0;
+	        
+	        var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 	        initFile.Seek(offset, SeekOrigin.Begin);
 	        initFile.Read(buffer, offset, BlockSize);
             
