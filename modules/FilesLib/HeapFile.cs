@@ -73,6 +73,7 @@
 	                
 	                _nextFreeBlockAddress = _currentBlock.Next;
 	                _currentBlock.Next = -1;
+	                //_currentBlock.Previous = -1;
                 }
             }
             else if (_nextEmptyBlockAddress != -1)
@@ -91,6 +92,7 @@
 	                
 	                _nextEmptyBlockAddress = _currentBlock.Next;
 	                _currentBlock.Next = -1;
+	                //_currentBlock.Previous = -1;
                 }
                 else
                 {
@@ -103,6 +105,12 @@
 	                }
 	                
 	                _currentBlock.Next = _nextFreeBlockAddress;
+	                if (_nextFreeBlockAddress != -1)
+	                {
+		                var nextBlock = GetBlock(_nextFreeBlockAddress);
+		                nextBlock.Previous = _currentBlockAddress;
+		                WriteBlock(nextBlock, _nextFreeBlockAddress);
+	                }
 	                _nextFreeBlockAddress = _currentBlockAddress;
                 }
             }
@@ -111,22 +119,16 @@
                 SetCurrentBlock((int)_file.Length);
                 _currentBlock.AddRecord(data);
 
-                if (_currentBlock.ValidCount < _currentBlock.BlockFactor)
+                if (_currentBlock.ValidCount < _currentBlock.BlockFactor) // zaradujem do zretazenia ciastocne plnych blokov
                 {
 	                if (_nextFreeBlockAddress != -1)
 	                {
 		                var nextBlock = GetBlock(_nextFreeBlockAddress);
 		                nextBlock.Previous = _currentBlockAddress;
 		                WriteBlock(nextBlock, _nextFreeBlockAddress);
-		                
-		                
 		                _currentBlock.Next = _nextFreeBlockAddress;
-		                _nextFreeBlockAddress = _currentBlockAddress;
 	                }
-	                else
-	                {
-		                _nextFreeBlockAddress = _currentBlockAddress;
-	                }
+	                _nextFreeBlockAddress = _currentBlockAddress;
                 }
             }
             
@@ -172,6 +174,10 @@
 						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
 					}
 					_nextEmptyBlockAddress = address;
+					if (_nextFreeBlockAddress != address)
+					{
+						_nextFreeBlockAddress = -1;
+					}
 				}	
 			}
 			else
@@ -191,6 +197,9 @@
 						prevBlock.Next = blockToDeleteFrom.Next;
 						WriteBlock(prevBlock, blockToDeleteFrom.Previous);
 					}
+					
+					blockToDeleteFrom.Next = -1;
+					blockToDeleteFrom.Previous = -1;
 					
 					if (_nextEmptyBlockAddress != -1)
 					{
@@ -283,28 +292,23 @@
         
         private void SetCurrentBlock(int address)
         {
-	        if (_currentBlock == null)
+	        if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
+	        
+	        if (_currentBlock == null! || _currentBlockAddress != address)
 	        {
 		        _currentBlock = new Block<T>(BlockSize, new T());
+		        byte[] bytes = new byte[BlockSize];
+		        _file.Seek(address, SeekOrigin.Begin);
+		        _file.Read(bytes, 0, BlockSize);
+		        _currentBlock.FromByteArray(bytes);
 		        _currentBlockAddress = address;
-		        return;
+		        
+		        if (address == _file.Length)
+		        {
+			        _currentBlock.Next = -1;
+			        _currentBlock.Previous = -1;
+		        }
 	        }
-            if (_currentBlockAddress == address)
-            {
-                return;
-            }
-
-            byte[] bytes = new byte[BlockSize];
-            _file.Seek(address, SeekOrigin.Begin);
-            _file.Read(bytes, 0, BlockSize);
-
-            _currentBlock.FromByteArray(bytes);
-            _currentBlockAddress = address;
-            if (address == _file.Length)
-            {
-	            _currentBlock.Next = -1;
-	            _currentBlock.Previous = -1;
-            }
         }
         
         private void WriteBlock(Block<T> currentBlock, int currentBlockAddress)
@@ -334,14 +338,14 @@
 
 		        if (lastBlock.ValidCount > 0) break;
 		        
-		        if (lastBlock.Next != -1 && lastBlock.Next < _file.Length && lastBlock.Previous < _file.Length)
+		        if (lastBlock.Next != -1 /*&& lastBlock.Next < _file.Length && lastBlock.Previous < _file.Length*/)
 		        {
 			        var nextBlock = GetBlock(lastBlock.Next);
 			        nextBlock.Previous = lastBlock.Previous;
 			        WriteBlock(nextBlock, lastBlock.Next);
 		        }
 
-		        if (lastBlock.Previous != -1 && lastBlock.Previous < _file.Length && lastBlock.Next < _file.Length)
+		        if (lastBlock.Previous != -1 /*&& lastBlock.Previous < _file.Length && lastBlock.Next < _file.Length*/)
 		        {
 			        var prevBlock = GetBlock(lastBlock.Previous);
 			        prevBlock.Next = lastBlock.Next;

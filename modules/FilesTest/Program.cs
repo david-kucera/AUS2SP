@@ -12,7 +12,7 @@ namespace FilesTest
         public static int NUMBER_OF_REPLICATIONS = 10;
         static void Main()
         {
-            int numberOperations = 1_000_000;
+            int numberOperations = 10_000;
             for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
@@ -44,14 +44,14 @@ namespace FilesTest
                             people.Add(new TestRP1(newPerson));
                             adresses.Add(adresa);
                             break;
-                        // case OperationType.Delete:
-                        //     var index = generator.GenerateInt(0, adresses.Count);
-                        //     var person = people[index];
-                        //     var adress = adresses[index];
-                        //     people.RemoveAt(index);
-                        //     adresses.RemoveAt(index);
-                        //     heapFile.Delete(adress, person);
-                        //     break;
+                        case OperationType.Delete:
+                            var index = generator.GenerateInt(0, adresses.Count);
+                            var person = people[index];
+                            var adress = adresses[index];
+                            people.RemoveAt(index);
+                            adresses.RemoveAt(index);
+                            heapFile.Delete(adress, person);
+                            break;
                         case OperationType.Find:
                             var iindex = generator.GenerateInt(0, adresses.Count);
                             var pperson = people[iindex];
