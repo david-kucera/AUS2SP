@@ -1,8 +1,9 @@
 ﻿using System.Text;
+using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Visit : IData<Visit>
+	public class Visit : IHashable<Visit>
 	{
 		#region Constants
 		private const int MAX_NOTES_COUNT = 10;
@@ -53,6 +54,12 @@ namespace FilesLib.Data
 		#endregion // Constructors
 
 		#region Public functions
+
+		public int GetHash()
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string ToString()
 		{
 			var notes = "\n";

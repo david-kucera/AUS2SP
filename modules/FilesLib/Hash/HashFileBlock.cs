@@ -1,4 +1,7 @@
-namespace FilesLib;
+using FilesLib.Heap;
+using FilesLib.Interfaces;
+
+namespace FilesLib.Hash;
 
 public class HashFileBlock<T> where T : class, IData<T>, new()
 {

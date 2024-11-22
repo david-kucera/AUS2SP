@@ -1,10 +1,14 @@
-namespace FilesLib;
+using FilesLib.Heap;
+using FilesLib.Interfaces;
 
-public class HashFile<T> where T : class, IData<T>, new()
+namespace FilesLib.Hash;
+
+public class HashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
     public HeapFile<T> HeapFile { get; set; }
     public int Depth { get; set; } = 0;
+    public int RecordsCount { get; set; } = 0;
     #endregion // Properties
     
     #region Constructors
@@ -16,7 +20,7 @@ public class HashFile<T> where T : class, IData<T>, new()
     #endregion // Constructors
     
     #region Public methods
-    public void Insert(T data)
+    public int Insert(T data)
     {
         throw new NotImplementedException();
     }
@@ -26,8 +30,9 @@ public class HashFile<T> where T : class, IData<T>, new()
         throw new NotImplementedException();
     }
 
-    public void Delete(T data)
+    public bool Delete(T data)
     {
+        // TODO Kontrola rozpracovania z
         throw new NotImplementedException();
     }
     #endregion // Public methods

@@ -1,8 +1,9 @@
 ﻿using System.Text;
+using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Person : IData<Person>
+	public class Person : IHashable<Person>
 	{
 		#region Constants
 		private const int MAX_VISITS = 5;
@@ -115,6 +116,11 @@ namespace FilesLib.Data
 		#endregion // Constructors
 
 		#region Public functions
+		public int GetHash()
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string ToString()
 		{
 			var zaznamy = string.Empty;

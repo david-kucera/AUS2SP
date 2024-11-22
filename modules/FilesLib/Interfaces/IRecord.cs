@@ -1,4 +1,4 @@
-﻿namespace FilesLib
+﻿namespace FilesLib.Interfaces
 {
 	public interface IRecord<T> where T : class
 	{

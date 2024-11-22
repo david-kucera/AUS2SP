@@ -1,6 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using FilesLib.Interfaces;
 
-namespace FilesLib
+namespace FilesLib.Heap
 {
 	public class Block<T> : IRecord<T> where T : class, IData<T>, new()
 	{

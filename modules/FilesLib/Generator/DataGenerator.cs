@@ -1,6 +1,6 @@
 using FilesLib.Data;
 
-namespace FilesLib;
+namespace FilesLib.Generator;
 
 public class DataGenerator
 {
@@ -100,13 +100,4 @@ public class DataGenerator
         return ret;
     }
     #endregion // Private methods
-
-    
-}
-
-public enum OperationType
-{
-    Insert,
-    Find,
-    Delete
 }

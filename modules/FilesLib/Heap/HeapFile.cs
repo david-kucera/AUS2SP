@@ -1,4 +1,6 @@
-﻿namespace FilesLib
+﻿using FilesLib.Interfaces;
+
+namespace FilesLib.Heap
 {
 	public class HeapFile<T> where T : class, IData<T>, new()
 	{

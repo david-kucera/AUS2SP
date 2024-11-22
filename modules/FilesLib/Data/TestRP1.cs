@@ -1,8 +1,9 @@
 using System.Text;
+using FilesLib.Interfaces;
 
 namespace FilesLib.Data;
 
-public class TestRP1 : IData<TestRP1>
+public class TestRP1 : IHashable<TestRP1>
 	{
 		#region Constants
 		private const int MAX_NAME_LENGTH = 15;
@@ -95,6 +96,11 @@ public class TestRP1 : IData<TestRP1>
 		#endregion // Constructors
 
 		#region Public functions
+		public int GetHash()
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string ToString()
 		{
 			return $"[{Id}, {Ecv}] {Name} {Surname}";
