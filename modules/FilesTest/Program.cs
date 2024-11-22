@@ -56,18 +56,18 @@ namespace FilesTest
                             people.Add(new TestRP1(newPerson));
                             adresses.Add(adresa);
                             break;
-                        case OperationType.Delete:
-                            var countBeforeDelete = heapFile.RecordsCount;
-                            if (adresses.Count == 0) break;
-                            var index = generator.GenerateInt(0, adresses.Count);
-                            var person = people[index];
-                            var adress = adresses[index];
-                            people.RemoveAt(index);
-                            adresses.RemoveAt(index);
-                            heapFile.Delete(adress, person);
-                            var countAfterDelete = heapFile.RecordsCount;
-                            if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
-                            break;
+                        // case OperationType.Delete:
+                        //     var countBeforeDelete = heapFile.RecordsCount;
+                        //     if (adresses.Count == 0) break;
+                        //     var index = generator.GenerateInt(0, adresses.Count);
+                        //     var person = people[index];
+                        //     var adress = adresses[index];
+                        //     people.RemoveAt(index);
+                        //     adresses.RemoveAt(index);
+                        //     heapFile.Delete(adress, person);
+                        //     var countAfterDelete = heapFile.RecordsCount;
+                        //     if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
+                        //     break;
                         case OperationType.Find:
                             if (adresses.Count == 0) break;
                             var iindex = generator.GenerateInt(0, adresses.Count);

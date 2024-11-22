@@ -312,6 +312,18 @@ namespace FilesLib.Heap
 	        }
 	        return ret;
         }
+        
+        /// <summary>
+        /// Vytvorí nový blok na koniec súboru.
+        /// </summary>
+        /// <returns>Adresa nového bloku.</returns>
+        public int CreateNewBlock()
+        {
+	        var address = (int)_file.Length;
+	        var newBlock = new Block<T>(BlockSize, new T());
+	        WriteBlock(newBlock, address);
+	        return address;
+        }
 
         /// <summary>
         /// Vyčistí celý súbor.
@@ -421,5 +433,5 @@ namespace FilesLib.Heap
 	        if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
         }
         #endregion // Private functions
-    }
+	}
 }
