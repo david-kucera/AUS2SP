@@ -170,7 +170,7 @@ namespace FilesLib.Heap
 			}
 		}
 
-		public void ResetBlock()
+		public void Clear()
 		{
 			ValidCount = 0;
 			_nextBlock = -1;
@@ -183,7 +183,9 @@ namespace FilesLib.Heap
 
 		public override string ToString()
 		{
-			return "Next,Previous: " + Next + "," + Previous + " ... "+ ValidCount + " record(s):\n" + string.Join("\n", Records);}
+			return "Next,Previous: " + Next + "," + Previous + " ... "+ ValidCount + " record(s):\n" + string.Join("\n", Records);
+			
 		}
 		#endregion // Public functions
+	}
 }

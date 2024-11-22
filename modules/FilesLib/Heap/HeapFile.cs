@@ -324,6 +324,14 @@ namespace FilesLib.Heap
 	        WriteBlock(newBlock, address);
 	        return address;
         }
+        
+        public void WriteBlock(Block<T> currentBlock, int currentBlockAddress)
+        {
+	        byte[] bytes = currentBlock.ToByteArray();
+	        _file.Seek(currentBlockAddress, SeekOrigin.Begin);
+	        _file.Write(bytes, 0, BlockSize);
+	        _file.Flush();
+        }
 
         /// <summary>
         /// Vyčistí celý súbor.
@@ -379,14 +387,6 @@ namespace FilesLib.Heap
 	        _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
 	        offset += sizeof(int);
 	        _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
-        }
-        
-        private void WriteBlock(Block<T> currentBlock, int currentBlockAddress)
-        {
-	        byte[] bytes = currentBlock.ToByteArray();
-	        _file.Seek(currentBlockAddress, SeekOrigin.Begin);
-	        _file.Write(bytes, 0, BlockSize);
-	        _file.Flush();
         }
         
         private void CheckFileEnding()

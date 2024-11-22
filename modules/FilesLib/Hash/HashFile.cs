@@ -55,6 +55,8 @@ public class HashFile<T> where T : class, IHashable<T>, new()
             else
             {
                 block.AddRecord(data);
+                HeapFile.WriteBlock(block, address);
+                RecordsCount++;
                 ret = address;
                 notInserted = false;
             }
@@ -65,13 +67,20 @@ public class HashFile<T> where T : class, IHashable<T>, new()
 
     public T Find(T data)
     {
-        return GetBlock(data).GetRecord(data);
+        var block = GetBlock(data);
+        var record = block.GetRecord(data);
+        return record;
     }
     
     public bool Delete(T data)
     {
-        // TODO Kontrola rozpracovania 2
-        throw new NotImplementedException();
+        var block = GetBlock(data);
+        bool ret = block.RemoveRecord(data);
+        RecordsCount--;
+        
+        // TODO zlucenia 
+        
+        return ret;
     }
     #endregion // Public methods
     
@@ -90,12 +99,51 @@ public class HashFile<T> where T : class, IHashable<T>, new()
     
     private void SplitBlock(int prefix)
     {
-        throw new NotImplementedException();
+        var oldBlock = Adresses[prefix];
+        var newBlockAddress = HeapFile.CreateNewBlock();
+        var newBlock = new HashFileBlock<T>(newBlockAddress, HeapFile);
+    
+        oldBlock.Depth++;
+        newBlock.Depth = oldBlock.Depth;
+        
+        var recordsToRehash = oldBlock.Block.Records;
+        oldBlock.Block.Clear();
+
+        foreach (var record in recordsToRehash)
+        {
+            int newPrefix = GetPrefix(record.GetHash());
+            if (newPrefix == prefix)
+            {
+                oldBlock.Block.AddRecord(record);
+            }
+            else
+            {
+                newBlock.Block.AddRecord(record);
+            }
+        }
+        
+        for (int i = 0; i < Adresses.Length; i++)
+        {
+            if (GetPrefix(i) == prefix && (i & (1 << (oldBlock.Depth - 1))) != 0)
+            {
+                Adresses[i] = newBlock;
+            }
+        }
     }
 
     private void IncreaseDepth()
     {
-        throw new NotImplementedException();
+        int newSize = Adresses.Length * 2;
+        var newAdresses = new HashFileBlock<T>[newSize];
+
+        for (int i = 0; i < Adresses.Length; i++)
+        {
+            newAdresses[i] = Adresses[i];
+            newAdresses[i + Adresses.Length] = Adresses[i];
+        }
+
+        Adresses = newAdresses;
+        Depth++;
     }
     #endregion // Private methods
 }

@@ -98,7 +98,7 @@ public class TestRP1 : IHashable<TestRP1>
 		#region Public functions
 		public int GetHash()
 		{
-			throw new NotImplementedException();
+			return Id.GetHashCode();
 		}
 
 		public override string ToString()
