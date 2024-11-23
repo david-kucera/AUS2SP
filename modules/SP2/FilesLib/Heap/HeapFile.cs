@@ -86,7 +86,7 @@ namespace FilesLib.Heap
 	            //		- A ak bol block zaciatkom nejakeho zretazenia, je potrebne ho len z tohto zretazenia odstrihnut
 	            if (_nextFreeBlockAddress != -1) address = _nextFreeBlockAddress;
 	            else address = _nextEmptyBlockAddress;
-	            
+
 	            blockToAdd = GetBlock(address);
 	            blockToAdd.AddRecord(data);
 
@@ -94,6 +94,7 @@ namespace FilesLib.Heap
 	            {
 		            if (_nextEmptyBlockAddress == address)
 		            {
+			            
 			            if (blockToAdd.Next != -1)
 			            {
 				            var nextBlock = GetBlock(blockToAdd.Next);
@@ -101,6 +102,7 @@ namespace FilesLib.Heap
 				            WriteBlock(nextBlock, blockToAdd.Next);
 			            }
 			            _nextEmptyBlockAddress = blockToAdd.Next;
+			            
 			            
 			            if (_nextFreeBlockAddress != -1)
 			            {
@@ -112,7 +114,7 @@ namespace FilesLib.Heap
 			            _nextFreeBlockAddress = address;
 		            }
 	            }
-	            else 
+	            else
 	            {
 		            if (blockToAdd.Next != -1)
 		            {
@@ -120,7 +122,7 @@ namespace FilesLib.Heap
 			            nextBlock.Previous = -1;
 			            WriteBlock(nextBlock, blockToAdd.Next);
 		            }
-		            
+
 		            if (_nextEmptyBlockAddress == address)
 		            {
 			            _nextEmptyBlockAddress = blockToAdd.Next;
@@ -133,7 +135,7 @@ namespace FilesLib.Heap
 		            }
 	            }
             }
-            else 
+            else
             {
 	            // Vytvaram novy blok na konci suboru
 	            // 1. Ak sa blok pridanim dat zaplnil, tak ho len zapiseme na koniec suboru - O(0,1)
@@ -144,7 +146,7 @@ namespace FilesLib.Heap
 	            address = (int)_file.Length;
 	            blockToAdd = new Block<T>(BlockSize, new T());
                 blockToAdd.AddRecord(data);
-                
+
                 if (blockToAdd.ValidCount < blockToAdd.BlockFactor) 
                 {
 	                if (_nextFreeBlockAddress != -1)
@@ -158,7 +160,6 @@ namespace FilesLib.Heap
                 }
             }
             
-            // Zapisanie dat blocku do suboru
             WriteBlock(blockToAdd, address);
             RecordsCount++;
             return address;
@@ -172,12 +173,12 @@ namespace FilesLib.Heap
         /// <returns>Trieda repzerentujúca prvok.</returns>
         public T Find(int address, T data)
         {
-	        // Jedna sa len o jeden pristup do suboru - citanie - O(1,0)
 	        CheckAddress(address);
 	        return GetBlock(address).GetRecord(data);
         }
 
         /// <summary>
+        /// O(1,1) - jeden prístup, jeden zápis
         /// Daný prvok vymaže zo súboru.
         /// </summary>
         /// <param name="address">Adresa bloku, kde sa prvok nachádza.</param>
@@ -245,6 +246,11 @@ namespace FilesLib.Heap
 						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
 					}
 					_nextEmptyBlockAddress = address;
+					
+					if (_nextFreeBlockAddress == address)
+					{
+						_nextFreeBlockAddress = -1;
+					}
 				}	
 			}
 			else
@@ -255,6 +261,11 @@ namespace FilesLib.Heap
 					{
 						var nextBlock = GetBlock(blockToDeleteFrom.Next);
 						nextBlock.Previous = blockToDeleteFrom.Previous;
+						if (_nextFreeBlockAddress == address)
+						{
+							_nextFreeBlockAddress = blockToDeleteFrom.Next;
+							nextBlock.Previous = -1;
+						}
 						WriteBlock(nextBlock, blockToDeleteFrom.Next);
 					}
 
@@ -358,11 +369,6 @@ namespace FilesLib.Heap
 	        return address;
         }
         
-        /// <summary>
-        /// Zapíše block na danú adresu.
-        /// </summary>
-        /// <param name="block">Block</param>
-        /// <param name="address">Adresa</param>
         public void WriteBlock(Block<T> block, int address)
         {
 	        byte[] bytes = block.ToByteArray();
@@ -439,7 +445,7 @@ namespace FilesLib.Heap
 	        // 2. Ak block obsahuje predchodcu
 	        //     - nacitam si dany block, ako nasledovnika mu nastavim nasledovnika mazaneho blocku - zapisem - O(1,1)
 	        // Nakoniec subor skratim o dany block
-	        while (true)
+	        while (_file.Length > 0)
 	        {
 		        int lastBlockAddress = (int)_file.Length - BlockSize;
 		        var lastBlock = GetBlock(lastBlockAddress);
@@ -457,7 +463,7 @@ namespace FilesLib.Heap
 			        nextBlock.Previous = lastBlock.Previous;
 			        WriteBlock(nextBlock, lastBlock.Next);
 		        }
-		        
+
 		        if (lastBlock.Previous != -1)
 		        {
 			        var prevBlock = GetBlock(lastBlock.Previous);
