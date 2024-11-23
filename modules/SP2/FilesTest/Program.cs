@@ -10,19 +10,19 @@ namespace FilesTest
         public static int BLOCK_SIZE = 1024;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 0;
+        public static int NUMBER_OF_PEOPLE = 1_000;
         public static int NUMBER_OF_OPERATIONS = 100_000;
+        public static int NUMBER_OF_REPLICATIONS = 10;
 
         static void Main()
         {
-            //TestHeapFile();
-            TestHashFile();
+            TestHeapFile();
+            //TestHashFile();
         }
         
         static void TestHeapFile()
         {
-            int numberOfReplications = 10;
-            for (int r = 0; r < numberOfReplications; r++)
+            for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
@@ -90,8 +90,7 @@ namespace FilesTest
         
         static void TestHashFile()
         {
-            int numberOfReplications = 10;
-            for (int r = 0; r < numberOfReplications; r++)
+            for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
