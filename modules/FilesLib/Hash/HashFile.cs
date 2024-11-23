@@ -7,24 +7,24 @@ public class HashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
     public HeapFile<T> HeapFile { get; set; }
-    public HashFileBlock<T>[] Adresses { get; set; }
+    public HashFileBlock<T>[] Addresses { get; set; }
     public int Depth { get; set; } = 1;
     public int RecordsCount { get; set; } = 0;
     #endregion // Properties
     
     #region Constructors
-    public HashFile(string filePath, string initFilePath, int blockSize)
+    public HashFile(string initFilePath, string filePath, int blockSize)
     {
         HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
         HeapFile.Clear();
 
-        Adresses = new HashFileBlock<T>[(int)Math.Pow(2, Depth)];
+        Addresses = new HashFileBlock<T>[(int)Math.Pow(2, Depth)];
         var initialAddr0 = HeapFile.CreateNewBlock();
         var initialBlock0 = new HashFileBlock<T>(initialAddr0, HeapFile);
-        Adresses[0] = initialBlock0;
+        Addresses[0] = initialBlock0;
         var initialAddr1 = HeapFile.CreateNewBlock();
         var initialBlock1 = new HashFileBlock<T>(initialAddr1, HeapFile);
-        Adresses[1] = initialBlock1;
+        Addresses[1] = initialBlock1;
         
     }
     #endregion // Constructors
@@ -39,9 +39,9 @@ public class HashFile<T> where T : class, IHashable<T>, new()
         {
             int hash = data.GetHash();
             int prefix = GetPrefix(hash);
-            var block = Adresses[prefix].Block;
-            var address = Adresses[prefix].Address;
-            var blockDepth = Adresses[prefix].Depth;
+            var block = Addresses[prefix].Block;
+            var address = Addresses[prefix].Address;
+            var blockDepth = Addresses[prefix].Depth;
             
             if (block.BlockFactor == block.ValidCount)
             {
@@ -90,60 +90,92 @@ public class HashFile<T> where T : class, IHashable<T>, new()
         return hash & ((1 << Depth) - 1);
     }
 
+    private int GetPrefix(int hash, int depth)
+    {
+        return hash & ((1 << depth) - 1);
+    }
+
     private Block<T> GetBlock(T data)
     {
         int hash = data.GetHash();
         int prefix = GetPrefix(hash);
-        return Adresses[prefix].Block;
+        return Addresses[prefix].Block;
     }
     
-    private void SplitBlock(int prefix)
+    private void SplitBlock(int splittingBlockIndex)
     {
-        var oldBlock = Adresses[prefix];
+        var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, Addresses[splittingBlockIndex].Depth);
+        var splittingBlock = Addresses[splittingIndex];
+        var newBlockDepth = splittingBlock.Depth + 1;
+        //Console.WriteLine(newBlockDepth);
+        
         var newBlockAddress = HeapFile.CreateNewBlock();
         var newBlock = new HashFileBlock<T>(newBlockAddress, HeapFile);
-    
-        oldBlock.Depth++;
-        newBlock.Depth = oldBlock.Depth;
         
-        var recordsToRehash = oldBlock.Block.Records;
-        oldBlock.Block.Clear();
-
+        var recordsToRehash = splittingBlock.Block.Records.ToList();
+        var splittingBlockItems = new List<T>();
+        var newBlockItems = new List<T>();
+        
         foreach (var record in recordsToRehash)
         {
-            int newPrefix = GetPrefix(record.GetHash());
-            if (newPrefix == prefix)
+            int hash = record.GetHash();
+            int newPrefix = GetPrefix(hash, newBlockDepth);
+
+            if (newPrefix == splittingIndex) // ostava v rovnakom bloku
             {
-                oldBlock.Block.AddRecord(record);
+                splittingBlockItems.Add(record);
             }
-            else
+            else // presuva sa do noveho bloku
             {
-                newBlock.Block.AddRecord(record);
+                newBlockItems.Add(record);
             }
+            
+            //Console.WriteLine($"Record {record} assigned to {(newPrefix == splittingIndex ? "splitting block" : "new block")}");
         }
         
-        for (int i = 0; i < Adresses.Length; i++)
+        splittingBlock.Block.Records = splittingBlockItems;
+        newBlock.Block.Records = newBlockItems;
+        
+        HeapFile.WriteBlock(splittingBlock.Block, splittingBlock.Address);
+        HeapFile.WriteBlock(newBlock.Block, newBlock.Address);
+        
+        splittingBlock.Depth = newBlockDepth;
+        newBlock.Depth = newBlockDepth;
+        
+        for (int i = 0; i < Addresses.Length; i++)
         {
-            if (GetPrefix(i) == prefix && (i & (1 << (oldBlock.Depth - 1))) != 0)
+            if ((i & ((1 << newBlockDepth) - 1)) == splittingIndex)
             {
-                Adresses[i] = newBlock;
+                if ((i & (1 << (newBlockDepth - 1))) != 0)
+                {
+                    Addresses[i] = newBlock;
+                }
+                else
+                {
+                    Addresses[i] = splittingBlock;
+                }
             }
         }
     }
 
     private void IncreaseDepth()
     {
-        int newSize = Adresses.Length * 2;
-        var newAdresses = new HashFileBlock<T>[newSize];
-
-        for (int i = 0; i < Adresses.Length; i++)
+        Depth++;
+        var newAddresses = new HashFileBlock<T>[1 << Depth];
+    
+        for (int i = 0; i < Addresses.Length; i++)
         {
-            newAdresses[i] = Adresses[i];
-            newAdresses[i + Adresses.Length] = Adresses[i];
+            int[] offsets = [0, 1 << (Depth - 1)];
+            foreach (int offset in offsets)
+            {
+                newAddresses[i + offset] = new HashFileBlock<T>(Addresses[i].Address, HeapFile)
+                {
+                    Depth = Addresses[i].Depth
+                };
+            }
         }
 
-        Adresses = newAdresses;
-        Depth++;
+        Addresses = newAddresses;
     }
     #endregion // Private methods
 }
