@@ -10,14 +10,14 @@ namespace FilesTest
         public static int BLOCK_SIZE = 1024;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 1_000;
+        public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 100;
 
         static void Main()
         {
-            TestHeapFile();
-            //TestHashFile();
+            //TestHeapFile();
+            TestHashFile();
         }
         
         static void TestHeapFile()

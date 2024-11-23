@@ -62,6 +62,32 @@ namespace FilesLib.Heap
 				}
 			}
 		}
+
+		public Block(Block<T> block)
+		{
+			_blockSize = block._blockSize;
+			_size = block._size;
+			_dataSize = block._dataSize;
+			ClassType = block.ClassType;
+
+			ValidCount = 0;
+			_prevBlock = block.Previous;
+			_nextBlock = block.Next;
+			
+			Records = new List<T>(BlockFactor);
+			for (int i = 0; i < BlockFactor; i++)
+			{
+				try
+				{
+					T? dummy = Activator.CreateInstance(ClassType) as T;	
+					Records.Add(dummy!);
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e.Message);
+				}
+			}
+		}
 		#endregion // Constructors
 
 		#region Public functions
@@ -114,6 +140,12 @@ namespace FilesLib.Heap
             return null!;
         }
 
+		public void ClearRecords()
+		{
+			Records = new List<T>(BlockFactor);
+			ValidCount = 0;
+		}
+
         public byte[] ToByteArray()
 		{
 			byte[] bytes = new byte[_blockSize];
@@ -126,7 +158,7 @@ namespace FilesLib.Heap
             BitConverter.GetBytes(_nextBlock).CopyTo(bytes, offset);
             offset += sizeof(int);
 
-            for (int i = 0; i < BlockFactor; i++)
+            for (int i = 0; i < ValidCount; i++)
             {
                 byte[] recordBytes = Records[i].ToByteArray();
                 recordBytes.CopyTo(bytes, offset);

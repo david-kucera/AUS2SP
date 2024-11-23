@@ -77,9 +77,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// <returns>Dáta</returns>
     public T Find(T data)
     {
-        var block = GetBlock(data);
-        var record = block.GetRecord(data);
-        return record;
+        return GetBlock(data).GetRecord(data);
     }
     
     /// <summary>
@@ -119,15 +117,13 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     
     private void SplitBlock(int splittingBlockIndex)
     {
-        var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, Addresses[splittingBlockIndex].Depth);
-        var splittingBlock = Addresses[splittingIndex];
+        var splittingBlock = Addresses[splittingBlockIndex];
         var newBlockDepth = splittingBlock.Depth + 1;
-        //Console.WriteLine(newBlockDepth);
         
         var newBlockAddress = HeapFile.CreateNewBlock();
         var newBlock = new ExtendibleHashFileBlock<T>(newBlockAddress, HeapFile);
-        
-        var recordsToRehash = splittingBlock.Block.Records.ToList();
+
+        var recordsToRehash = splittingBlock.Block.Records;
         var splittingBlockItems = new List<T>();
         var newBlockItems = new List<T>();
         
@@ -136,7 +132,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             int hash = record.GetHash();
             int newPrefix = GetPrefix(hash, newBlockDepth);
 
-            if (newPrefix == splittingIndex) // ostava v rovnakom bloku
+            if (newPrefix == GetPrefix(splittingBlockIndex, newBlockDepth)) // ostava v rovnakom bloku
             {
                 splittingBlockItems.Add(record);
             }
@@ -144,31 +140,30 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             {
                 newBlockItems.Add(record);
             }
-            
-            //Console.WriteLine($"Record {record} assigned to {(newPrefix == splittingIndex ? "splitting block" : "new block")}");
         }
         
-        splittingBlock.Block.Records = splittingBlockItems;
-        newBlock.Block.Records = newBlockItems;
-        
-        HeapFile.WriteBlock(splittingBlock.Block, splittingBlock.Address);
-        HeapFile.WriteBlock(newBlock.Block, newBlock.Address);
+        var blockSplitting = new Block<T>(splittingBlock.Block);
+        foreach (var record in splittingBlockItems)
+        {
+            blockSplitting.AddRecord(record);
+        }
+        var blockNew = new Block<T>(newBlock.Block);
+        foreach (var record in newBlockItems)
+        {
+            blockNew.AddRecord(record);
+        }
         
         splittingBlock.Depth = newBlockDepth;
         newBlock.Depth = newBlockDepth;
         
+        HeapFile.WriteBlock(blockSplitting, splittingBlock.Address);
+        HeapFile.WriteBlock(blockNew, newBlock.Address);
+        
         for (int i = 0; i < Addresses.Length; i++)
         {
-            if ((i & ((1 << newBlockDepth) - 1)) == splittingIndex)
+            if ((i & ((1 << newBlockDepth) - 1)) == splittingBlockIndex)
             {
-                if ((i & (1 << (newBlockDepth - 1))) != 0)
-                {
-                    Addresses[i] = newBlock;
-                }
-                else
-                {
-                    Addresses[i] = splittingBlock;
-                }
+                Addresses[i] = ((i & (1 << (newBlockDepth - 1))) != 0) ? newBlock : splittingBlock;
             }
         }
     }
@@ -177,17 +172,11 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         Depth++;
         var newAddresses = new ExtendibleHashFileBlock<T>[1 << Depth];
-    
+
         for (int i = 0; i < Addresses.Length; i++)
         {
-            int[] offsets = [0, 1 << (Depth - 1)];
-            foreach (int offset in offsets)
-            {
-                newAddresses[i + offset] = new ExtendibleHashFileBlock<T>(Addresses[i].Address, HeapFile)
-                {
-                    Depth = Addresses[i].Depth
-                };
-            }
+            newAddresses[i] = Addresses[i];
+            newAddresses[i + (1 << (Depth - 1))] = Addresses[i];
         }
 
         Addresses = newAddresses;
