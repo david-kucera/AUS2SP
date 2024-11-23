@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoLib", "..\modules\GeoLib\GeoLib.csproj", "{E888241E-CE8A-4C79-A8CC-C4AB88AC6E48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoLib", "..\modules\SP1\GeoLib\GeoLib.csproj", "{E888241E-CE8A-4C79-A8CC-C4AB88AC6E48}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataStructures", "..\modules\DataStructures\DataStructures.csproj", "{DE15C285-8187-4CBB-8870-492E2262E444}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataStructures", "..\modules\SP1\DataStructures\DataStructures.csproj", "{DE15C285-8187-4CBB-8870-492E2262E444}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "..\modules\TestApp\TestApp.csproj", "{3693B610-C2F7-4FA8-A418-88A4F143A25A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "..\modules\SP1\TestApp\TestApp.csproj", "{3693B610-C2F7-4FA8-A418-88A4F143A25A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoViewer", "..\modules\GeoViewer\GeoViewer.csproj", "{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoViewer", "..\modules\SP1\GeoViewer\GeoViewer.csproj", "{F821390C-E8CB-4FAA-9DC7-4FA1AC2D6E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
