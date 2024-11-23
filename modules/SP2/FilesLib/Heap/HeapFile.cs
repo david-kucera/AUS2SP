@@ -92,47 +92,11 @@ namespace FilesLib.Heap
 
 	            if (blockToAdd.ValidCount < blockToAdd.BlockFactor)
 	            {
-		            if (_nextEmptyBlockAddress == address)
-		            {
-			            
-			            if (blockToAdd.Next != -1)
-			            {
-				            var nextBlock = GetBlock(blockToAdd.Next);
-				            nextBlock.Previous = -1;
-				            WriteBlock(nextBlock, blockToAdd.Next);
-			            }
-			            _nextEmptyBlockAddress = blockToAdd.Next;
-			            
-			            
-			            if (_nextFreeBlockAddress != -1)
-			            {
-				            var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
-				            nextFreeBlock.Previous = address;
-				            WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
-			            }
-			            blockToAdd.Next = _nextFreeBlockAddress;
-			            _nextFreeBlockAddress = address;
-		            }
+		            AddBlockToFreeList(blockToAdd, address);
 	            }
 	            else
 	            {
-		            if (blockToAdd.Next != -1)
-		            {
-			            var nextBlock = GetBlock(blockToAdd.Next);
-			            nextBlock.Previous = -1;
-			            WriteBlock(nextBlock, blockToAdd.Next);
-		            }
-
-		            if (_nextEmptyBlockAddress == address)
-		            {
-			            _nextEmptyBlockAddress = blockToAdd.Next;
-			            blockToAdd.Next = -1;
-		            }
-		            if (_nextFreeBlockAddress == address)
-		            {
-			            _nextFreeBlockAddress = blockToAdd.Next;
-			            blockToAdd.Next = -1;
-		            }
+		            RemoveBlockFromLinkedLists(blockToAdd, address);
 	            }
             }
             else
@@ -149,14 +113,7 @@ namespace FilesLib.Heap
 
                 if (blockToAdd.ValidCount < blockToAdd.BlockFactor) 
                 {
-	                if (_nextFreeBlockAddress != -1)
-	                {
-		                var nextBlock = GetBlock(_nextFreeBlockAddress);
-		                nextBlock.Previous = address;
-		                blockToAdd.Next = _nextFreeBlockAddress;
-		                WriteBlock(nextBlock, _nextFreeBlockAddress);
-	                }
-	                _nextFreeBlockAddress = address;
+	                AddBlockToFreeList(blockToAdd, address);
                 }
             }
             
@@ -178,7 +135,6 @@ namespace FilesLib.Heap
         }
 
         /// <summary>
-        /// O(1,1) - jeden prístup, jeden zápis
         /// Daný prvok vymaže zo súboru.
         /// </summary>
         /// <param name="address">Adresa bloku, kde sa prvok nachádza.</param>
@@ -224,78 +180,29 @@ namespace FilesLib.Heap
 			{
 				if (blockToDeleteFrom.ValidCount > 0)
 				{
-					if (_nextFreeBlockAddress != address)
-					{
-						if (_nextFreeBlockAddress != -1)
-						{
-							var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
-							nextFreeBlock.Previous = address;
-							blockToDeleteFrom.Next = _nextFreeBlockAddress;
-							WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
-						}
-						_nextFreeBlockAddress = address;
-					}
+					AddBlockToFreeList(blockToDeleteFrom, address);
 				}
 				else
 				{
-					if (_nextEmptyBlockAddress != -1)
-					{
-						var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
-						nextEmptyBlock.Previous = address;
-						blockToDeleteFrom.Next = _nextEmptyBlockAddress;
-						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
-					}
-					_nextEmptyBlockAddress = address;
-					
-					if (_nextFreeBlockAddress == address)
-					{
-						_nextFreeBlockAddress = -1;
-					}
+					AddBlockToEmptyList(blockToDeleteFrom, address);
 				}	
 			}
 			else
 			{
 				if (blockToDeleteFrom.ValidCount == 0)
 				{
-					if (blockToDeleteFrom.Next != -1)
-					{
-						var nextBlock = GetBlock(blockToDeleteFrom.Next);
-						nextBlock.Previous = blockToDeleteFrom.Previous;
-						if (_nextFreeBlockAddress == address)
-						{
-							_nextFreeBlockAddress = blockToDeleteFrom.Next;
-							nextBlock.Previous = -1;
-						}
-						WriteBlock(nextBlock, blockToDeleteFrom.Next);
-					}
-
-					if (blockToDeleteFrom.Previous != -1)
-					{
-						var prevBlock = GetBlock(blockToDeleteFrom.Previous);
-						prevBlock.Next = blockToDeleteFrom.Next;
-						WriteBlock(prevBlock, blockToDeleteFrom.Previous);
-					}
-					
-					blockToDeleteFrom.Next = -1;
-					blockToDeleteFrom.Previous = -1;
-					
-					if (_nextEmptyBlockAddress != -1)
-					{
-						var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
-						nextEmptyBlock.Previous = address;
-						blockToDeleteFrom.Next = _nextEmptyBlockAddress;
-						WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
-					}
-					_nextEmptyBlockAddress = address;
+					MoveBlockFromFreeToEmptyList(blockToDeleteFrom, address);
 				}
 			}
 			
 			WriteBlock(blockToDeleteFrom, address);
 			RecordsCount--;
-			CheckFileEnding();
+			
+			if (_file.Length - BlockSize == address) CheckFileEnding();
+			
 			return true;
 		}
-        
+
         /// <summary>
         /// Vráti blok na zadanej adrese.
         /// </summary>
@@ -369,6 +276,11 @@ namespace FilesLib.Heap
 	        return address;
         }
         
+        /// <summary>
+        /// Zapíše dáta bloku do súboru na danú adresu.
+        /// </summary>
+        /// <param name="block">Blok</param>
+        /// <param name="address">Adresa</param>
         public void WriteBlock(Block<T> block, int address)
         {
 	        byte[] bytes = block.ToByteArray();
@@ -431,6 +343,85 @@ namespace FilesLib.Heap
 	        _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
 	        offset += sizeof(int);
 	        _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
+        }
+        
+        private void AddBlockToFreeList(Block<T> block, int address)
+        {
+	        if (_nextEmptyBlockAddress == address)
+	        {
+		        if (block.Next != -1)
+		        {
+			        var nextBlock = GetBlock(block.Next);
+			        nextBlock.Previous = -1;
+			        WriteBlock(nextBlock, block.Next);
+		        }
+		        _nextEmptyBlockAddress = block.Next;
+		        
+		        if (_nextFreeBlockAddress != -1)
+		        {
+			        var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
+			        nextFreeBlock.Previous = address;
+			        WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
+		        }
+		        block.Next = _nextFreeBlockAddress;
+		        _nextFreeBlockAddress = address;
+	        }
+        }
+        
+        private void AddBlockToEmptyList(Block<T> block, int address)
+        {
+	        if (_nextEmptyBlockAddress != -1)
+	        {
+		        var nextEmptyBlock = GetBlock(_nextEmptyBlockAddress);
+		        nextEmptyBlock.Previous = address;
+		        block.Next = _nextEmptyBlockAddress;
+		        WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
+	        }
+	        _nextEmptyBlockAddress = address;
+					
+	        if (_nextFreeBlockAddress == address) _nextFreeBlockAddress = -1;
+        }
+
+        private void RemoveBlockFromLinkedLists(Block<T> block, int address)
+        {
+	        if (block.Next != -1)
+	        {
+		        var nextBlock = GetBlock(block.Next);
+		        nextBlock.Previous = -1;
+		        WriteBlock(nextBlock, block.Next);
+	        }
+
+	        if (_nextEmptyBlockAddress == address) _nextEmptyBlockAddress = block.Next;
+	        if (_nextFreeBlockAddress == address) _nextFreeBlockAddress = block.Next;
+	        
+	        block.Next = -1;
+        }
+        
+        private void MoveBlockFromFreeToEmptyList(Block<T> block, int address)
+        {
+	        if (block.Next != -1)
+	        {
+		        var nextBlock = GetBlock(block.Next);
+		        nextBlock.Previous = block.Previous;
+		        if (_nextFreeBlockAddress == address)
+		        {
+			        _nextFreeBlockAddress = block.Next;
+			        nextBlock.Previous = -1;
+		        }
+		        WriteBlock(nextBlock, block.Next);
+	        }
+
+	        if (block.Previous != -1)
+	        {
+		        var prevBlock = GetBlock(block.Previous);
+		        prevBlock.Next = block.Next;
+		        WriteBlock(prevBlock, block.Previous);
+	        }
+					
+	        block.Next = -1;
+	        block.Previous = -1;
+	        
+	        AddBlockToEmptyList(block, address);
         }
         
         private void CheckFileEnding()
