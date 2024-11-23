@@ -3,7 +3,7 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
 
-public class HashFileBlock<T> where T : class, IHashable<T>, new()
+public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 {
     #region Class members
     private readonly HeapFile<T> _heapFile;
@@ -16,7 +16,7 @@ public class HashFileBlock<T> where T : class, IHashable<T>, new()
     #endregion // Properties
     
     #region Constructors
-    public HashFileBlock(int address, HeapFile<T> heapFile)
+    public ExtendibleHashFileBlock(int address, HeapFile<T> heapFile)
     {
         Address = address;
         _heapFile = heapFile;

@@ -3,33 +3,38 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
 
-public class HashFile<T> where T : class, IHashable<T>, new()
+public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
     public HeapFile<T> HeapFile { get; set; }
-    public HashFileBlock<T>[] Addresses { get; set; }
+    public ExtendibleHashFileBlock<T>[] Addresses { get; set; }
     public int Depth { get; set; } = 1;
     public int RecordsCount { get; set; } = 0;
     #endregion // Properties
     
     #region Constructors
-    public HashFile(string initFilePath, string filePath, int blockSize)
+    public ExtendibleHashFile(string initFilePath, string filePath, int blockSize)
     {
         HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
         HeapFile.Clear();
 
-        Addresses = new HashFileBlock<T>[(int)Math.Pow(2, Depth)];
+        Addresses = new ExtendibleHashFileBlock<T>[(int)Math.Pow(2, Depth)];
         var initialAddr0 = HeapFile.CreateNewBlock();
-        var initialBlock0 = new HashFileBlock<T>(initialAddr0, HeapFile);
+        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0, HeapFile);
         Addresses[0] = initialBlock0;
         var initialAddr1 = HeapFile.CreateNewBlock();
-        var initialBlock1 = new HashFileBlock<T>(initialAddr1, HeapFile);
+        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1, HeapFile);
         Addresses[1] = initialBlock1;
         
     }
     #endregion // Constructors
     
     #region Public methods
+    /// <summary>
+    /// Vloží dáta do súboru.
+    /// </summary>
+    /// <param name="data">Dáta</param>
+    /// <returns>Adresa dát, kde sú uložené.</returns>
     public int Insert(T data)
     {
         bool notInserted = true;
@@ -65,6 +70,11 @@ public class HashFile<T> where T : class, IHashable<T>, new()
         return ret;
     }
 
+    /// <summary>
+    /// Nájde zadané dáta v súbore.
+    /// </summary>
+    /// <param name="data">Dáta</param>
+    /// <returns>Dáta</returns>
     public T Find(T data)
     {
         var block = GetBlock(data);
@@ -72,6 +82,11 @@ public class HashFile<T> where T : class, IHashable<T>, new()
         return record;
     }
     
+    /// <summary>
+    /// Vymaže dané dáta zo súboru.
+    /// </summary>
+    /// <param name="data">Dáta</param>
+    /// <returns>True, ak sa operácia podarila, False inak</returns>
     public bool Delete(T data)
     {
         var block = GetBlock(data);
@@ -110,7 +125,7 @@ public class HashFile<T> where T : class, IHashable<T>, new()
         //Console.WriteLine(newBlockDepth);
         
         var newBlockAddress = HeapFile.CreateNewBlock();
-        var newBlock = new HashFileBlock<T>(newBlockAddress, HeapFile);
+        var newBlock = new ExtendibleHashFileBlock<T>(newBlockAddress, HeapFile);
         
         var recordsToRehash = splittingBlock.Block.Records.ToList();
         var splittingBlockItems = new List<T>();
@@ -161,14 +176,14 @@ public class HashFile<T> where T : class, IHashable<T>, new()
     private void IncreaseDepth()
     {
         Depth++;
-        var newAddresses = new HashFileBlock<T>[1 << Depth];
+        var newAddresses = new ExtendibleHashFileBlock<T>[1 << Depth];
     
         for (int i = 0; i < Addresses.Length; i++)
         {
             int[] offsets = [0, 1 << (Depth - 1)];
             foreach (int offset in offsets)
             {
-                newAddresses[i + offset] = new HashFileBlock<T>(Addresses[i].Address, HeapFile)
+                newAddresses[i + offset] = new ExtendibleHashFileBlock<T>(Addresses[i].Address, HeapFile)
                 {
                     Depth = Addresses[i].Depth
                 };
