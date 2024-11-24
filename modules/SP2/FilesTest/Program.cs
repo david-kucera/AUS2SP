@@ -12,7 +12,7 @@ namespace FilesTest
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 100;
+        public static int NUMBER_OF_REPLICATIONS = 10;
 
         static void Main()
         {

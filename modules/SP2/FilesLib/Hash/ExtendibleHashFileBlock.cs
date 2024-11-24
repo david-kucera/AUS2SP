@@ -21,6 +21,12 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
         Address = address;
         _heapFile = heapFile;
     }
+
+    public ExtendibleHashFileBlock(ExtendibleHashFileBlock<T> block)
+    {
+        Address = block.Address;
+        _heapFile = block._heapFile;
+    }
     #endregion // Constructors
     
     #region Public methods
