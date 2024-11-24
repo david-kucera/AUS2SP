@@ -12,12 +12,15 @@ namespace FilesTest
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 10;
+        public static int NUMBER_OF_REPLICATIONS = 1;
 
         static void Main()
         {
-            //TestHeapFile();
-            TestHashFile();
+            Console.WriteLine("Choose what you want to run:");
+            var choice = Console.ReadLine();
+            if (choice == "1") TestHeapFile();
+            else if (choice == "2") TestHashFile();
+            else throw new Exception("Invalid choice");
         }
         
         static void TestHeapFile()
@@ -123,7 +126,7 @@ namespace FilesTest
                     if (operation == OperationType.Find && people.Count == 0) continue;
                     Console.WriteLine(i + ". " + operation);
                     if (i == 178) 
-                        Console.WriteLine("tu");
+                        Console.WriteLine("tu to padne :(");
                     switch (operation)
                     {
                         case OperationType.Insert:
