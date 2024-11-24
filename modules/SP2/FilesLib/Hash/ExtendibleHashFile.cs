@@ -19,7 +19,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
         HeapFile.Clear();
 
-        Addresses = new ExtendibleHashFileBlock<T>[(int)Math.Pow(2, Depth)];
+        Addresses = new ExtendibleHashFileBlock<T>[2];
         var initialAddr0 = HeapFile.CreateNewBlock();
         var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0, HeapFile);
         Addresses[0] = initialBlock0;

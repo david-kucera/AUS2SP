@@ -104,7 +104,7 @@ public class TestRP1 : IHashable<TestRP1>
 
 		public override string ToString()
 		{
-			return $"[{Id}, {Ecv}] {Name} {Surname}";
+			return $"[{Id}, {Ecv}]";
 		}
 
         public byte[] ToByteArray()
