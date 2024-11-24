@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 using FilesLib.Interfaces;
 
@@ -96,9 +97,9 @@ public class TestRP1 : IHashable<TestRP1>
 		#endregion // Constructors
 
 		#region Public functions
-		public int GetHash()
+		public BitArray GetHash()
 		{
-			return Id.GetHashCode();
+			return new BitArray(BitConverter.GetBytes(Id));
 		}
 
 		public override string ToString()

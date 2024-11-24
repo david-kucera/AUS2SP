@@ -153,8 +153,6 @@ namespace FilesTest
                             break;
                     }
                 }
-            
-                //hashFile.Close();
             }
         }
     }

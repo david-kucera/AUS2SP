@@ -1,3 +1,4 @@
+using System.Collections;
 using FilesLib.Heap;
 using FilesLib.Interfaces;
 
@@ -42,7 +43,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
         while (notInserted)
         {
-            int hash = data.GetHash();
+            var hash = data.GetHash();
             int prefix = GetPrefix(hash);
             var block = Addresses[prefix].Block;
             var address = Addresses[prefix].Address;
@@ -98,61 +99,81 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     #endregion // Public methods
     
     #region Private methods
-    private int GetPrefix(int hash)
+    private int GetPrefix(BitArray hash)
     {
-        return hash & ((1 << Depth) - 1);
+        var hashInt = BitArrayToInt(hash);
+        return hashInt & ((1 << Depth) - 1);
     }
 
-    private int GetPrefix(int hash, int depth)
+    private int GetPrefix(BitArray hash, int depth)
     {
-        return hash & ((1 << depth) - 1);
+        var hashInt = BitArrayToInt(hash);
+        return hashInt & ((1 << depth) - 1);
+    }
+    
+    private int BitArrayToInt(BitArray bitArray)
+    {
+        if (bitArray.Length > 32) throw new ArgumentException("BitArray must be less than 32 bits!");
+
+        int ret = 0;
+        for (int i = 0; i < bitArray.Length; i++)
+        {
+            if (bitArray[i]) ret |= (1 << i);
+        }
+
+        return ret;
     }
 
     private Block<T> GetBlock(T data)
     {
-        int hash = data.GetHash();
+        var hash = data.GetHash();
         int prefix = GetPrefix(hash);
         return Addresses[prefix].Block;
     }
     
-    private void SplitBlock(int splittingBlockIndex)
+    private void SplitBlock(int splittingIndex)
     {
-        var splittingIndex = splittingBlockIndex % (int)Math.Pow(2, Addresses[splittingBlockIndex].Depth);
-        var splittingBlock = Addresses[splittingBlockIndex];
+        // Najdem si blok, ktory idem delit
+        var splittingBlockIndex = splittingIndex % (int)Math.Pow(2, Addresses[splittingIndex].Depth);
+        var splittingBlock = Addresses[splittingIndex];
         
+        // Najdem k nemu novy blok, do ktoreho budem ukladat po prehashovani nove data
         var newBlockAddress = HeapFile.CreateNewBlock();
-        var newBlock = Addresses[splittingIndex + (int)Math.Pow(2, splittingBlock.Depth)];
+        var newBlock = Addresses[splittingBlockIndex + (int)Math.Pow(2, splittingBlock.Depth)];
         newBlock.Address = newBlockAddress;
 
+        // Rozdelim data po prehashovani do stareho a noveho blocku
         var splittingBlockItems = new List<T>();
         var newBlockItems = new List<T>();
         for (int i = 0; i < splittingBlock.Block.ValidCount; i++)
         {
             var record = splittingBlock.Block.Records[i];
-            int hash = record.GetHash();
+            var hash = record.GetHash();
             int newPrefix = GetPrefix(hash, splittingBlock.Depth + 1);
 
-            if (newPrefix == splittingIndex) // ostava v rovnakom bloku
+            if (newPrefix == splittingBlockIndex) 
             {
                 splittingBlockItems.Add(record);
             }
-            else // presuva sa do noveho bloku
+            else
             {
                 newBlockItems.Add(record);
             }
         }
         
+        // Nasledne data zapisem do suboru
         var blockSplitting = new Block<T>(splittingBlock.Block);
+        var blockNew = new Block<T>(newBlock.Block);
         foreach (var record in splittingBlockItems)
         {
             blockSplitting.AddRecord(record);
         }
-        var blockNew = new Block<T>(newBlock.Block);
         foreach (var record in newBlockItems)
         {
             blockNew.AddRecord(record);
         }
         
+        // A zvysim hlbku novemu a staremu blocku
         newBlock.Depth = splittingBlock.Depth + 1;
         splittingBlock.Depth += 1;
         

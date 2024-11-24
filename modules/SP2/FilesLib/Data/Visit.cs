@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
@@ -55,7 +56,7 @@ namespace FilesLib.Data
 
 		#region Public functions
 
-		public int GetHash()
+		public BitArray GetHash()
 		{
 			throw new NotImplementedException();
 		}
