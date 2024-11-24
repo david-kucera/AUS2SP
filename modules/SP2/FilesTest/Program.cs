@@ -16,8 +16,8 @@ namespace FilesTest
 
         static void Main()
         {
-            //TestHeapFile();
-            TestHashFile();
+            TestHeapFile();
+            //TestHashFile();
         }
         
         static void TestHeapFile()
@@ -45,7 +45,7 @@ namespace FilesTest
                 for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
-                    //Console.WriteLine(i + ". " + operation);
+                    Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -63,9 +63,9 @@ namespace FilesTest
                             var index = generator.GenerateInt(0, adresses.Count);
                             var person = people[index];
                             var adress = adresses[index];
+                            heapFile.Delete(adress, person);
                             people.RemoveAt(index);
                             adresses.RemoveAt(index);
-                            heapFile.Delete(adress, person);
                             var countAfterDelete = heapFile.RecordsCount;
                             if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
                             break;
@@ -83,6 +83,12 @@ namespace FilesTest
                         default:    
                             break;
                     }
+                }
+                
+                for (int i = 0; i < people.Count; i++)
+                {
+                    heapFile.Delete(adresses[i], people[i]);
+                    Console.WriteLine($"Deleting {i}");
                 }
             
                 heapFile.Close();
