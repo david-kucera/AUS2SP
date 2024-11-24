@@ -8,7 +8,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
     public HeapFile<T> HeapFile { get; set; }
-    public ExtendibleHashFileBlock<T>[] Addresses { get; set; }
+    public List<ExtendibleHashFileBlock<T>> Addresses { get; set; }
     public int Depth { get; set; } = 1;
     public int RecordsCount { get; set; } = 0;
     #endregion // Properties
@@ -19,13 +19,13 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
         HeapFile.Clear();
 
-        Addresses = new ExtendibleHashFileBlock<T>[2];
+        Addresses = new List<ExtendibleHashFileBlock<T>>();
         var initialAddr0 = HeapFile.CreateNewBlock();
         var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0, HeapFile);
-        Addresses[0] = initialBlock0;
+        Addresses.Add(initialBlock0);
         var initialAddr1 = HeapFile.CreateNewBlock();
         var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1, HeapFile);
-        Addresses[1] = initialBlock1;
+        Addresses.Add(initialBlock1);
         
     }
     #endregion // Constructors
@@ -40,10 +40,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         bool notInserted = true;
         int ret = -1;
-
+        var hash = data.GetHash();
         while (notInserted)
         {
-            var hash = data.GetHash();
             int prefix = GetPrefix(hash);
             var block = Addresses[prefix].Block;
             var address = Addresses[prefix].Address;
@@ -92,7 +91,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         bool ret = block.RemoveRecord(data);
         RecordsCount--;
         
-        // TODO zlucenia 
+        // TODO 
         
         return ret;
     }
@@ -151,14 +150,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             var hash = record.GetHash();
             int newPrefix = GetPrefix(hash, splittingBlock.Depth + 1);
 
-            if (newPrefix == splittingBlockIndex) 
-            {
-                blockSplitting.AddRecord(record);
-            }
-            else
-            {
-                blockNew.AddRecord(record);
-            }
+            if (newPrefix == splittingBlockIndex) blockSplitting.AddRecord(record);
+            else blockNew.AddRecord(record);
         }
         
         // Zvysim hlbku novemu a delenemu blocku
@@ -173,15 +166,11 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     private void IncreaseDepth()
     {
         Depth++;
-        var newAddresses = new ExtendibleHashFileBlock<T>[1 << Depth];
-
-        for (int i = 0; i < Addresses.Length; i++)
+        var size = Addresses.Count;
+        for (int i = 0; i < size; i++)
         {
-            newAddresses[i] = new ExtendibleHashFileBlock<T>(Addresses[i]);
-            newAddresses[i + (1 << (Depth - 1))] = new ExtendibleHashFileBlock<T>(Addresses[i]);
+            Addresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i]));
         }
-
-        Addresses = newAddresses;
     }
     #endregion // Private methods
 }

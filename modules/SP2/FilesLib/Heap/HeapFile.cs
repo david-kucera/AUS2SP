@@ -75,14 +75,8 @@ namespace FilesLib.Heap
 	            blockToAdd = GetBlock(address);
 	            blockToAdd.AddRecord(data);
 
-	            if (blockToAdd.ValidCount < blockToAdd.BlockFactor)
-	            {
-		            AddBlockToFreeList(blockToAdd, address);
-	            }
-	            else
-	            {
-		            RemoveBlockFromLinkedLists(blockToAdd, address);
-	            }
+	            if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddBlockToFreeList(blockToAdd, address);
+	            else RemoveBlockFromLinkedLists(blockToAdd, address);
             }
             else
             {
@@ -90,10 +84,7 @@ namespace FilesLib.Heap
 	            blockToAdd = new Block<T>(BlockSize, new T());
                 blockToAdd.AddRecord(data);
 
-                if (blockToAdd.ValidCount < blockToAdd.BlockFactor) 
-                {
-	                AddBlockToFreeList(blockToAdd, address);
-                }
+                if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddBlockToFreeList(blockToAdd, address);
             }
             
             WriteBlock(blockToAdd, address);
@@ -128,21 +119,12 @@ namespace FilesLib.Heap
 			
 			if (blockToDeleteFrom is { Next: -1, Previous: -1 })
 			{
-				if (blockToDeleteFrom.ValidCount > 0)
-				{
-					AddBlockToFreeList(blockToDeleteFrom, address);
-				}
-				else
-				{
-					AddBlockToEmptyList(blockToDeleteFrom, address);
-				}	
+				if (blockToDeleteFrom.ValidCount > 0) AddBlockToFreeList(blockToDeleteFrom, address);
+				else AddBlockToEmptyList(blockToDeleteFrom, address);
 			}
 			else
 			{
-				if (blockToDeleteFrom.ValidCount == 0)
-				{
-					MoveBlockFromFreeToEmptyList(blockToDeleteFrom, address);
-				}
+				if (blockToDeleteFrom.ValidCount == 0) MoveBlockFromFreeToEmptyList(blockToDeleteFrom, address);
 			}
 			
 			WriteBlock(blockToDeleteFrom, address);
@@ -383,10 +365,7 @@ namespace FilesLib.Heap
 
 		        if (lastBlock.ValidCount > 0) break;
 		        
-		        if (_nextEmptyBlockAddress == lastBlockAddress)
-		        {
-			        _nextEmptyBlockAddress = lastBlock.Next;
-		        }
+		        if (_nextEmptyBlockAddress == lastBlockAddress) _nextEmptyBlockAddress = lastBlock.Next;
 		        
 		        if (lastBlock.Next != -1)
 		        {
