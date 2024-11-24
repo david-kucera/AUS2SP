@@ -5,8 +5,78 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="CarViewer" Height="920" Width="1280">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <!--menu-->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Click="OpenFile_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="_Save..." Click="SaveNewFile_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Zobraz všetky dáta" Click="ShowAllData_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Pridaj záznam o vozidle..." Click="AddPerson_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Vyčisti obrazovku dát" Click="ClearDataDisplay_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Generuj dáta..." Click="GenerateData_OnClick"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Show data details..." Click="ShowDataDetails_OnClick"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="About" Click="About_OnClick"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!--gps a buttony-->
+        <GroupBox Grid.Row="1" Margin="5" Header="Input">
+            <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                <!--Id-->
+                <Label Margin="10,0,0,0">Id zákazníka:</Label>
+                <TextBox Name="IdCar" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <!--Ecv-->
+                <Label Margin="10,0,0,0">ECV:</Label>
+                <TextBox Name="EcvCar" MinWidth="100" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <!--buttony-->
+                <!--hladanie-->
+                <Button Name="FindById" Margin="30,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi podľa ID" Click="FindById_OnClick"></Button>
+                <Button Name="FindByEcv" Margin="5,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi podľa EČV" Click="FindByEcv_OnClick"></Button>
+                <!--modifikacia-->
+                <Button Name="DeleteButton" Margin="30,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Vyraď" IsEnabled="False" Click="DeleteButton_OnClick"></Button>
+                <Button Name="EditButton" Margin="5,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Uprav" IsEnabled="False" Click="EditButton_OnClick"></Button>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Row="2" Margin="5" Header="Data">
+            <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged" MouseDoubleClick="OpenData_OnClick">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Label>
+                                <Label.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="{Binding Id}" Margin="0,0,0,0"/>
+                                        <Label Content="{Binding Ecv}" Margin="0,0,0,0"/>
+                                    </StackPanel>
+                                </Label.Content>
+                            </Label>
+                            <Label Content="{Binding Name}" FontSize="12" VerticalAlignment="Center"/>
+                            <Label Content="{Binding Surname}" FontSize="12" VerticalAlignment="Center"/>
+                            <Label Content="{Binding VisitCount}" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
     </Grid>
 </Window>

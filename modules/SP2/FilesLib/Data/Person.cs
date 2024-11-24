@@ -74,6 +74,10 @@ namespace FilesLib.Data
 		/// </summary>
 		public int Id { get; set; } = -1;
 		/// <summary>
+		/// Number of car repair visits.
+		/// </summary>
+		public int VisitCount => Zaznamy.Count;
+		/// <summary>
 		/// Car repair visits.
 		/// </summary>
 		/// <exception cref="ArgumentException">If list is too long.</exception>
