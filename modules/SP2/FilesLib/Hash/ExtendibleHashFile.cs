@@ -142,9 +142,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var newBlock = Addresses[splittingBlockIndex + (int)Math.Pow(2, splittingBlock.Depth)];
         newBlock.Address = newBlockAddress;
 
-        // Rozdelim data po prehashovani do stareho a noveho blocku
-        var splittingBlockItems = new List<T>();
-        var newBlockItems = new List<T>();
+        // Rozdelim data po prehashovani do deleneho a noveho blocku
+        var blockSplitting = new Block<T>(splittingBlock.Block);
+        var blockNew = new Block<T>(newBlock.Block);
         for (int i = 0; i < splittingBlock.Block.ValidCount; i++)
         {
             var record = splittingBlock.Block.Records[i];
@@ -153,30 +153,19 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
             if (newPrefix == splittingBlockIndex) 
             {
-                splittingBlockItems.Add(record);
+                blockSplitting.AddRecord(record);
             }
             else
             {
-                newBlockItems.Add(record);
+                blockNew.AddRecord(record);
             }
         }
         
-        // Nasledne data zapisem do suboru
-        var blockSplitting = new Block<T>(splittingBlock.Block);
-        var blockNew = new Block<T>(newBlock.Block);
-        foreach (var record in splittingBlockItems)
-        {
-            blockSplitting.AddRecord(record);
-        }
-        foreach (var record in newBlockItems)
-        {
-            blockNew.AddRecord(record);
-        }
-        
-        // A zvysim hlbku novemu a staremu blocku
+        // Zvysim hlbku novemu a delenemu blocku
         newBlock.Depth = splittingBlock.Depth + 1;
         splittingBlock.Depth += 1;
         
+        // Nakoniec data zapisem do suboru
         HeapFile.WriteBlock(blockSplitting, splittingBlock.Address);
         HeapFile.WriteBlock(blockNew, newBlock.Address);
     }
