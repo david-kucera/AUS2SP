@@ -5,35 +5,23 @@ namespace FilesLib.Hash;
 
 public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 {
-    #region Class members
-    private readonly HeapFile<T> _heapFile;
-    #endregion // Class members
-    
     #region Properties
-    public Block<T> Block => _heapFile.GetBlock(Address);
     public int Address { get; set; }
     public int Depth { get; set; } = 1;
+    public int ValidCount { get; set; } = 0;
     #endregion // Properties
     
     #region Constructors
-    public ExtendibleHashFileBlock(int address, HeapFile<T> heapFile)
+    public ExtendibleHashFileBlock(int address)
     {
         Address = address;
-        _heapFile = heapFile;
     }
-
-    public ExtendibleHashFileBlock(ExtendibleHashFileBlock<T> block)
-    {
-        Address = block.Address;
-        _heapFile = block._heapFile;
-		Depth = block.Depth;
-	}
     #endregion // Constructors
     
     #region Public methods
     public override string ToString()
     {
-        return $"{Address}, {Depth}";
+        return $"Address: {Address}, Depth: {Depth}, ValidCount: {ValidCount}";
     }
     #endregion // Public methods
 }

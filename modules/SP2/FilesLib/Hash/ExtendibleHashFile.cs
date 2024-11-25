@@ -19,12 +19,12 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
         HeapFile.Clear();
 
-        Addresses = new List<ExtendibleHashFileBlock<T>>();
+        Addresses = [];
         var initialAddr0 = HeapFile.CreateNewBlock();
-        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0, HeapFile);
-        Addresses.Add(initialBlock0);
+        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0);
         var initialAddr1 = HeapFile.CreateNewBlock();
-        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1, HeapFile);
+        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1);
+        Addresses.Add(initialBlock0);
         Addresses.Add(initialBlock1);
         
     }
@@ -44,7 +44,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         while (notInserted)
         {
             int prefix = GetPrefix(hash);
-            var block = Addresses[prefix].Block;
+            var block = HeapFile.GetBlock(Addresses[prefix].Address);
             var address = Addresses[prefix].Address;
             var blockDepth = Addresses[prefix].Depth;
             
@@ -127,7 +127,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         var hash = data.GetHash();
         int prefix = GetPrefix(hash);
-        return Addresses[prefix].Block;
+        var block = HeapFile.GetBlock(Addresses[prefix].Address);
+        return block;
     }
     
     private void SplitBlock(int splittingIndex)
@@ -140,18 +141,31 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var newBlockAddress = HeapFile.CreateNewBlock();
         var newBlock = Addresses[splittingBlockIndex + (int)Math.Pow(2, splittingBlock.Depth)];
         newBlock.Address = newBlockAddress;
+        
+        // Vynulujem valid count pre adresy
+        newBlock.ValidCount = 0;
+        splittingBlock.ValidCount = 0;
 
         // Rozdelim data po prehashovani do deleneho a noveho blocku
-        var blockSplitting = new Block<T>(splittingBlock.Block);
-        var blockNew = new Block<T>(newBlock.Block);
-        for (int i = 0; i < splittingBlock.Block.ValidCount; i++)
+        var splittBlock = HeapFile.GetBlock(splittingBlock.Address);
+        var newSplitBlock = new Block<T>(splittBlock);
+        var newBlockSplit = new Block<T>(HeapFile.GetBlock(newBlockAddress));
+        for (int i = 0; i < splittBlock.ValidCount; i++)
         {
-            var record = splittingBlock.Block.Records[i];
+            var record = splittBlock.Records[i];
             var hash = record.GetHash();
             int newPrefix = GetPrefix(hash, splittingBlock.Depth + 1);
 
-            if (newPrefix == splittingBlockIndex) blockSplitting.AddRecord(record);
-            else blockNew.AddRecord(record);
+            if (newPrefix == splittingBlockIndex)
+            {
+                newSplitBlock.AddRecord(record);
+                splittingBlock.ValidCount++;
+            }
+            else
+            {
+                newBlockSplit.AddRecord(record);
+                newBlock.ValidCount++;
+            }
         }
         
         // Zvysim hlbku novemu a delenemu blocku
@@ -159,8 +173,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         splittingBlock.Depth += 1;
         
         // Nakoniec data zapisem do suboru
-        HeapFile.WriteBlock(blockSplitting, splittingBlock.Address);
-        HeapFile.WriteBlock(blockNew, newBlock.Address);
+        HeapFile.WriteBlock(newSplitBlock, splittingBlock.Address);
+        HeapFile.WriteBlock(newBlockSplit, newBlock.Address);
     }
 
     private void IncreaseDepth()
@@ -169,7 +183,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var size = Addresses.Count;
         for (int i = 0; i < size; i++)
         {
-            Addresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i]));
+            Addresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i].Address));
         }
     }
     #endregion // Private methods
