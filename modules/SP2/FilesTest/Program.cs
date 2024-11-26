@@ -127,10 +127,11 @@ namespace FilesTest
                     if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
                     Console.WriteLine(i + ". " + operation);
-                    Console.WriteLine(extendibleHashFile.SequentialOutput());
                     switch (operation)
                     {
                         case OperationType.Insert:
+                            Console.WriteLine("BEFORE INSERT");
+                            Console.WriteLine(extendibleHashFile.SequentialOutput());
                             var countBeforeInsert = extendibleHashFile.RecordsCount;
                             var newPerson = generator.GenerateTestRP1();
                             var adresa = extendibleHashFile.Insert(newPerson);
@@ -138,6 +139,8 @@ namespace FilesTest
                             if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
                             people.Add(new TestRP1(newPerson));
                             adresses.Add(adresa);
+                            Console.WriteLine("AFTER INSERT");
+                            Console.WriteLine(extendibleHashFile.SequentialOutput());
                             break;
                         case OperationType.Delete:
                             var countBeforeDelete = extendibleHashFile.RecordsCount;
@@ -165,6 +168,7 @@ namespace FilesTest
                             break;
                     }
                 }
+                extendibleHashFile.Close();
             }
         }
     }

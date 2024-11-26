@@ -116,29 +116,30 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         }
         return ret;
     }
+
+    /// <summary>
+    /// Metóda potrebná pri skončení práce.
+    /// </summary>
+    public void Close()
+    {
+        HeapFile.Close();
+        // TODO save metadata do suboru
+    }
     #endregion // Public methods
     
     #region Private methods
     private int GetPrefix(BitArray hash)
     {
-        var newBitArray = new BitArray(Depth);
-        for (int i = 0; i < Depth; i++)
-        {
-            newBitArray[newBitArray.Length - i - 1] = hash[i];
-        }
-        
-        return BitArrayToInt(newBitArray);
+        var reversedHash = new BitArray(Depth);
+        for (int i = 0; i < Depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
+        return BitArrayToInt(reversedHash);
     }
 
     private int GetPrefix(BitArray hash, int depth)
     {
-        var newBitArray = new BitArray(depth);
-        for (int i = 0; i < depth; i++)
-        {
-            newBitArray[newBitArray.Length - i - 1] = hash[i];
-        }
-        
-        return BitArrayToInt(newBitArray);
+        var reversedHash = new BitArray(depth);
+        for (int i = 0; i < depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
+        return BitArrayToInt(reversedHash);
     }
     
     private int BitArrayToInt(BitArray bitArray)
