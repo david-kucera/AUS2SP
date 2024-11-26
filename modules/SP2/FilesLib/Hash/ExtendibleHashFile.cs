@@ -165,28 +165,27 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     
     private void SplitBlock(int splittingIndex)
     {
-        // Najdem si blok, ktory idem delit
         var splittingBlock = Addresses[splittingIndex];
+        splittingBlock.Depth++;
         
-        // Najdem k nemu novy blok, do ktoreho budem ukladat po prehashovani nove data
-        var newBlockAddress = HeapFile.CreateNewBlock();
-        var newBlockaa = (int)(splittingIndex - (Math.Pow(2, Depth - splittingBlock.Depth))/2);
-        var newBlock = Addresses[newBlockaa];
-        newBlock.Address = newBlockAddress;
+        var newBlock = new ExtendibleHashFileBlock<T>(HeapFile.CreateNewBlock(), HeapFile)
+        {
+            Depth = splittingBlock.Depth
+        };
+        Addresses[splittingIndex + 1] = newBlock;
         
-        // Vynulujem valid count pre adresy
         newBlock.ValidCount = 0;
         splittingBlock.ValidCount = 0;
-
-        // Rozdelim data po prehashovani do deleneho a noveho blocku
+        
         var splittBlock = HeapFile.GetBlock(splittingBlock.Address);
+        var newwBlock = HeapFile.GetBlock(newBlock.Address);
         var newSplitBlock = new Block<T>(splittBlock);
-        var newBlockSplit = new Block<T>(HeapFile.GetBlock(newBlockAddress));
+        var newBlockSplit = new Block<T>(newwBlock);
         for (int i = 0; i < splittBlock.ValidCount; i++)
         {
             var record = splittBlock.Records[i];
             var hash = record.GetHash();
-            int newPrefix = GetPrefix(hash, Depth);
+            int newPrefix = GetPrefix(hash, splittingBlock.Depth);
 
             if (newPrefix == splittingIndex)
             {
@@ -200,11 +199,6 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             }
         }
         
-        // Zvysim hlbku novemu a delenemu blocku
-        newBlock.Depth = splittingBlock.Depth + 1;
-        splittingBlock.Depth += 1;
-        
-        // Nakoniec data zapisem do suboru
         HeapFile.WriteBlock(newSplitBlock, splittingBlock.Address);
         HeapFile.WriteBlock(newBlockSplit, newBlock.Address);
     }
