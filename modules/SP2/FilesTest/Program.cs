@@ -93,7 +93,9 @@ namespace FilesTest
                     heapFile.Delete(adresses[i], people[i]);
                     Console.WriteLine($"Deleting {i}");
                 }
-            
+
+                Console.WriteLine(heapFile.ToString());
+                Console.WriteLine(heapFile.SequentialOutput());
                 heapFile.Close();
             }
         }

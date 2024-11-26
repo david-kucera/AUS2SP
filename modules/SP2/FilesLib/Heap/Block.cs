@@ -215,7 +215,12 @@ namespace FilesLib.Heap
 
 		public override string ToString()
 		{
-			return "Next,Previous: " + Next + "," + Previous + " ... "+ ValidCount + " record(s):\n" + string.Join("\n", Records);
+			List<string> records = [];
+			for (int i = 0; i < ValidCount; i++)
+			{
+				records.Add(Records[i].ToString()!);
+			}
+			return "Previous,Next: " + Previous + "," + Next + " ... "+ ValidCount + " record(s):\n" + string.Join("\n", records);
 			
 		}
 		#endregion // Public functions

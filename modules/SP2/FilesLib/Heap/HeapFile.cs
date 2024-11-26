@@ -84,7 +84,7 @@ namespace FilesLib.Heap
 	            blockToAdd = new Block<T>(BlockSize, new T());
                 blockToAdd.AddRecord(data);
 
-                if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddBlockToFreeList(blockToAdd, address);
+                if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddNewBlockToFreeList(blockToAdd, address);
             }
             
             WriteBlock(blockToAdd, address);
@@ -222,6 +222,26 @@ namespace FilesLib.Heap
         }
 
         /// <summary>
+        /// Vráti sekvečnú reprezentáciu celého súboru na disku.
+        /// </summary>
+        /// <returns>Reťazec tvorený dátami bloku.</returns>
+        public string SequentialOutput()
+        {
+	        string ret = string.Empty;
+	        var allBlocks = GetAllBlocks();
+	        int por = 0;
+	        foreach (var block in allBlocks)
+	        {
+		        ret += por + ". Block:" +  " at address: " + por * BlockSize + Environment.NewLine;
+		        ret += block.ToString();
+		        ret += Environment.NewLine;
+		        por++;
+	        }
+	        if (allBlocks.Count == 0) ret += "There are no records in this block."; 
+	        return ret;
+        }
+
+        /// <summary>
         /// Vyčistí celý súbor.
         /// </summary>
         public void Clear()
@@ -244,6 +264,16 @@ namespace FilesLib.Heap
 	        _file.Flush();
 	        _file.Close();
         }
+
+        /// <summary>
+        /// Metóda pre výpis zreťazenia heap file.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+	        return "NextFreeBlockAddress: " + _nextFreeBlockAddress + ", NextEmptyBlockAddress: " + _nextEmptyBlockAddress;
+        }
+
         #endregion // Public functions
 
         #region Private functions
@@ -298,6 +328,18 @@ namespace FilesLib.Heap
 		        block.Next = _nextFreeBlockAddress;
 		        _nextFreeBlockAddress = address;
 	        }
+        }
+        
+        private void AddNewBlockToFreeList(Block<T> block, int address)
+        {
+	        if (_nextFreeBlockAddress != -1)
+	        {
+		        var nextFreeBlock = GetBlock(_nextFreeBlockAddress);
+		        nextFreeBlock.Previous = (int)_file.Length;
+		        block.Next = _nextFreeBlockAddress;
+		        WriteBlock(nextFreeBlock, _nextFreeBlockAddress);
+	        }
+	        _nextFreeBlockAddress = address;
         }
         
         private void AddBlockToEmptyList(Block<T> block, int address)
