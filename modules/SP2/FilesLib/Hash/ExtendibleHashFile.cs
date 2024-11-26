@@ -96,6 +96,26 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         
         return ret;
     }
+
+    /// <summary>
+    /// Vypíše sekvenčne všetky dáta o adresách.
+    /// </summary>
+    /// <returns>Reťazec informácií o adresách.</returns>
+    public string SequentialOutput()
+    {
+        string ret = string.Empty;
+        ret += "Addresses:";
+        ret += Environment.NewLine;
+        int index = 0;
+        foreach (var address in Addresses)
+        {
+            ret += index + ". address: ";
+            ret += address.ToString();
+            ret += Environment.NewLine;
+            index++;
+        }
+        return ret;
+    }
     #endregion // Public methods
     
     #region Private methods

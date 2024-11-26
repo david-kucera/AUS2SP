@@ -127,6 +127,7 @@ namespace FilesTest
                     if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
                     Console.WriteLine(i + ". " + operation);
+                    Console.WriteLine(extendibleHashFile.SequentialOutput());
                     switch (operation)
                     {
                         case OperationType.Insert:
