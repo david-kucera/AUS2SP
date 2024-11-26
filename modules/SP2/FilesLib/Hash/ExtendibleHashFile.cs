@@ -21,9 +21,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
         Addresses = [];
         var initialAddr0 = HeapFile.CreateNewBlock();
-        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0);
+        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0, HeapFile);
         var initialAddr1 = HeapFile.CreateNewBlock();
-        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1);
+        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1, HeapFile);
         Addresses.Add(initialBlock0);
         Addresses.Add(initialBlock1);
         
@@ -61,6 +61,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             {
                 block.AddRecord(data);
                 HeapFile.WriteBlock(block, address);
+                Addresses[prefix].ValidCount++;
                 RecordsCount++;
                 ret = address;
                 notInserted = false;
@@ -100,14 +101,24 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     #region Private methods
     private int GetPrefix(BitArray hash)
     {
-        var hashInt = BitArrayToInt(hash);
-        return hashInt & ((1 << Depth) - 1);
+        var newBitArray = new BitArray(Depth);
+        for (int i = 0; i < Depth; i++)
+        {
+            newBitArray[newBitArray.Length - i - 1] = hash[i];
+        }
+        
+        return BitArrayToInt(newBitArray);
     }
 
     private int GetPrefix(BitArray hash, int depth)
     {
-        var hashInt = BitArrayToInt(hash);
-        return hashInt & ((1 << depth) - 1);
+        var newBitArray = new BitArray(depth);
+        for (int i = 0; i < depth; i++)
+        {
+            newBitArray[newBitArray.Length - i - 1] = hash[i];
+        }
+        
+        return BitArrayToInt(newBitArray);
     }
     
     private int BitArrayToInt(BitArray bitArray)
@@ -134,12 +145,12 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     private void SplitBlock(int splittingIndex)
     {
         // Najdem si blok, ktory idem delit
-        var splittingBlockIndex = splittingIndex % (int)Math.Pow(2, Addresses[splittingIndex].Depth);
         var splittingBlock = Addresses[splittingIndex];
         
         // Najdem k nemu novy blok, do ktoreho budem ukladat po prehashovani nove data
         var newBlockAddress = HeapFile.CreateNewBlock();
-        var newBlock = Addresses[splittingBlockIndex + (int)Math.Pow(2, splittingBlock.Depth)];
+        var newBlockaa = (int)(splittingIndex - (Math.Pow(2, Depth - splittingBlock.Depth))/2);
+        var newBlock = Addresses[newBlockaa];
         newBlock.Address = newBlockAddress;
         
         // Vynulujem valid count pre adresy
@@ -154,9 +165,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         {
             var record = splittBlock.Records[i];
             var hash = record.GetHash();
-            int newPrefix = GetPrefix(hash, splittingBlock.Depth + 1);
+            int newPrefix = GetPrefix(hash, Depth);
 
-            if (newPrefix == splittingBlockIndex)
+            if (newPrefix == splittingIndex)
             {
                 newSplitBlock.AddRecord(record);
                 splittingBlock.ValidCount++;
@@ -180,11 +191,13 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     private void IncreaseDepth()
     {
         Depth++;
-        var size = Addresses.Count;
-        for (int i = 0; i < size; i++)
+        var newAddresses = new List<ExtendibleHashFileBlock<T>>();
+        for (int i = 0; i < Addresses.Count; i++)
         {
-            Addresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i].Address));
+            newAddresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i]));
+            newAddresses.Add(new ExtendibleHashFileBlock<T>(Addresses[i]));
         }
+        Addresses = newAddresses;
     }
     #endregion // Private methods
 }
