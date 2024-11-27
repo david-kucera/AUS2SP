@@ -12,7 +12,7 @@ namespace FilesTest
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 1;
+        public static int NUMBER_OF_REPLICATIONS = 10;
 
         static void Main()
         {
@@ -109,15 +109,13 @@ namespace FilesTest
 
                 ExtendibleHashFile<TestRP1> extendibleHashFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
                 DataGenerator generator = new DataGenerator(r);
-                List<int> adresses = new();
                 List<TestRP1> people = new();
                 
                 for (int x = 0; x < NUMBER_OF_PEOPLE; x++)
                 {
                     TestRP1 person = generator.GenerateTestRP1();
-                    var adresa = extendibleHashFile.Insert(person);
+                    extendibleHashFile.Insert(person);
                     people.Add(new TestRP1(person));
-                    adresses.Add(adresa);
                 }
 
                 // Operations
@@ -130,36 +128,33 @@ namespace FilesTest
                     switch (operation)
                     {
                         case OperationType.Insert:
-                            Console.WriteLine("BEFORE INSERT");
-                            Console.WriteLine(extendibleHashFile.SequentialOutput());
                             var countBeforeInsert = extendibleHashFile.RecordsCount;
                             var newPerson = generator.GenerateTestRP1();
-                            var adresa = extendibleHashFile.Insert(newPerson);
+                            extendibleHashFile.Insert(newPerson);
                             var countAfterInsert = extendibleHashFile.RecordsCount;
                             if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
                             people.Add(new TestRP1(newPerson));
-                            adresses.Add(adresa);
-                            Console.WriteLine("AFTER INSERT");
-                            Console.WriteLine(extendibleHashFile.SequentialOutput());
                             break;
                         case OperationType.Delete:
                             var countBeforeDelete = extendibleHashFile.RecordsCount;
-                            if (adresses.Count == 0) break;
-                            var index = generator.GenerateInt(0, adresses.Count);
+                            if (people.Count == 0) break;
+                            var index = generator.GenerateInt(0, people.Count);
                             var person = people[index];
-                            var adress = adresses[index];
                             people.RemoveAt(index);
-                            adresses.RemoveAt(index);
                             extendibleHashFile.Delete(person);
                             var countAfterDelete = extendibleHashFile.RecordsCount;
                             if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
                             break;
                         case OperationType.Find:
-                            if (adresses.Count == 0) break;
-                            var iindex = generator.GenerateInt(0, adresses.Count);
+                            if (people.Count == 0) break;
+                            var iindex = generator.GenerateInt(0, people.Count);
                             var pperson = people[iindex];
+                            if (pperson.Id == 320220)
+                            {
+                                Console.WriteLine("tu");
+                            }
                             var foundPerson = extendibleHashFile.Find(pperson);
-                            if (foundPerson.Id != pperson.Id)
+                            if (foundPerson == null)
                             {
                                 throw new Exception("Person not found!");
                             }

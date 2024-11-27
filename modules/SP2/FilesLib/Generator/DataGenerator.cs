@@ -29,7 +29,7 @@ public class DataGenerator
             Id = NEXT_ID++,
             Name = GenerateString(_rand.Next(1,15)),
             Surname = GenerateString(_rand.Next(1,20)),
-            Ecv = GenerateString(_rand.Next(1,10)),
+            Ecv = GenerateString(_rand.Next(1,10)), // TODO unikatne generovat ECV
             Zaznamy = GenerateVisits(_rand.Next(1,5)),
         };
         return ret;
@@ -39,10 +39,10 @@ public class DataGenerator
     {
         TestRP1 ret = new()
         {
-            Id = _rand.Next(1,1000000),
+            Id = NEXT_ID++,
             Name = GenerateString(_rand.Next(1,15)),
             Surname = GenerateString(_rand.Next(1,20)),
-            Ecv = GenerateString(_rand.Next(1,10)),
+            Ecv = GenerateString(_rand.Next(1,10)), // TODO treba unikatne generovat ECV
         };
         return ret;
     }

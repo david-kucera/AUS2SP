@@ -142,7 +142,10 @@ namespace FilesLib.Heap
 
 		public void ClearRecords()
 		{
-			Records = new List<T>(BlockFactor);
+			for (int i = 0; i < BlockFactor; i++)
+			{
+				Records[i] = new T().CreateClass();
+			}
 			ValidCount = 0;
 		}
 

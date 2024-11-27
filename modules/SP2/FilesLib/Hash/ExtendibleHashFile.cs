@@ -36,7 +36,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// </summary>
     /// <param name="data">Dáta</param>
     /// <returns>Adresa dát, kde sú uložené.</returns>
-    public int Insert(T data)
+    public void Insert(T data)
     {
         bool notInserted = true;
         int ret = -1;
@@ -45,7 +45,6 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         {
             int prefix = GetPrefix(hash);
             var block = HeapFile.GetBlock(Addresses[prefix].Address);
-            var address = Addresses[prefix].Address;
             var blockDepth = Addresses[prefix].Depth;
             
             if (block.BlockFactor == block.ValidCount)
@@ -53,22 +52,22 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
                 if (blockDepth == Depth)
                 {
                     IncreaseDepth();
+                    SplitBlock(GetPrefix(hash));
                 }
-
-                SplitBlock(prefix);
+                else
+                {
+                    SplitBlock(prefix);
+                }
             }
             else
             {
+                var address = Addresses[prefix].Address;
                 block.AddRecord(data);
                 HeapFile.WriteBlock(block, address);
-                Addresses[prefix].ValidCount++;
                 RecordsCount++;
-                ret = address;
                 notInserted = false;
             }
         }
-
-        return ret;
     }
 
     /// <summary>
@@ -165,19 +164,26 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     
     private void SplitBlock(int splittingIndex)
     {
-        var splittingBlock = Addresses[splittingIndex];
-        splittingBlock.Depth++;
+        var length = (int)Math.Pow(2, Depth - Addresses[splittingIndex].Depth);
+        var actualSplittingIndex = (splittingIndex/length) * length;
+        var block = Addresses[actualSplittingIndex];
+        var localDepth = block.Depth;
+        block.Depth++;
         
         var newBlock = new ExtendibleHashFileBlock<T>(HeapFile.CreateNewBlock(), HeapFile)
         {
-            Depth = splittingBlock.Depth
+            Depth = block.Depth
         };
-        Addresses[splittingIndex + 1] = newBlock;
+        var half = ((int)Math.Pow(2, Depth - localDepth))/2;
+        var startIndex = actualSplittingIndex + half;
+        var endIndex = startIndex + half;
+    
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            Addresses[i] = newBlock;
+        }
         
-        newBlock.ValidCount = 0;
-        splittingBlock.ValidCount = 0;
-        
-        var splittBlock = HeapFile.GetBlock(splittingBlock.Address);
+        var splittBlock = HeapFile.GetBlock(block.Address);
         var newwBlock = HeapFile.GetBlock(newBlock.Address);
         var newSplitBlock = new Block<T>(splittBlock);
         var newBlockSplit = new Block<T>(newwBlock);
@@ -185,21 +191,19 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         {
             var record = splittBlock.Records[i];
             var hash = record.GetHash();
-            int newPrefix = GetPrefix(hash, splittingBlock.Depth);
-
-            if (newPrefix == splittingIndex)
+            int newPrefix = GetPrefix(hash);
+    
+            if (newPrefix != splittingIndex)
             {
                 newSplitBlock.AddRecord(record);
-                splittingBlock.ValidCount++;
             }
             else
             {
                 newBlockSplit.AddRecord(record);
-                newBlock.ValidCount++;
             }
         }
         
-        HeapFile.WriteBlock(newSplitBlock, splittingBlock.Address);
+        HeapFile.WriteBlock(newSplitBlock, block.Address);
         HeapFile.WriteBlock(newBlockSplit, newBlock.Address);
     }
 

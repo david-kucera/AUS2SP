@@ -214,7 +214,7 @@ public class TestRP1 : IHashable<TestRP1>
 
         public bool Equals(TestRP1 data)
         {
-	        return Id == data.Id && Ecv == data.Ecv;
+	        return Id == data.Id;
         }
         #endregion // Public functions
     }
