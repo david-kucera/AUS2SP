@@ -166,7 +166,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var splittingBlock = Addresses[addressIndex];
         var localDepth = splittingBlock.Depth;
         splittingBlock.Depth++;
-        
+
         var newAddressBlock = new ExtendibleHashFileBlock<T>(HeapFile.CreateNewBlock(), HeapFile)
         {
             Depth = splittingBlock.Depth
@@ -174,26 +174,24 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var halfLength = ((int)Math.Pow(2, Depth - localDepth))/2;
         var startIndex = addressIndex + halfLength;
         var endIndex = startIndex + halfLength;
-    
+ 
         for (int i = startIndex; i < endIndex; i++) Addresses[i] = newAddressBlock;
         
+        var oldBlockItems = new List<T>();
+        var newBlockItems = new List<T>();
         var splittBlock = HeapFile.GetBlock(splittingBlock.Address);
-        var newBlock = HeapFile.GetBlock(newAddressBlock.Address);
         for (int i = 0; i < splittBlock.ValidCount; i++)
         {
             var record = splittBlock.GetRecord(i);
             var hash = record.GetHash();
             int newPrefix = GetPrefix(hash);
-    
-            if (newPrefix == splittingIndex)
-            {
-                splittBlock.RemoveRecord(record);
-                newBlock.AddRecord(record);
-            }
+            
+            if (newPrefix != addressIndex) newBlockItems.Add(record);
+            else oldBlockItems.Add(record);
         }
-        
-        HeapFile.WriteBlock(splittBlock, splittingBlock.Address);
-        HeapFile.WriteBlock(newBlock, newAddressBlock.Address);
+            
+        HeapFile.Update(splittingBlock.Address, oldBlockItems);
+        HeapFile.Update(newAddressBlock.Address, newBlockItems);
     }
 
     private void IncreaseDepth()
