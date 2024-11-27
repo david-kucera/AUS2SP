@@ -5,15 +5,15 @@ using FilesLib.Heap;
 
 namespace FilesTest
 {
-    public class Program
+    public static class Program
     {
         #region Constants
-        public static int BLOCK_SIZE = 512;
+        public static int BLOCK_SIZE = 2048;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 1_000;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 1;
+        public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
 
         static void Main()
@@ -121,6 +121,9 @@ namespace FilesTest
                 }
 
                 // Operations
+                int inserts = 0;
+                int deletes = 0;
+                int searches = 0;
                 for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
@@ -136,6 +139,7 @@ namespace FilesTest
                             var countAfterInsert = extendibleHashFile.RecordsCount;
                             if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
                             people.Add(new TestRP1(newPerson));
+                            inserts++;
                             break;
                         case OperationType.Delete:
                             var countBeforeDelete = extendibleHashFile.RecordsCount;
@@ -144,6 +148,7 @@ namespace FilesTest
                             var person = people[index];
                             people.RemoveAt(index);
                             extendibleHashFile.Delete(person);
+                            deletes++;
                             var countAfterDelete = extendibleHashFile.RecordsCount;
                             if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
                             break;
@@ -152,13 +157,13 @@ namespace FilesTest
                             var iindex = generator.GenerateInt(0, people.Count);
                             var pperson = people[iindex];
                             var foundPerson = extendibleHashFile.Find(pperson);
-                            if (foundPerson == null)
-                            {
-                                throw new Exception("Person not found!");
-                            }
+                            searches++;
+                            if (foundPerson == null) throw new Exception("Person not found!");
                             break;
                     }
                 }
+
+                Console.WriteLine($"Inserted {inserts} inserts, {deletes} deletes, {searches} searches");
                 extendibleHashFile.Close();
             }
         }
