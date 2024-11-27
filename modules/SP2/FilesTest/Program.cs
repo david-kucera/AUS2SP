@@ -7,12 +7,14 @@ namespace FilesTest
 {
     public class Program
     {
+        #region Constants
         public static int BLOCK_SIZE = 1024;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 10;
+        public static int NUMBER_OF_REPLICATIONS = 1;
+        #endregion // Constants
 
         static void Main()
         {
@@ -33,8 +35,8 @@ namespace FilesTest
 
                 HeapFile<TestRP1> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
                 DataGenerator generator = new DataGenerator(r);
-                List<int> adresses = new();
-                List<TestRP1> people = new();
+                List<int> adresses = [];
+                List<TestRP1> people = [];
                 
                 for (int x = 0; x < NUMBER_OF_PEOPLE; x++)
                 {
@@ -48,7 +50,7 @@ namespace FilesTest
                 for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
-                    Console.WriteLine(i + ". " + operation);
+                    //Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -83,8 +85,6 @@ namespace FilesTest
                                 throw new Exception("Person not found!");
                             }
                             break;
-                        default:    
-                            break;
                     }
                 }
                 
@@ -106,10 +106,12 @@ namespace FilesTest
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
+                Console.WriteLine($"{r}. replication");
 
-                ExtendibleHashFile<TestRP1> extendibleHashFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
+                HeapFile<TestRP1> heapFile = new(DATA_FILE, DATA_FILE, BLOCK_SIZE);
+                ExtendibleHashFile<TestRP1> extendibleHashFile = new(null!, heapFile);
                 DataGenerator generator = new DataGenerator(r);
-                List<TestRP1> people = new();
+                List<TestRP1> people = [];
                 
                 for (int x = 0; x < NUMBER_OF_PEOPLE; x++)
                 {
@@ -124,7 +126,7 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    Console.WriteLine(i + ". " + operation);
+                    // Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -149,17 +151,11 @@ namespace FilesTest
                             if (people.Count == 0) break;
                             var iindex = generator.GenerateInt(0, people.Count);
                             var pperson = people[iindex];
-                            if (pperson.Id == 320220)
-                            {
-                                Console.WriteLine("tu");
-                            }
                             var foundPerson = extendibleHashFile.Find(pperson);
                             if (foundPerson == null)
                             {
                                 throw new Exception("Person not found!");
                             }
-                            break;
-                        default:    
                             break;
                     }
                 }

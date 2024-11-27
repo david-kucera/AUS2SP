@@ -14,9 +14,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     #endregion // Properties
     
     #region Constructors
-    public ExtendibleHashFile(string initFilePath, string filePath, int blockSize)
+    public ExtendibleHashFile(string initFilePath, HeapFile<T> heapFile)
     {
-        HeapFile = new HeapFile<T>(initFilePath, filePath, blockSize);
+        HeapFile = heapFile;
         HeapFile.Clear();
 
         Addresses = [];
