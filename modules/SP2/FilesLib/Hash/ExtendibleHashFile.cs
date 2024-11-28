@@ -1,5 +1,4 @@
 using System.Collections;
-using FilesLib.Heap;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
@@ -7,26 +6,19 @@ namespace FilesLib.Hash;
 public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
-    public HeapFile<T> HeapFile { get; set; }
     public List<ExtendibleHashFileBlock<T>> Addresses { get; set; }
     public int Depth { get; set; } = 1;
     public int RecordsCount { get; set; } = 0;
+    public int BlockFactor { get; set; }
     #endregion // Properties
-    
-    #region Constructors
-    public ExtendibleHashFile(string initFilePath, HeapFile<T> heapFile)
-    {
-        HeapFile = heapFile;
-        HeapFile.Clear();
 
+    #region Constructors
+    public ExtendibleHashFile(string initFilePath, int blockFactor)
+    {
         Addresses = [];
-        var initialAddr0 = HeapFile.CreateNewBlock();
-        var initialBlock0 = new ExtendibleHashFileBlock<T>(initialAddr0);
-        var initialAddr1 = HeapFile.CreateNewBlock();
-        var initialBlock1 = new ExtendibleHashFileBlock<T>(initialAddr1);
-        Addresses.Add(initialBlock0);
-        Addresses.Add(initialBlock1);
-        
+        Addresses.Add(new ExtendibleHashFileBlock<T>());
+        Addresses.Add(new ExtendibleHashFileBlock<T>());
+        BlockFactor = blockFactor;
     }
     #endregion // Constructors
     
@@ -43,9 +35,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         while (notInserted)
         {
             int prefix = GetPrefix(hash);
-            var block = HeapFile.GetBlock(Addresses[prefix].Address);
-            
-            if (block.BlockFactor == block.ValidCount)
+            var block = GetBlock(data);
+
+            if (BlockFactor == block.Values.Count)
             {
                 if (Addresses[prefix].Depth == Depth)
                 {
@@ -59,8 +51,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             }
             else
             {
-                block.AddRecord(data);
-                HeapFile.WriteBlock(block, Addresses[prefix].Address);
+                Addresses[prefix].Values.Add(data);
                 RecordsCount++;
                 notInserted = false;
             }
@@ -74,7 +65,12 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// <returns>Dáta</returns>
     public T Find(T data)
     {
-        return GetBlock(data).GetRecord(data);
+        var addressBlock = GetBlock(data);
+        foreach (var record in addressBlock.Values)
+        {
+            if (record.Equals(data)) return (T)record;
+        }
+        return null!;
     }
     
     /// <summary>
@@ -82,24 +78,25 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// </summary>
     /// <param name="data">Dáta</param>
     /// <returns>True, ak sa operácia podarila, False inak</returns>
-    public void Delete(T data)
-    {
-        var hash = data.GetHash();
-        var blockIndex = GetPrefix(hash);
-        var block = Addresses[blockIndex];
-        var hBlock = HeapFile.GetBlock(block.Address);
-        var entry = hBlock.GetRecord(data);
+    //public void Delete(T data)
+    //{
+    //    var hash = data.GetHash();
+    //    var prefix = GetPrefix(hash);
+    //    var block = Addresses[prefix];
+    //    var hBlock = HeapFile.GetBlock(block.Address);
+    //    var entry = hBlock.GetRecord(data);
  
-        if (entry != null!)
-        {
-            HeapFile.Delete(block.Address, entry);
-            RecordsCount--;
-            if (hBlock.ValidCount < hBlock.BlockFactor / 2 && block.Depth > 1)
-            {
-                MergeBlock(blockIndex);
-            }
-        }
-    }
+    //    if (entry != null!)
+    //    {
+    //        HeapFile.Delete(block.Address, entry);
+    //        Addresses[prefix].ValidCount--;
+    //        RecordsCount--;
+    //        if (hBlock.ValidCount < hBlock.BlockFactor / 2 && block.Depth > 1)
+    //        {
+    //            MergeBlock(prefix);
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// Vypíše sekvenčne všetky dáta o adresách.
@@ -126,7 +123,6 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// </summary>
     public void Close()
     {
-        HeapFile.Close();
         // TODO save metadata do suboru
     }
     #endregion // Public methods
@@ -159,12 +155,11 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         return ret;
     }
 
-    private Block<T> GetBlock(T data)
+    private ExtendibleHashFileBlock<T> GetBlock(T data)
     {
         var hash = data.GetHash();
         int prefix = GetPrefix(hash);
-        var block = HeapFile.GetBlock(Addresses[prefix].Address);
-        return block;
+        return Addresses[prefix];
     }
     
     private void SplitBlock(int splittingIndex)
@@ -175,7 +170,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var localDepth = splittingBlock.Depth;
         splittingBlock.Depth++;
 
-        var newAddressBlock = new ExtendibleHashFileBlock<T>(HeapFile.CreateNewBlock())
+        var newAddressBlock = new ExtendibleHashFileBlock<T>()
         {
             Depth = splittingBlock.Depth
         };
@@ -185,21 +180,19 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
  
         for (int i = startIndex; i < endIndex; i++) Addresses[i] = newAddressBlock;
         
-        var oldBlockItems = new List<T>();
-        var newBlockItems = new List<T>();
-        var splittBlock = HeapFile.GetBlock(splittingBlock.Address);
-        for (int i = 0; i < splittBlock.ValidCount; i++)
+        var oldBlockItems = new List<IHashable<T>>();
+        var newBlockItems = new List<IHashable<T>>();
+        for (int i = 0; i < splittingBlock.Values.Count; i++)
         {
-            var record = splittBlock.GetRecord(i);
+            var record = splittingBlock.Values[i];
             var hash = record.GetHash();
             int newPrefix = GetPrefix(hash);
             
             if (newPrefix != addressIndex) newBlockItems.Add(record);
             else oldBlockItems.Add(record);
         }
-            
-        HeapFile.Update(splittingBlock.Address, oldBlockItems);
-        HeapFile.Update(newAddressBlock.Address, newBlockItems);
+        splittingBlock.Values = oldBlockItems;
+        newAddressBlock.Values = newBlockItems;
     }
 
     private void IncreaseDepth()
@@ -214,94 +207,94 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         Addresses = newAddresses;
     }
 
-    private void DecreaseDepth()
-    {
-        Depth--;
-        int size = Addresses.Count;
-        var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
-        for (int i = 0; i < size; i += 2)
-        {
-            newAdresses.Add(Addresses[i]);
-        }
-        Addresses = newAdresses;
-    }
+    //private void DecreaseDepth()
+    //{
+    //    Depth--;
+    //    int size = Addresses.Count;
+    //    var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
+    //    for (int i = 0; i < size; i += 2)
+    //    {
+    //        newAdresses.Add(Addresses[i]);
+    //    }
+    //    Addresses = newAdresses;
+    //}
     
-    private void MergeBlock(int blockIndex)
-        {
-            var length = (int)Math.Pow(2, Depth - Addresses[blockIndex].Depth);
-            var actualMergeIndex = (blockIndex / length) * length;
-            var block = Addresses[actualMergeIndex];
-            var hBlock = HeapFile.GetBlock(block.Address);
+    //private void MergeBlock(int blockIndex)
+    //    {
+    //        var length = (int)Math.Pow(2, Depth - Addresses[blockIndex].Depth);
+    //        var actualMergeIndex = (blockIndex / length) * length;
+    //        var block = Addresses[actualMergeIndex];
+    //        var hBlock = HeapFile.GetBlock(block.Address);
  
-            var neighborIndex = actualMergeIndex + length;
-            var neighborLength = 0;
-            if (actualMergeIndex < Addresses.Count/2)
-            {
-                if (neighborIndex >= Addresses.Count/2)
-                {
-                    neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-                else
-                {
-                    neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-            }
-            else
-            {
-                if (neighborIndex >= Addresses.Count)
-                {
-                    neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-                else
-                {
-                    neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-            }
+    //        var neighborIndex = actualMergeIndex + length;
+    //        var neighborLength = 0;
+    //        if (actualMergeIndex < Addresses.Count/2)
+    //        {
+    //            if (neighborIndex >= Addresses.Count/2)
+    //            {
+    //                neighborIndex = actualMergeIndex - 1;
+    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+    //            }
+    //            else
+    //            {
+    //                neighborIndex = actualMergeIndex + length;
+    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            if (neighborIndex >= Addresses.Count)
+    //            {
+    //                neighborIndex = actualMergeIndex - 1;
+    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+    //            }
+    //            else
+    //            {
+    //                neighborIndex = actualMergeIndex + length;
+    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+    //            }
+    //        }
  
-            var neighbor = Addresses[neighborIndex];
-            var neighborBlock = HeapFile.GetBlock(neighbor.Address);
-            if (neighbor.Depth == block.Depth && neighborBlock.ValidCount + hBlock.ValidCount <= hBlock.BlockFactor)
-            {
-                var entries = new List<T>(hBlock.ValidCount);
-                List<T> validRecords = new List<T>();
-                for (int i = 0; i < hBlock.ValidCount; i++)
-                {
-                    validRecords.Add(hBlock.GetRecord(i));
-                }
-                entries.AddRange(validRecords);
-                HeapFile.Update(block.Address, entries);
-                HeapFile.Update(neighbor.Address, new List<T>());
-                block.Depth--;
+    //        var neighbor = Addresses[neighborIndex];
+    //        var neighborBlock = HeapFile.GetBlock(neighbor.Address);
+    //        if (neighbor.Depth == block.Depth && neighborBlock.ValidCount + hBlock.ValidCount <= hBlock.BlockFactor)
+    //        {
+    //            var entries = new List<T>(hBlock.ValidCount);
+    //            List<T> validRecords = new List<T>();
+    //            for (int i = 0; i < hBlock.ValidCount; i++)
+    //            {
+    //                validRecords.Add(hBlock.GetRecord(i));
+    //            }
+    //            entries.AddRange(validRecords);
+    //            HeapFile.Update(block.Address, entries);
+    //            HeapFile.Update(neighbor.Address, new List<T>());
+    //            block.Depth--;
  
-                var endIndex = neighborIndex + neighborLength;
+    //            var endIndex = neighborIndex + neighborLength;
  
-                for (int i = neighborIndex; i < endIndex; i++)
-                {
-                    Addresses[i] = block;
-                }
+    //            for (int i = neighborIndex; i < endIndex; i++)
+    //            {
+    //                Addresses[i] = block;
+    //            }
  
-                var maxDepth = int.MinValue;
-                foreach (var address in Addresses)
-                {
-                    if (maxDepth < address.Depth)
-                    {
-                        maxDepth = address.Depth;
-                    }
-                }
-                if (maxDepth < Depth)
-                {
-                    DecreaseDepth();
-                }
-            }
-        }
+    //            var maxDepth = int.MinValue;
+    //            foreach (var address in Addresses)
+    //            {
+    //                if (maxDepth < address.Depth)
+    //                {
+    //                    maxDepth = address.Depth;
+    //                }
+    //            }
+    //            if (maxDepth < Depth)
+    //            {
+    //                DecreaseDepth();
+    //            }
+    //        }
+    //    }
     
     #endregion // Private methods
 }

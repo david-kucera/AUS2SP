@@ -4,7 +4,7 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Person : IHashable<Person>
+	public class Person : IData<Person>
 	{
 		#region Constants
 		private const int MAX_VISITS = 5;
@@ -121,11 +121,6 @@ namespace FilesLib.Data
 		#endregion // Constructors
 
 		#region Public functions
-		public BitArray GetHash()
-		{
-			throw new NotImplementedException();
-		}
-
 		public override string ToString()
 		{
 			var zaznamy = string.Empty;
@@ -291,22 +286,7 @@ namespace FilesLib.Data
 
         public bool Equals(Person data)
         {
-	        if (Zaznamy.Count != data.Zaznamy.Count) return false;
-	        
-	        bool equal = true;
-	        for (int i = 0; i < Zaznamy.Count; i++)
-	        {
-		        for (int j = 0; j < Zaznamy[i].Notes.Count; j++)
-		        {
-			        if (!Zaznamy[i].Notes[j].Equals(data.Zaznamy[i].Notes[j]))
-			        {
-				        equal = false;
-				        break;
-			        }
-			        
-		        }
-	        }
-	        return Id == data.Id && Name == data.Name && Surname == data.Surname && Ecv == data.Ecv && equal;
+	        return Id == data.Id || Ecv == data.Ecv;
         }
         #endregion // Public functions
     }

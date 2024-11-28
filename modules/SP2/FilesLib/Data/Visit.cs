@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Text;
+﻿using System.Text;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Visit : IHashable<Visit>
+	public class Visit : IData<Visit>
 	{
 		#region Constants
 		private const int MAX_NOTES_COUNT = 10;
@@ -55,11 +54,6 @@ namespace FilesLib.Data
 		#endregion // Constructors
 
 		#region Public functions
-
-		public BitArray GetHash()
-		{
-			throw new NotImplementedException();
-		}
 
 		public override string ToString()
 		{
