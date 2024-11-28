@@ -3,11 +3,17 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
+    /// <summary>
+    /// Class for testing purposes...
+    /// </summary>
     public class TestRP1Id : IHashable<TestRP1Id>
     {
-        public int Id { get; set; }
-        public int Address { get; set; }
+        #region Properties
+        public int Id { get; set; } = -1;
+        public int Address { get; set; } = -1;
+        #endregion // Properties
 
+        #region Public functions
         public TestRP1Id CreateClass()
         {
             return new TestRP1Id();
@@ -37,5 +43,6 @@ namespace FilesLib.Data
         {
             throw new NotImplementedException();
         }
+        #endregion // Public functions
     }
 }

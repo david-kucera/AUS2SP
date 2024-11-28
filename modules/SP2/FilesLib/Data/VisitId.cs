@@ -3,11 +3,17 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
+    /// <summary>
+    /// Class used for storing in ExtendibleHashFile.
+    /// </summary>
     public class VisitId : IHashable<VisitId>
     {
-        public int Id { get; set; }
-        public int Address { get; set; }
+        #region Properties
+        public int Id { get; set; } = -1;
+        public int Address { get; set; } = -1;
+        #endregion // Properties
 
+        #region Public functions
         public VisitId CreateClass()
         {
             return new VisitId();
@@ -20,7 +26,7 @@ namespace FilesLib.Data
 
         public VisitId FromByteArray(byte[] byteArray)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // TODO
         }
 
         public BitArray GetHash()
@@ -35,7 +41,9 @@ namespace FilesLib.Data
 
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // TODO
         }
+        #endregion // Public functions
+        
     }
 }

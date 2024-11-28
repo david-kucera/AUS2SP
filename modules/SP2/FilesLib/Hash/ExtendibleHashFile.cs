@@ -3,12 +3,28 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
 
+/// <summary>
+/// Class of Extendible hashing implementation.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
     #region Properties
+    /// <summary>
+    /// Addresses/buckets list.
+    /// </summary>
     public List<ExtendibleHashFileBlock<T>> Addresses { get; set; }
+    /// <summary>
+    /// Global depth of hash file.
+    /// </summary>
     public int Depth { get; set; } = 1;
+    /// <summary>
+    /// Number of records stored in hash file.
+    /// </summary>
     public int RecordsCount { get; set; } = 0;
+    /// <summary>
+    /// Block factor of heap file.
+    /// </summary>
     public int BlockFactor { get; set; }
     #endregion // Properties
 
@@ -78,25 +94,23 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// </summary>
     /// <param name="data">Dáta</param>
     /// <returns>True, ak sa operácia podarila, False inak</returns>
-    //public void Delete(T data)
-    //{
-    //    var hash = data.GetHash();
-    //    var prefix = GetPrefix(hash);
-    //    var block = Addresses[prefix];
-    //    var hBlock = HeapFile.GetBlock(block.Address);
-    //    var entry = hBlock.GetRecord(data);
+    public void Delete(T data)
+    {
+        var hash = data.GetHash();
+        var prefix = GetPrefix(hash);
+        var block = Addresses[prefix];
+        var entry = block.GetValue(data);
  
-    //    if (entry != null!)
-    //    {
-    //        HeapFile.Delete(block.Address, entry);
-    //        Addresses[prefix].ValidCount--;
-    //        RecordsCount--;
-    //        if (hBlock.ValidCount < hBlock.BlockFactor / 2 && block.Depth > 1)
-    //        {
-    //            MergeBlock(prefix);
-    //        }
-    //    }
-    //}
+        if (entry != null!)
+        {
+            Addresses[prefix].Values.Remove(entry);
+            RecordsCount--;
+            if (block.Values.Count < BlockFactor / 2 && block.Depth > 1)
+            {
+                MergeBlock(prefix);
+            }
+        }
+    }
 
     /// <summary>
     /// Vypíše sekvenčne všetky dáta o adresách.
@@ -207,94 +221,78 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         Addresses = newAddresses;
     }
 
-    //private void DecreaseDepth()
-    //{
-    //    Depth--;
-    //    int size = Addresses.Count;
-    //    var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
-    //    for (int i = 0; i < size; i += 2)
-    //    {
-    //        newAdresses.Add(Addresses[i]);
-    //    }
-    //    Addresses = newAdresses;
-    //}
+    private void DecreaseDepth()
+    {
+        Depth--;
+        int size = Addresses.Count;
+        var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
+        for (int i = 0; i < size; i += 2)
+        {
+            newAdresses.Add(Addresses[i]);
+        }
+        Addresses = newAdresses;
+    }
     
-    //private void MergeBlock(int blockIndex)
-    //    {
-    //        var length = (int)Math.Pow(2, Depth - Addresses[blockIndex].Depth);
-    //        var actualMergeIndex = (blockIndex / length) * length;
-    //        var block = Addresses[actualMergeIndex];
-    //        var hBlock = HeapFile.GetBlock(block.Address);
+    private void MergeBlock(int blockIndex)
+        {
+            var length = (int)Math.Pow(2, Depth - Addresses[blockIndex].Depth);
+            var actualMergeIndex = (blockIndex / length) * length;
+            var block = Addresses[actualMergeIndex];
  
-    //        var neighborIndex = actualMergeIndex + length;
-    //        var neighborLength = 0;
-    //        if (actualMergeIndex < Addresses.Count/2)
-    //        {
-    //            if (neighborIndex >= Addresses.Count/2)
-    //            {
-    //                neighborIndex = actualMergeIndex - 1;
-    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-    //            }
-    //            else
-    //            {
-    //                neighborIndex = actualMergeIndex + length;
-    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-    //            }
-    //        }
-    //        else
-    //        {
-    //            if (neighborIndex >= Addresses.Count)
-    //            {
-    //                neighborIndex = actualMergeIndex - 1;
-    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-    //            }
-    //            else
-    //            {
-    //                neighborIndex = actualMergeIndex + length;
-    //                neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
-    //                neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-    //            }
-    //        }
+            var neighborIndex = actualMergeIndex + length;
+            var neighborLength = 0;
+            if (actualMergeIndex < Addresses.Count/2)
+            {
+                if (neighborIndex >= Addresses.Count/2)
+                {
+                    neighborIndex = actualMergeIndex - 1;
+                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+                }
+                else
+                {
+                    neighborIndex = actualMergeIndex + length;
+                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+                }
+            }
+            else
+            {
+                if (neighborIndex >= Addresses.Count)
+                {
+                    neighborIndex = actualMergeIndex - 1;
+                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+                }
+                else
+                {
+                    neighborIndex = actualMergeIndex + length;
+                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
+                }
+            }
  
-    //        var neighbor = Addresses[neighborIndex];
-    //        var neighborBlock = HeapFile.GetBlock(neighbor.Address);
-    //        if (neighbor.Depth == block.Depth && neighborBlock.ValidCount + hBlock.ValidCount <= hBlock.BlockFactor)
-    //        {
-    //            var entries = new List<T>(hBlock.ValidCount);
-    //            List<T> validRecords = new List<T>();
-    //            for (int i = 0; i < hBlock.ValidCount; i++)
-    //            {
-    //                validRecords.Add(hBlock.GetRecord(i));
-    //            }
-    //            entries.AddRange(validRecords);
-    //            HeapFile.Update(block.Address, entries);
-    //            HeapFile.Update(neighbor.Address, new List<T>());
-    //            block.Depth--;
+            var neighbor = Addresses[neighborIndex];
+            if (neighbor.Depth == block.Depth && neighbor.Values.Count + block.Values.Count <= BlockFactor)
+            {
+                var entries = new List<IHashable<T>>(block.Values.Count);
+                List<IHashable<T>> validRecords = new();
+                for (int i = 0; i < block.Values.Count; i++) validRecords.Add(block.Values[i]);
+                entries.AddRange(validRecords);
+                block.Values = entries;
+                block.Depth--;
+                
+                var endIndex = neighborIndex + neighborLength;
+                for (int i = neighborIndex; i < endIndex; i++) Addresses[i] = block;
  
-    //            var endIndex = neighborIndex + neighborLength;
- 
-    //            for (int i = neighborIndex; i < endIndex; i++)
-    //            {
-    //                Addresses[i] = block;
-    //            }
- 
-    //            var maxDepth = int.MinValue;
-    //            foreach (var address in Addresses)
-    //            {
-    //                if (maxDepth < address.Depth)
-    //                {
-    //                    maxDepth = address.Depth;
-    //                }
-    //            }
-    //            if (maxDepth < Depth)
-    //            {
-    //                DecreaseDepth();
-    //            }
-    //        }
-    //    }
+                var maxDepth = int.MinValue;
+                foreach (var address in Addresses)
+                {
+                    if (maxDepth < address.Depth) maxDepth = address.Depth;
+                }
+                if (maxDepth < Depth) DecreaseDepth();
+            }
+        }
     
     #endregion // Private methods
 }

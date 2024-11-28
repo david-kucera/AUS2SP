@@ -8,7 +8,7 @@ namespace FilesTest
     public static class Program
     {
         #region Constants
-        public static int BLOCK_SIZE = 2048;
+        public static int BLOCK_SIZE = 2500;
         public static string INIT_FILE = "../../userdata/person_init.aus";
         public static string DATA_FILE = "../../userdata/person.aus";
         public static int NUMBER_OF_PEOPLE = 1_000;
@@ -16,15 +16,25 @@ namespace FilesTest
         public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
 
+        #region Main
         static void Main()
         {
+            Console.WriteLine("STRUCTURE TESTER");
+            Console.WriteLine("Current configuration");
+            Console.WriteLine($"Block size: {BLOCK_SIZE}, Number of people: {NUMBER_OF_PEOPLE}, Number of operations: {NUMBER_OF_OPERATIONS}, Number of repllications: {NUMBER_OF_REPLICATIONS}");
             Console.WriteLine("Choose what you want to run:");
+            Console.WriteLine("1 - Test heap file with TestRP1");
+            Console.WriteLine("2 - Test hash file with TestRP1");
+            Console.WriteLine("3 - Test heap file with Person class !!!Block size must be larger than 2500!!!");
             var choice = Console.ReadLine();
             if (choice == "1") TestHeapFile();
             else if (choice == "2") TestHashFile();
+            else if (choice == "3") TestHeapFilePerson();
             else throw new Exception("Invalid choice");
         }
+        #endregion // Main
         
+        #region Heap file
         static void TestHeapFile()
         {
             for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
@@ -100,8 +110,9 @@ namespace FilesTest
             }
         }
         
-        static void TestHeapFileVisit()
+        static void TestHeapFilePerson()
         {
+            if (BLOCK_SIZE < 2500) throw new Exception("Block size is too small!");
             for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
@@ -174,7 +185,9 @@ namespace FilesTest
                 heapFile.Close();
             }
         }
+        #endregion // Heap file
         
+        #region Hash file
         static void TestHashFile()
         {
             for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
@@ -260,5 +273,6 @@ namespace FilesTest
                 extendibleHashFile.Close();
             }
         }
+        #endregion // Hash file
     }
 }
