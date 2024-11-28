@@ -109,14 +109,20 @@ namespace FilesTest
                 Console.WriteLine($"{r}. replication");
 
                 HeapFile<TestRP1> heapFile = new(DATA_FILE, DATA_FILE, BLOCK_SIZE);
-                ExtendibleHashFile<TestRP1> extendibleHashFile = new(null!, heapFile);
-                DataGenerator generator = new DataGenerator(r);
+                ExtendibleHashFile<TestRP1Id> extendibleHashFile = new(null!, heapFile.BlockFactor);
+                DataGenerator generator = new(r);
                 List<TestRP1> people = [];
                 
                 for (int x = 0; x < NUMBER_OF_PEOPLE; x++)
                 {
                     TestRP1 person = generator.GenerateTestRP1();
-                    extendibleHashFile.Insert(person);
+                    var address = heapFile.Insert(person);
+                    TestRP1Id personId = new()
+                    {
+                        Id = person.Id,
+                        Address = address
+                    };
+                    extendibleHashFile.Insert(personId);
                     people.Add(new TestRP1(person));
                 }
 
@@ -129,34 +135,46 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    // Console.WriteLine(i + ". " + operation);
+                    Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
                             var countBeforeInsert = extendibleHashFile.RecordsCount;
                             var newPerson = generator.GenerateTestRP1();
-                            extendibleHashFile.Insert(newPerson);
-                            var countAfterInsert = extendibleHashFile.RecordsCount;
+                            var address = heapFile.Insert(newPerson);
+                            TestRP1Id newPersonId = new()
+                            {
+                                Id = newPerson.Id,
+                                Address = address
+                            };
+                            extendibleHashFile.Insert(newPersonId);
+                            var countAfterInsert = heapFile.RecordsCount;
                             if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
                             people.Add(new TestRP1(newPerson));
                             inserts++;
                             break;
-                        case OperationType.Delete:
-                            var countBeforeDelete = extendibleHashFile.RecordsCount;
-                            if (people.Count == 0) break;
-                            var index = generator.GenerateInt(0, people.Count);
-                            var person = people[index];
-                            people.RemoveAt(index);
-                            extendibleHashFile.Delete(person);
-                            deletes++;
-                            var countAfterDelete = extendibleHashFile.RecordsCount;
-                            if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
-                            break;
+                        //case OperationType.Delete:
+                        //    var countBeforeDelete = extendibleHashFile.RecordsCount;
+                        //    if (people.Count == 0) break;
+                        //    var index = generator.GenerateInt(0, people.Count);
+                        //    var person = people[index];
+                        //    people.RemoveAt(index);
+                        //    heapFile.Delete(person);
+                        //    extendibleHashFile.Delete(person);
+                        //    deletes++;
+                        //    var countAfterDelete = extendibleHashFile.RecordsCount;
+                        //    if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
+                        //    break;
                         case OperationType.Find:
                             if (people.Count == 0) break;
                             var iindex = generator.GenerateInt(0, people.Count);
                             var pperson = people[iindex];
-                            var foundPerson = extendibleHashFile.Find(pperson);
+                            TestRP1Id personId = new()
+                            {
+                                Id = pperson.Id
+                            };
+                            TestRP1Id a = extendibleHashFile.Find(personId);
+                            var foundPerson = heapFile.Find(a.Address, pperson);
                             searches++;
                             if (foundPerson == null) throw new Exception("Person not found!");
                             break;

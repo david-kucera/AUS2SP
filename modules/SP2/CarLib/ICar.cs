@@ -13,5 +13,6 @@ namespace CarLib
 		void AddVisit(Person person, Visit visit);
 		void RemoveVisit(Person person, Visit visit);
 		void Remove(Person person);
+		void Close();
 	}
 }

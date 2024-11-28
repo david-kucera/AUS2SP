@@ -24,17 +24,21 @@ namespace FilesLib.Heap
         /// Celkový počet záznamov v súbore.
         /// </summary>
 		public int RecordsCount = 0;
-		#endregion // Properties
+        /// <summary>
+        /// Maximálny počet záznamov v bloku.
+        /// </summary>
+        public int BlockFactor => BlockSize / new T().GetSize();
+        #endregion // Properties
 
-		#region Constructor
-		/// <summary>
-		/// Konštruktor triedy HeapFile.
-		/// </summary>
-		/// <param name="initFilePath">Cesta k inicializačnému súboru.</param>
-		/// <param name="filePath">Cesta k dátovému súboru.</param>
-		/// <param name="blockSize">Veľkosť bloku.</param>
-		/// <exception cref="Exception">Ak nastane chyba pri otváraí súboru.</exception>
-		public HeapFile(string initFilePath, string filePath, int blockSize)
+        #region Constructor
+        /// <summary>
+        /// Konštruktor triedy HeapFile.
+        /// </summary>
+        /// <param name="initFilePath">Cesta k inicializačnému súboru.</param>
+        /// <param name="filePath">Cesta k dátovému súboru.</param>
+        /// <param name="blockSize">Veľkosť bloku.</param>
+        /// <exception cref="Exception">Ak nastane chyba pri otváraí súboru.</exception>
+        public HeapFile(string initFilePath, string filePath, int blockSize)
 		{
 			if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
 			if (!File.Exists(filePath)) File.Create(filePath).Close();
@@ -50,8 +54,8 @@ namespace FilesLib.Heap
 				throw new Exception("Error while opening file: " + ex.Message);
             }
 
-            if (_file.Length == 0) SaveInitData();
-			else LoadInitData();
+   //         if (_file.Length == 0) SaveInitData();
+			//else LoadInitData();
         }
         #endregion // Constructor
 
