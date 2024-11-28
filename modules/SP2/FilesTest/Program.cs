@@ -100,6 +100,81 @@ namespace FilesTest
             }
         }
         
+        static void TestHeapFileVisit()
+        {
+            for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
+            {
+                if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
+                if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
+                Console.WriteLine($"{r}. replication");
+
+                HeapFile<Person> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
+                DataGenerator generator = new DataGenerator(r);
+                List<int> adresses = [];
+                List<Person> people = [];
+                
+                for (int x = 0; x < NUMBER_OF_PEOPLE; x++)
+                {
+                    Person person = generator.GeneratePerson();
+                    var adresa = heapFile.Insert(person);
+                    people.Add(new Person(person));
+                    adresses.Add(adresa);
+                }
+
+                // Operations
+                for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
+                {
+                    var operation = generator.GenerateOperation();
+                    //Console.WriteLine(i + ". " + operation);
+                    switch (operation)
+                    {
+                        case OperationType.Insert:
+                            var countBeforeInsert = heapFile.RecordsCount;
+                            var newPerson = generator.GeneratePerson();
+                            var adresa = heapFile.Insert(newPerson);
+                            var countAfterInsert = heapFile.RecordsCount;
+                            if (countBeforeInsert+1 != countAfterInsert) throw new Exception("Insert failed!");
+                            people.Add(new Person(newPerson));
+                            adresses.Add(adresa);
+                            break;
+                        case OperationType.Delete:
+                            var countBeforeDelete = heapFile.RecordsCount;
+                            if (adresses.Count == 0) break;
+                            var index = generator.GenerateInt(0, adresses.Count);
+                            var person = people[index];
+                            var adress = adresses[index];
+                            heapFile.Delete(adress, person);
+                            people.RemoveAt(index);
+                            adresses.RemoveAt(index);
+                            var countAfterDelete = heapFile.RecordsCount;
+                            if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
+                            break;
+                        case OperationType.Find:
+                            if (adresses.Count == 0) break;
+                            var iindex = generator.GenerateInt(0, adresses.Count);
+                            var pperson = people[iindex];
+                            var aadress = adresses[iindex];
+                            var foundPerson = heapFile.Find(aadress, pperson);
+                            if (foundPerson.Id != pperson.Id)
+                            {
+                                throw new Exception("Person not found!");
+                            }
+                            break;
+                    }
+                }
+                
+                for (int i = 0; i < people.Count; i++)
+                {
+                    heapFile.Delete(adresses[i], people[i]);
+                    Console.WriteLine($"Deleting {i}");
+                }
+
+                Console.WriteLine(heapFile.ToString());
+                Console.WriteLine(heapFile.SequentialOutput());
+                heapFile.Close();
+            }
+        }
+        
         static void TestHashFile()
         {
             for (int r = 0; r < NUMBER_OF_REPLICATIONS; r++)
