@@ -31,7 +31,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     #region Constructors
     public ExtendibleHashFile(string initFilePath, int blockFactor)
     {
-        Addresses = [];
+	    if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
+
+		Addresses = [];
         Addresses.Add(new ExtendibleHashFileBlock<T>());
         Addresses.Add(new ExtendibleHashFileBlock<T>());
         BlockFactor = blockFactor;

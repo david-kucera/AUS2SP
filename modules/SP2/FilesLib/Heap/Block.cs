@@ -101,17 +101,17 @@ namespace FilesLib.Heap
 			else throw new Exception("Block is full");
         }
 
-		public void RemoveRecord(int index)
+		public void UpdateRecord(T newData)
 		{
-			if (index < 0) throw new Exception("Invalid index pointer.");
-			if (index >= ValidCount) throw new Exception("Index out of range.");
-
-			for (int i = index; i < ValidCount - 1; i++)
+			for (int i = 0; i < ValidCount; i++)
 			{
-				Records[i] = Records[i + 1];
+				if (Records[i].Equals(newData))
+				{
+					Records[i] = newData;
+					return;
+				}
 			}
-            ValidCount--;
-        }
+		}
 
 		public bool RemoveRecord(T record)
 		{
@@ -227,5 +227,19 @@ namespace FilesLib.Heap
 			
 		}
 		#endregion // Public functions
+
+		#region Private functions
+		private void RemoveRecord(int index)
+		{
+			if (index < 0) throw new Exception("Invalid index pointer.");
+			if (index >= ValidCount) throw new Exception("Index out of range.");
+
+			for (int i = index; i < ValidCount - 1; i++)
+			{
+				Records[i] = Records[i + 1];
+			}
+			ValidCount--;
+		}
+		#endregion // Private functions
 	}
 }

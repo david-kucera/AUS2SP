@@ -1,4 +1,5 @@
 ﻿using FilesLib.Data;
+using FilesLib.Generator;
 using FilesLib.Hash;
 using FilesLib.Heap;
 
@@ -10,7 +11,7 @@ namespace CarLib
 	public class CarSys : ICar
 	{
 		#region Constants
-		private const int BLOCK_SIZE = 1024;
+		private const int BLOCK_SIZE = 4096;
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
         private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
         private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";
@@ -26,9 +27,14 @@ namespace CarLib
         #region Constructor
         public CarSys()
 		{
-            _heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
-            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockCount);
-            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_ECV, _heapFile.BlockCount);
+			if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
+			if (File.Exists(INIT_FILE_HEAP)) File.Delete(INIT_FILE_HEAP);
+			if (File.Exists(INIT_FILE_ID)) File.Delete(INIT_FILE_ID);
+			if (File.Exists(INIT_FILE_ECV)) File.Delete(INIT_FILE_ECV);
+
+			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
+            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockFactor);
+            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_ECV, _heapFile.BlockFactor);
         }
 		#endregion // Constructor
 
@@ -40,6 +46,8 @@ namespace CarLib
 				Id = id
 			};
 			var obj = _hashFileId.Find(dummy);
+			if (obj == null!) return null!;
+
 			var heapFileAddress = obj.Address;
             Person personData = new()
             {
@@ -55,18 +63,14 @@ namespace CarLib
 				Ecv = ecv
 			};
 			var obj = _hashFileEcv.Find(dummy);
+			if (obj == null!) return null!;
+
 			var heapFileAddress = obj.Address;
             Person personData = new()
 			{
                 Ecv = ecv
             };
             return _heapFile.Find(heapFileAddress, personData);
-		}
-
-		public List<Person> GetAllPeople()
-		{
-			// TODO
-			throw new NotImplementedException();
 		}
 
 		public void Add(Person person)
@@ -92,6 +96,25 @@ namespace CarLib
 			throw new NotImplementedException();
 		}
 
+		public void Update(Person updatedPerson)
+		{
+			var address = _hashFileId.Find(new VisitId { Id = updatedPerson.Id }).Address;
+			try
+			{
+				_heapFile.Update(address, updatedPerson);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Chyba pri upravovaní osoby: " + ex.Message);
+			}
+		}
+
+		public void UpdateKeyChanged(Person editedPerson, int oldId, string oldEcv)
+		{
+			// TODO - najskor zmazat z indexov, heap file a potom vlozit s novymi hodnotami
+			throw new NotImplementedException();
+		}
+
 		public void RemoveVisit(Person person, Visit visit)
 		{
 			// TODO
@@ -106,14 +129,12 @@ namespace CarLib
 
         public void GenerujData(int count)
 		{
-			// TODO
-			throw new NotImplementedException();
-		}
-
-		public string ZobrazTotalInfo()
-		{
-			// TODO basic info o strukture 
-			throw new NotImplementedException();
+			var generator = new DataGenerator(count % 100);
+			for (int i = 0; i < count; i++)
+			{
+				var person = generator.GeneratePerson();
+				Add(person);
+			}
 		}
 
 		public void Close()
@@ -125,18 +146,36 @@ namespace CarLib
 
         public string ZobrazHeapFileInfo()
         {
-            throw new NotImplementedException();
-        }
+            return _heapFile.SequentialOutput();
+		}
 
         public string ZobrazHashFileIdInfo()
         {
-            throw new NotImplementedException();
+	        return _hashFileId.SequentialOutput();
         }
 
         public string ZobrazHashFileEcvInfo()
         {
-            throw new NotImplementedException();
+            return _hashFileEcv.SequentialOutput();
+		}
+
+        public void CheckId(int id)
+        {
+	        var person = Find(id);
+	        if (person != null)
+	        {
+		        throw new Exception("Osoba s ID " + id + " bola nájdená!");
+	        }
         }
-        #endregion // Public functions
-    }
+
+        public void CheckEcv(string ecv)
+        {
+	        var person = Find(ecv);
+	        if (person != null)
+	        {
+		        throw new Exception("Osoba s ECV " + ecv + " bola nájdená!");
+	        }
+        }
+		#endregion // Public functions
+	}
 }

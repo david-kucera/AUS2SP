@@ -108,19 +108,13 @@ namespace FilesLib.Heap
 	        return GetBlock(address).GetRecord(data);
         }
 
-        public void Update(int address, List<T> newData)
+        public void Update(int address, T newData)
         {
 	        CheckAddress(address);
 	        
 	        var block = GetBlock(address);
-	        var blockRecordsCount = block.ValidCount;
-	        RecordsCount -= blockRecordsCount;
-	        block.ClearRecords();
-	        foreach (var data in newData)
-	        {
-		        block.AddRecord(data);
-	        }
-	        WriteBlock(block, address);
+	        block.UpdateRecord(newData);
+			WriteBlock(block, address);
         }
 
         /// <summary>

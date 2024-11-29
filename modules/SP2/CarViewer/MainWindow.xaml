@@ -16,8 +16,7 @@
         <!--menu-->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Save work..." Click="SaveWork_OnClick"></MenuItem>
-                <Separator></Separator>
+                <MenuItem Header="Exit without saving" Click="ExitWithoutSaving_OnClick"></MenuItem>
                 <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
@@ -40,7 +39,7 @@
         <GroupBox Grid.Row="1" Margin="5" Header="Input">
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                 <!--Id-->
-                <Label Margin="10,0,0,0">Id zákazníka:</Label>
+                <Label Margin="10,0,0,0">ID zákazníka:</Label>
                 <TextBox x:Name="IdCar" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--Ecv-->
                 <Label Margin="10,0,0,0">ECV:</Label>
@@ -53,7 +52,6 @@
                 <Button Name="DeleteButton" Margin="30,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Vyraď" IsEnabled="False" Click="DeleteButton_OnClick"></Button>
                 <Button Name="EditButton" Margin="5,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Uprav" IsEnabled="False" Click="EditButton_OnClick"></Button>
                 <Button Name="AddVisitButton" Margin="5,0,0,0" Padding="5" MaxWidth="100" MinWidth="70" Content="Pridaj návštevu..." IsEnabled="False" Click="AddVisitButton_OnClick"></Button>
-                <Button Name="AddNoteButton" Margin="5,0,0,0" Padding="5" MaxWidth="120" MinWidth="100" Content="Pridaj poznámku..." IsEnabled="False" Click="AddNoteButton_OnClick"></Button>
             </StackPanel>
         </GroupBox>
 
@@ -81,14 +79,14 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Label Grid.Row="0" Grid.Column="0" Content="Id:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdTextBox" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                        <Label Grid.Row="1" Grid.Column="0" Content="Ecv:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="EcvTextBox" MinWidth="100" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="0" Grid.Column="0" Content="ID:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdTextBox" MinWidth="200" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="1" Grid.Column="0" Content="ECV:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="EcvTextBox" MinWidth="200" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                         <Label Grid.Row="2" Grid.Column="0" Content="Meno:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="NameTextBox" MinWidth="100" Margin="0,0,0,0" Text="David" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="NameTextBox" MinWidth="200" Margin="0,0,0,0" Text="David" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                         <Label Grid.Row="3" Grid.Column="0" Content="Priezvisko:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="SurnameTextBox" MinWidth="100" Margin="0,0,0,0" Text="Kučera" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="SurnameTextBox" MinWidth="200" Margin="0,0,0,0" Text="Kučera" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                     </Grid>
                 </GroupBox>
                 <!--visits-->
