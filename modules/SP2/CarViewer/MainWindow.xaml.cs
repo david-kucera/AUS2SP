@@ -9,64 +9,78 @@ namespace CarViewer
 	public partial class MainWindow : Window
 	{
 		#region Class members
-		private CarSys _carSys;
-		private List<Person> _currentlyDisplayedObjects = [];
+		private readonly CarSys _carSys = new();
+		private Person _currentlyDisplayedObject = null!;
 		#endregion // Class members
 
 		#region Constructor
-
 		public MainWindow()
 		{
 			InitializeComponent();
-			_carSys = new CarSys();
 		}
-
 		#endregion // Constructor
 
 		#region Button handlers
 		private void FindById_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
-		}
+			int searchId = int.Parse(IdCar.Text);
+            var foundPerson = _carSys.Find(searchId);
+			if (foundPerson != null) 
+			{
+                _currentlyDisplayedObject = foundPerson;
+                RefreshData();
+            }
+            else MessageBox.Show("Osoba s ID " + searchId + " nebola nájdená!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
 
 		private void FindByEcv_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
-		}
+			string searchEcv = EcvCar.Text;
+			var foundPerson = _carSys.Find(searchEcv);
+            if (foundPerson != null)
+			{
+				_currentlyDisplayedObject = foundPerson;
+                RefreshData();
+            }
+            else MessageBox.Show("Osoba s ECV " + searchEcv + " nebola nájdená!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
 
 		private void DeleteButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+            // TODO - vymazanie osoby z databazy
+            throw new NotImplementedException();
 		}
 
 		private void EditButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+            // TODO - editacia osoby v databaze
+			// user moze upravovat v main okne data, ak stlaci tlacidlo - upravi sa s danymi hodnotami
+            throw new NotImplementedException();
 		}
 
-		private void OpenData_OnClick(object sender, MouseButtonEventArgs e)
+		private void AddVisitButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			var selectedObject = (Person)ObjectListBox.SelectedItem;
-			var person = selectedObject as Person;
-			PersonWindow detailWindow = new(person);
-			detailWindow.ShowDialog();
+            // TODO - pridanie navstevy osoby
+            // otvorit nove okno , kde sa vyplnia data o navsteve
+            throw new NotImplementedException();
 		}
 
-		private void ShowAllData_OnClick(object sender, RoutedEventArgs e)
+		private void AddNoteButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			_currentlyDisplayedObjects.Clear();
-			_currentlyDisplayedObjects.AddRange(_carSys.GetAllPeople());
-			RefreshData();
+            // TODO - pridanie poznamky k navsteve
+            // musi byt kliknute na navstevu v listboxe - otvori sa nove okno , kde sa vyplnia data o poznamke, tie sa pridaju do listboxu
+            throw new NotImplementedException();
 		}
 
-		private void AddPerson_OnClick(object sender, RoutedEventArgs e)
+        private void AddPerson_OnClick(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+            // TODO - pridaj nove data o osobe/aute
+            throw new NotImplementedException();
 		}
 
 		private void ClearDataDisplay_OnClick(object sender, RoutedEventArgs e)
 		{
-			_currentlyDisplayedObjects.Clear();
+			_currentlyDisplayedObject = null!;
 			RefreshData();
 		}
 
@@ -77,43 +91,46 @@ namespace CarViewer
 			{
 				int count = Int32.Parse(inputWindow.TextBoxCount.Text);
 				_carSys.GenerujData(count);
-				_currentlyDisplayedObjects.Clear();
-				foreach (var objekt in _carSys.GetAllPeople())
-				{
-					_currentlyDisplayedObjects.Add(objekt);
-				}
+				_currentlyDisplayedObject = null!;
 				RefreshData();
 				MessageBox.Show("Dáta boli úspešne vygenerované!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
+			// TODO skontrolovat
 		}
 
-		private void ShowDataDetails_OnClick(object sender, RoutedEventArgs e)
+		private void ShowHeapFileDetails_OnClick(object sender, RoutedEventArgs e)
 		{
-			var msg = _carSys.ZobrazTotalInfo();
+			var msg = _carSys.ZobrazHeapFileInfo();
 			MessageBox.Show(msg, "Info o dátach", MessageBoxButton.OK);
 		}
 
-		private void About_OnClick(object sender, RoutedEventArgs e)
+        private void ShowHashFileIdDetails_OnClick(object sender, RoutedEventArgs e)
+        {
+            var msg = _carSys.ZobrazHashFileIdInfo();
+            MessageBox.Show(msg, "Info o hash file ID", MessageBoxButton.OK);
+        }
+
+        private void ShowHashFileEcvDetails_OnClick(object sender, RoutedEventArgs e)
+        {
+            var msg = _carSys.ZobrazHashFileEcvInfo();
+            MessageBox.Show(msg, "Info o hash file ECV", MessageBoxButton.OK);
+        }
+
+        private void About_OnClick(object sender, RoutedEventArgs e)
 		{
 			MessageBox.Show("Semestrálna práca 2 z predmetu\nALGORITMY A ÚDAJOVÉ ŠTRUKTÚRY 2\n\nAutor: Bc. David Kučera\nFRI UNIZA, 2024", "O aplikácii", MessageBoxButton.OK);
 		}
 
 		private void Exit_OnClick(object sender, RoutedEventArgs e)
 		{
-			Environment.Exit(0);
+			SaveWork_OnClick(sender, e);
+            Environment.Exit(0);
 		}
 
-		private void OpenFile_OnClick(object sender, RoutedEventArgs e)
+		private void SaveWork_OnClick(object sender, RoutedEventArgs e)
 		{
-			// TODO - toto asi nebude treba ???
-			throw new NotImplementedException();
-		}
-
-		private void SaveNewFile_OnClick(object sender, RoutedEventArgs e)
-		{
-			// TODO - toto asi nebude treba ???
-			throw new NotImplementedException();
-		}
+			_carSys.Close();
+        }
 		#endregion // Button handlers
 
 		#region Event handlers
@@ -130,17 +147,34 @@ namespace CarViewer
 				EditButton.IsEnabled = false;
 			}
 		}
-		#endregion // Event handlers
 
-		#region Private functions
-		private void RefreshData()
+		private void VisitsListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			ObjectListBox.Items.Clear();
-			foreach (var obj in _currentlyDisplayedObjects)
+            // TODO - naplnit notes textbox poznamkami k vybranej navsteve
+        }
+        #endregion // Event handlers
+
+        #region Private functions
+        private void RefreshData()
+		{
+			if (_currentlyDisplayedObject == null)
 			{
-				ObjectListBox.Items.Add(obj);
-			}
-		}
-		#endregion // Private functions
-	}
+                IdTextBox.Text = string.Empty;
+				EcvTextBox.Text = string.Empty;
+				NameTextBox.Text = string.Empty;
+                SurnameTextBox.Text = string.Empty;
+                VisitsListBox.Items.Clear();
+                NotesTextBox.Text = string.Empty;
+            }
+			else
+			{
+                IdTextBox.Text = _currentlyDisplayedObject.Id.ToString();
+				EcvTextBox.Text = _currentlyDisplayedObject.Ecv;
+                NameTextBox.Text = _currentlyDisplayedObject.Name;
+                SurnameTextBox.Text = _currentlyDisplayedObject.Surname;
+                VisitsListBox.Items = _currentlyDisplayedObject.Visits;
+            }
+        }
+        #endregion // Private functions
+    }
 }

@@ -122,6 +122,21 @@ namespace CarLib
             _hashFileId.Close();
             _hashFileEcv.Close();
         }
+
+        public string ZobrazHeapFileInfo()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ZobrazHashFileIdInfo()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ZobrazHashFileEcvInfo()
+        {
+            throw new NotImplementedException();
+        }
         #endregion // Public functions
     }
 }

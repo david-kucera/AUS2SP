@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarViewer"
         mc:Ignorable="d"
-        Title="CarViewer" Height="920" Width="1280">
+        Title="CarViewer" Height="680" Width="1080">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -16,15 +16,11 @@
         <!--menu-->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open..." Click="OpenFile_OnClick"></MenuItem>
-                <Separator></Separator>
-                <MenuItem Header="_Save..." Click="SaveNewFile_OnClick"></MenuItem>
+                <MenuItem Header="_Save work..." Click="SaveWork_OnClick"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="Zobraz všetky dáta" Click="ShowAllData_OnClick"></MenuItem>
-                <Separator></Separator>
                 <MenuItem Header="Pridaj záznam o vozidle..." Click="AddPerson_OnClick"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="Vyčisti obrazovku dát" Click="ClearDataDisplay_OnClick"></MenuItem>
@@ -32,21 +28,23 @@
                 <MenuItem Header="Generuj dáta..." Click="GenerateData_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="Show data details..." Click="ShowDataDetails_OnClick"></MenuItem>
+                <MenuItem Header="Show heap file details..." Click="ShowHeapFileDetails_OnClick"></MenuItem>
+                <MenuItem Header="Show ID hash file details..." Click="ShowHashFileIdDetails_OnClick"></MenuItem>
+                <MenuItem Header="Show ECV hash file details..." Click="ShowHashFileEcvDetails_OnClick"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="About" Click="About_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
 
-        <!--gps a buttony-->
+        <!--input a buttony-->
         <GroupBox Grid.Row="1" Margin="5" Header="Input">
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                 <!--Id-->
                 <Label Margin="10,0,0,0">Id zákazníka:</Label>
-                <TextBox Name="IdCar" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox x:Name="IdCar" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--Ecv-->
                 <Label Margin="10,0,0,0">ECV:</Label>
-                <TextBox Name="EcvCar" MinWidth="100" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                <TextBox x:Name="EcvCar" MinWidth="100" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                 <!--buttony-->
                 <!--hladanie-->
                 <Button Name="FindById" Margin="30,0,0,0" Padding="5" MaxWidth="150" MinWidth="50" Content="Nájdi podľa ID" Click="FindById_OnClick"></Button>
@@ -54,29 +52,69 @@
                 <!--modifikacia-->
                 <Button Name="DeleteButton" Margin="30,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Vyraď" IsEnabled="False" Click="DeleteButton_OnClick"></Button>
                 <Button Name="EditButton" Margin="5,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Uprav" IsEnabled="False" Click="EditButton_OnClick"></Button>
+                <Button Name="AddVisitButton" Margin="5,0,0,0" Padding="5" MaxWidth="100" MinWidth="70" Content="Pridaj návštevu..." IsEnabled="False" Click="AddVisitButton_OnClick"></Button>
+                <Button Name="AddNoteButton" Margin="5,0,0,0" Padding="5" MaxWidth="120" MinWidth="100" Content="Pridaj poznámku..." IsEnabled="False" Click="AddNoteButton_OnClick"></Button>
             </StackPanel>
         </GroupBox>
 
+        <!--data-->
         <GroupBox Grid.Row="2" Margin="5" Header="Data">
-            <ListBox Name="ObjectListBox" Margin="5" SelectionChanged="SelectionChanged" MouseDoubleClick="OpenData_OnClick">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Label>
-                                <Label.Content>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label Content="{Binding Id}" Margin="0,0,0,0"/>
-                                        <Label Content="{Binding Ecv}" Margin="0,0,0,0"/>
-                                    </StackPanel>
-                                </Label.Content>
-                            </Label>
-                            <Label Content="{Binding Name}" FontSize="12" VerticalAlignment="Center"/>
-                            <Label Content="{Binding Surname}" FontSize="12" VerticalAlignment="Center"/>
-                            <Label Content="{Binding VisitCount}" FontSize="12" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <!--info-->
+                <GroupBox Grid.Column="0" Grid.Row="0" Header="Info" Margin="5" Padding="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Id:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdTextBox" MinWidth="100" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Ecv:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="EcvTextBox" MinWidth="100" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Meno:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="NameTextBox" MinWidth="100" Margin="0,0,0,0" Text="David" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Priezvisko:" Margin="0,0,0,0"></Label>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="SurnameTextBox" MinWidth="100" Margin="0,0,0,0" Text="Kučera" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                    </Grid>
+                </GroupBox>
+                <!--visits-->
+                <GroupBox Grid.Column="1" Grid.Row="0" Header="Visits" Margin="5" Padding="5">
+                    <ListBox Name="VisitsListBox" Margin="5" SelectionChanged="VisitsListBoxSelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>
+                                        <Label.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label Content="{Binding Date}" Margin="0,0,0,0"/>
+                                                <Label Content="{Binding Price}" Margin="0,0,0,0"/>
+                                            </StackPanel>
+                                        </Label.Content>
+                                    </Label>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </GroupBox>
+                <!--notes-->
+                <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Notes" Margin="5" Padding="5">
+                    <TextBox Name="NotesTextBox" Margin="5" Padding="5" TextWrapping="WrapWithOverflow" FontSize="16" TextAlignment="Left"></TextBox>
+                </GroupBox>
+            </Grid>
         </GroupBox>
     </Grid>
 </Window>
