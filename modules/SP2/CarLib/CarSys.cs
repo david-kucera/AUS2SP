@@ -1,5 +1,7 @@
 ﻿using FilesLib.Data;
+using FilesLib.Generator;
 using FilesLib.Hash;
+using FilesLib.Heap;
 
 namespace CarLib
 {
@@ -9,55 +11,107 @@ namespace CarLib
 	public class CarSys : ICar
 	{
 		#region Constants
-		private const int BLOCK_SIZE = 1024;
-		private const string INIT_FILE = "../../userdata/person_init.aus";
-		private const string DATA_FILE = "../../userdata/person.aus";
+		private const int BLOCK_SIZE = 4096;
+		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
+        private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
+        private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";
+        private const string DATA_FILE = "../../userdata/person.aus";
 		#endregion // Constants
 
 		#region Class members
-		private readonly ExtendibleHashFile<Person> _hashFile;
-		#endregion // Class members
+		private HeapFile<Person> _heapFile;
+        private readonly ExtendibleHashFile<VisitId> _hashFileId;
+		private readonly ExtendibleHashFile<VisitEcv> _hashFileEcv;
+        #endregion // Class members
 
-		#region Constructor
-		public CarSys()
+        #region Constructor
+        public CarSys()
 		{
-			_hashFile = new ExtendibleHashFile<Person>(INIT_FILE, DATA_FILE, BLOCK_SIZE);
-		}
+			if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
+			if (File.Exists(INIT_FILE_HEAP)) File.Delete(INIT_FILE_HEAP);
+			if (File.Exists(INIT_FILE_ID)) File.Delete(INIT_FILE_ID);
+			if (File.Exists(INIT_FILE_ECV)) File.Delete(INIT_FILE_ECV);
+
+			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
+            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockFactor);
+            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_ECV, _heapFile.BlockFactor);
+        }
 		#endregion // Constructor
 
 		#region Public functions
 		public Person Find(int id)
 		{
-			Person dummy = new()
+			VisitId dummy = new()
 			{
 				Id = id
 			};
-			return _hashFile.Find(dummy);
+			var obj = _hashFileId.Find(dummy);
+			if (obj == null!) return null!;
+
+			var heapFileAddress = obj.Address;
+            Person personData = new()
+            {
+                Id = id
+            };
+            return _heapFile.Find(heapFileAddress, personData);
 		}
 
 		public Person Find(string ecv)
 		{
-			Person dummy = new()
+			VisitEcv dummy = new()
 			{
 				Ecv = ecv
 			};
-			return _hashFile.Find(dummy);
+			var obj = _hashFileEcv.Find(dummy);
+			if (obj == null!) return null!;
+
+			var heapFileAddress = obj.Address;
+            Person personData = new()
+			{
+                Ecv = ecv
+            };
+            return _heapFile.Find(heapFileAddress, personData);
 		}
 
-		public List<Person> GetAllPeople()
+		public void Add(Person person)
+		{
+			var address = _heapFile.Insert(person);
+			VisitId visitId = new()
+			{
+				Address = address,
+				Id = person.Id
+			};
+			VisitEcv visitEcv = new()
+			{
+				Address = address,
+				Ecv = person.Ecv
+			};
+            _hashFileId.Insert(visitId);
+			_hashFileEcv.Insert(visitEcv);
+        }
+
+		public void AddVisit(Person person, Visit visit)
 		{
 			// TODO
 			throw new NotImplementedException();
 		}
 
-		public void Add(Person person)
+		public void Update(Person updatedPerson)
 		{
-			_hashFile.Insert(person);
+			var address = _hashFileId.Find(new VisitId { Id = updatedPerson.Id }).Address;
+			try
+			{
+				_heapFile.Update(address, updatedPerson);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Chyba pri upravovaní osoby: " + ex.Message);
+			}
 		}
 
-		public void AddVisit(Person person, Visit visit)
+		public void UpdateKeyChanged(Person editedPerson, int oldId, string oldEcv)
 		{
-			// TODO
+			// TODO - najskor zmazat z indexov, heap file a potom vlozit s novymi hodnotami
 			throw new NotImplementedException();
 		}
 
@@ -69,20 +123,59 @@ namespace CarLib
 
 		public void Remove(Person person)
 		{
-			_hashFile.Delete(person);
-		}
-		
-		public void GenerujData(int count)
+            // TODO
+            //_hashFileId.Delete(person);
+        }
+
+        public void GenerujData(int count)
 		{
-			// TODO
-			throw new NotImplementedException();
+			var generator = new DataGenerator(count % 100);
+			for (int i = 0; i < count; i++)
+			{
+				var person = generator.GeneratePerson();
+				Add(person);
+			}
 		}
 
-		public string ZobrazTotalInfo()
-		{
-			// TODO basic info o strukture 
-			throw new NotImplementedException();
+		public void Close()
+        {
+            _heapFile.Close();
+            _hashFileId.Close();
+            _hashFileEcv.Close();
+        }
+
+        public string ZobrazHeapFileInfo()
+        {
+            return _heapFile.SequentialOutput();
 		}
+
+        public string ZobrazHashFileIdInfo()
+        {
+	        return _hashFileId.SequentialOutput();
+        }
+
+        public string ZobrazHashFileEcvInfo()
+        {
+            return _hashFileEcv.SequentialOutput();
+		}
+
+        public void CheckId(int id)
+        {
+	        var person = Find(id);
+	        if (person != null)
+	        {
+		        throw new Exception("Osoba s ID " + id + " bola nájdená!");
+	        }
+        }
+
+        public void CheckEcv(string ecv)
+        {
+	        var person = Find(ecv);
+	        if (person != null)
+	        {
+		        throw new Exception("Osoba s ECV " + ecv + " bola nájdená!");
+	        }
+        }
 		#endregion // Public functions
 	}
 }

@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Text;
+﻿using System.Text;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Person : IHashable<Person>
+	/// <summary>
+	/// Class representing Car/Person data of system.
+	/// </summary>
+	public class Person : IData<Person>
 	{
 		#region Constants
 		private const int MAX_VISITS = 5;
@@ -17,7 +19,7 @@ namespace FilesLib.Data
 		private string _name = string.Empty;
 		private string _surname = string.Empty;
 		private string _ecv = string.Empty;
-		private List<Visit> _zaznamy = new(MAX_VISITS);
+		private List<Visit> _visits = new(MAX_VISITS);
 		#endregion // Class members
 
 		#region Properties
@@ -74,23 +76,19 @@ namespace FilesLib.Data
 		/// </summary>
 		public int Id { get; set; } = -1;
 		/// <summary>
-		/// Number of car repair visits.
-		/// </summary>
-		public int VisitCount => Zaznamy.Count;
-		/// <summary>
 		/// Car repair visits.
 		/// </summary>
 		/// <exception cref="ArgumentException">If list is too long.</exception>
-		public List<Visit> Zaznamy
+		public List<Visit> Visits
 		{
-			get => _zaznamy;
+			get => _visits;
 			set
 			{
 				if (value.Count > MAX_VISITS)
 				{
 					throw new ArgumentException($"Number of visits must be less than {MAX_VISITS}.");
 				}
-				_zaznamy = value;
+				_visits = value;
 			}
 		}
 		#endregion // Properties
@@ -100,59 +98,70 @@ namespace FilesLib.Data
 		{
 			
 		}
-
-		public Person(int id, string ecv, string name, string surname)
+		
+		public Person(Person copy)
 		{
-			Name = name;
-			Surname = surname;
-			Ecv = ecv;
-			Id = id;
-			Zaznamy = new List<Visit>(MAX_VISITS);
-		}
-
-		public Person(Person p)
-		{
-			Name = p.Name;
-			Surname = p.Surname;
-			Ecv = p.Ecv;
-			Id = p.Id;
-			Zaznamy = p.Zaznamy;
+			Name = copy.Name;
+			Surname = copy.Surname;
+			Ecv = copy.Ecv;
+			Id = copy.Id;
+			Visits = copy.Visits;
 		}
 		#endregion // Constructors
 
 		#region Public functions
-		public BitArray GetHash()
-		{
-			throw new NotImplementedException();
-		}
-
+		/// <summary>
+		/// Returns string representation of data in this class.
+		/// </summary>
+		/// <returns>string</returns>
 		public override string ToString()
 		{
 			var zaznamy = string.Empty;
 			int i = 1;
-			foreach (var visit in Zaznamy)
+			foreach (var visit in Visits)
 			{
 				zaznamy += $"{i}. {visit.ToString()}\n";
 				i++;
 			}
-			return $"[{Id}, {Ecv}] {Name} {Surname} ({Zaznamy.Count}):\n{zaznamy}";
+			return $"[{Id}, {Ecv}] {Name} {Surname} ({Visits.Count}):\n{zaznamy}";
 		}
-
-		public void Add(Visit visit)
+		
+		/// <summary>
+		/// Adds a visit to a list of visits, if possible.
+		/// </summary>
+		/// <param name="visit">New visit.</param>
+		/// <exception cref="ArgumentException">If limit is reached.</exception>
+		public void AddVisit(Visit visit)
 		{
-			Zaznamy.Add(visit);
+			if (Visits.Count == MAX_VISITS) throw new ArgumentException("Zaznamy is full!");
+			else Visits.Add(visit);
 		}
 
-		public Visit Get(int i)
+		/// <summary>
+		/// Gets visit at given index from list of visits.
+		/// </summary>
+		/// <param name="i">Index from visits list.</param>
+		/// <returns>Visit at given index.</returns>
+		public Visit GetVisit(int i)
 		{
-			return Zaznamy.ElementAt(i);
+			return Visits.ElementAt(i);
 		}
 
-		public void Remove(Visit visit)
+		/// <summary>
+		/// Removes a visit from list of visits.
+		/// </summary>
+		/// <param name="visit">Visit to remove.</param>
+		/// <exception cref="ArgumentException">If visit is not in the visits list.</exception>
+		public void RemoveVisit(Visit visit)
 		{
-			Zaznamy.Remove(visit);
+			if (Visits.Contains(visit)) Visits.Remove(visit);
+			else throw new ArgumentException($"Visit {visit.ToString()} is not in the list!");
 		}
 
+		/// <summary>
+		/// Serializes the class to byte array.
+		/// </summary>
+		/// <returns>Byte array of the class.</returns>
         public byte[] ToByteArray()
         {
 			byte[] bytes = new byte[GetSize()];
@@ -205,7 +214,7 @@ namespace FilesLib.Data
             offset += sizeof(char) * MAX_ECV_LENGTH;
 
 			// Zaznamy count
-			int zaznamyCount = Zaznamy.Count;
+			int zaznamyCount = Visits.Count;
 			BitConverter.GetBytes(zaznamyCount).CopyTo(bytes, offset);
 			offset += sizeof(int);
 
@@ -213,12 +222,17 @@ namespace FilesLib.Data
 			int zaznamSize = new Visit().GetSize();
 			for (int i = 0; i < zaznamyCount; i++)
 			{
-				Zaznamy[i].ToByteArray().CopyTo(bytes, offset);
+				Visits[i].ToByteArray().CopyTo(bytes, offset);
 				offset += zaznamSize;
 			}
             return bytes;
         }
 
+		/// <summary>
+		/// Returns the class object from given byte array.
+		/// </summary>
+		/// <param name="byteArray">Byte array of class data.</param>
+		/// <returns>New class object.</returns>
         public Person FromByteArray(byte[] byteArray)
         {
             int offset = 0;
@@ -256,18 +270,22 @@ namespace FilesLib.Data
 			offset += sizeof(int);
 
 			// Zaznamy
-			Zaznamy = new List<Visit>(MAX_VISITS);
+			Visits = new List<Visit>(MAX_VISITS);
 			int zaznamSize = new Visit().GetSize();
 			for (int i = 0; i < zaznamyCount; i++)
 			{
 				var bytes = byteArray.Skip(offset).Take(zaznamSize).ToArray();
-				Zaznamy.Add(new Visit().FromByteArray(bytes));
+				Visits.Add(new Visit().FromByteArray(bytes));
 				offset += zaznamSize;
 			}
 			
 			return this;
 		}
 
+		/// <summary>
+		/// Returns the size of this class in bytes.
+		/// </summary>
+		/// <returns>Integer</returns>
 		public int GetSize()
         {
             int ret = 0;
@@ -284,29 +302,23 @@ namespace FilesLib.Data
             return ret;
         }
 
+		/// <summary>
+		/// Creates a new dummy class.
+		/// </summary>
+		/// <returns>Dummy class.</returns>
         public Person CreateClass()
         {
             return new Person();
         }
 
+		/// <summary>
+		/// Checks wether this and other data match Id or Ecv.
+		/// </summary>
+		/// <param name="data">Other class data.</param>
+		/// <returns>True if equal, false other.</returns>
         public bool Equals(Person data)
         {
-	        if (Zaznamy.Count != data.Zaznamy.Count) return false;
-	        
-	        bool equal = true;
-	        for (int i = 0; i < Zaznamy.Count; i++)
-	        {
-		        for (int j = 0; j < Zaznamy[i].Notes.Count; j++)
-		        {
-			        if (!Zaznamy[i].Notes[j].Equals(data.Zaznamy[i].Notes[j]))
-			        {
-				        equal = false;
-				        break;
-			        }
-			        
-		        }
-	        }
-	        return Id == data.Id && Name == data.Name && Surname == data.Surname && Ecv == data.Ecv && equal;
+	        return Id == data.Id || Ecv == data.Ecv;
         }
         #endregion // Public functions
     }

@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Text;
+﻿using System.Text;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
 {
-	public class Visit : IHashable<Visit>
+	public class Visit : IData<Visit>
 	{
 		#region Constants
 		private const int MAX_NOTES_COUNT = 10;
@@ -17,8 +16,18 @@ namespace FilesLib.Data
 		#endregion // Class members
 
 		#region Properties
+		/// <summary>
+		/// Date of visit.
+		/// </summary>
 		public DateOnly Date { get; set; } = DateOnly.MinValue;
+		/// <summary>
+		/// Price of visit.
+		/// </summary>
 		public double Price { get; set; } = double.MinValue;
+		/// <summary>
+		/// Notes of visit.
+		/// </summary>
+		/// <exception cref="ArgumentException">If count of notes is more than MAX_NOTES_COUNT</exception>
 		public List<string> Notes
 		{
 			get => _notes;
@@ -55,12 +64,10 @@ namespace FilesLib.Data
 		#endregion // Constructors
 
 		#region Public functions
-
-		public BitArray GetHash()
-		{
-			throw new NotImplementedException();
-		}
-
+		/// <summary>
+		/// Returns string representation of class data.
+		/// </summary>
+		/// <returns>String</returns>
 		public override string ToString()
 		{
 			var notes = "\n";
@@ -71,6 +78,10 @@ namespace FilesLib.Data
 			return $"Date: {Date}, Price: {Price}, Notes({Notes.Count}): {notes}";
 		}
 
+		/// <summary>
+		/// Returns the size of class data in bytes.
+		/// </summary>
+		/// <returns>Integer</returns>
 		public int GetSize()
         {
             int ret = 0;
@@ -82,16 +93,24 @@ namespace FilesLib.Data
             return ret;
         }
 
+		/// <summary>
+		/// Creates a new dummy class.
+		/// </summary>
+		/// <returns>Dummy class.</returns>
         public Visit CreateClass()
         {
 			return new Visit();
         }
-
+		
         public bool Equals(Visit data)
         {
-            return Date == data.Date && Math.Abs(Price - data.Price) < TOLERANCE && Notes == data.Notes;
+            return Date == data.Date && Math.Abs(Price - data.Price) < TOLERANCE && Notes == data.Notes; // This method is not necessary...
         }
 
+        /// <summary>
+        /// Serializes the class to byte array.
+        /// </summary>
+        /// <returns>Byte array of class data.</returns>
         public byte[] ToByteArray()
         {
 			byte[] bytes = new byte[GetSize()];
@@ -154,6 +173,11 @@ namespace FilesLib.Data
             return bytes;
         }
 
+        /// <summary>
+        /// Returns new class object from given byte array.
+        /// </summary>
+        /// <param name="byteArray">Byte array of data.</param>
+        /// <returns>New class object.</returns>
         public Visit FromByteArray(byte[] byteArray)
         {
             int offset = 0;

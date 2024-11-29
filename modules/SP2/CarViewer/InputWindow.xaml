@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarViewer"
         mc:Ignorable="d"
-        Title="Generovanie dát" Height="150" Width="400">
+        Title="Input Window" Height="150" Width="400">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -14,10 +14,10 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <GroupBox Header="Input dáta" Grid.Row="0">
+        <GroupBox Header="Input" Grid.Row="0">
             <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
-                <Label Name="LabelZadajNehn" Content="Zadaj počet dát na vygenerovanie: "></Label>
-                <TextBox Name="TextBoxCount"  Text="100" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
+                <Label Name="LabelInput" Content=""></Label>
+                <TextBox Name="TextBoxInput"  Text="" MinWidth="100" VerticalContentAlignment="Center"></TextBox>
             </StackPanel>
         </GroupBox>
 

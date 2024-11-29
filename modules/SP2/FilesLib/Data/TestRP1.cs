@@ -4,6 +4,9 @@ using FilesLib.Interfaces;
 
 namespace FilesLib.Data;
 
+/// <summary>
+/// Class for testing purposes...
+/// </summary>
 public class TestRP1 : IHashable<TestRP1>
 	{
 		#region Constants
