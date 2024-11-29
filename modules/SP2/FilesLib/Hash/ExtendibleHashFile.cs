@@ -9,34 +9,39 @@ namespace FilesLib.Hash;
 /// <typeparam name="T"></typeparam>
 public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
-    #region Properties
-    /// <summary>
-    /// Addresses/buckets list.
-    /// </summary>
-    public List<ExtendibleHashFileBlock<T>> Addresses { get; set; }
-    /// <summary>
-    /// Global depth of hash file.
-    /// </summary>
-    public int Depth { get; set; } = 1;
-    /// <summary>
-    /// Number of records stored in hash file.
-    /// </summary>
-    public int RecordsCount { get; set; } = 0;
-    /// <summary>
-    /// Block factor of heap file.
-    /// </summary>
-    public int BlockFactor { get; set; }
+	#region Constants
+    private int BLOCK_SIZE = 4096 * 4096;
+	#endregion // Constants
+
+	#region Class members
+	private int _blockFactor = 1;
+	private int _depth = 1;
+	private List<ExtendibleHashFileBlock<T>> _addresses = [];
+    private readonly string _initFilePath;
+	#endregion // Class members
+
+	#region Properties
+	/// <summary>
+	/// Number of records stored in hash file.
+	/// </summary>
+	public int RecordsCount { get; set; } = 0;
     #endregion // Properties
 
     #region Constructors
     public ExtendibleHashFile(string initFilePath, int blockFactor)
     {
 	    if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
+	    _initFilePath = initFilePath;
+		if (File.ReadAllBytes(initFilePath).Length > 0)
+		{
+			LoadFromInit();
+            return;
+		}
 
-		Addresses = [];
-        Addresses.Add(new ExtendibleHashFileBlock<T>());
-        Addresses.Add(new ExtendibleHashFileBlock<T>());
-        BlockFactor = blockFactor;
+		_addresses = [];
+        _addresses.Add(new ExtendibleHashFileBlock<T>());
+        _addresses.Add(new ExtendibleHashFileBlock<T>());
+        _blockFactor = blockFactor;
     }
     #endregion // Constructors
     
@@ -55,9 +60,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             int prefix = GetPrefix(hash);
             var block = GetBlock(data);
 
-            if (BlockFactor == block.Values.Count)
+            if (_blockFactor == block.Values.Count)
             {
-                if (Addresses[prefix].Depth == Depth)
+                if (_addresses[prefix].Depth == _depth)
                 {
                     IncreaseDepth();
                     SplitBlock(GetPrefix(hash));
@@ -69,7 +74,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             }
             else
             {
-                Addresses[prefix].Values.Add(data);
+                _addresses[prefix].Values.Add(data);
                 RecordsCount++;
                 notInserted = false;
             }
@@ -100,18 +105,27 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         var hash = data.GetHash();
         var prefix = GetPrefix(hash);
-        var block = Addresses[prefix];
+        var block = _addresses[prefix];
         var entry = block.GetValue(data);
  
         if (entry != null!)
         {
-            Addresses[prefix].Values.Remove(entry);
+            _addresses[prefix].Values.Remove(entry);
             RecordsCount--;
-            if (block.Values.Count < BlockFactor / 2 && block.Depth > 1)
+            if (block.Values.Count < _blockFactor / 2 && block.Depth > 1)
             {
                 MergeBlock(prefix);
             }
         }
+    }
+
+	/// <summary>
+	/// Vráti reťazec informácií o súbore.
+	/// </summary>
+	/// <returns>String</returns>
+	public override string ToString()
+    {
+	    return $"Depth: {_depth}, RecordsCount: {RecordsCount}, BlockFactor: {_blockFactor}";
     }
 
     /// <summary>
@@ -124,7 +138,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         ret += "Addresses:";
         ret += Environment.NewLine;
         int index = 0;
-        foreach (var address in Addresses)
+        foreach (var address in _addresses)
         {
             ret += index + ". address: ";
             ret += address.ToString();
@@ -139,35 +153,111 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// </summary>
     public void Close()
     {
-        // TODO save metadata do suboru
+        SaveToInit();
     }
 
-    public void Clear()
+    /// <summary>
+	/// Vyčistí súbor.
+	/// </summary>
+	public void Clear()
     {
-	    Addresses = [];
-	    Addresses.Add(new ExtendibleHashFileBlock<T>());
-	    Addresses.Add(new ExtendibleHashFileBlock<T>());
-	    Depth = 1;
+	    _addresses = [];
+	    _addresses.Add(new ExtendibleHashFileBlock<T>());
+	    _addresses.Add(new ExtendibleHashFileBlock<T>());
+	    _depth = 1;
 	    RecordsCount = 0;
     }
 	#endregion // Public methods
 
 	#region Private methods
+	private void LoadFromInit()
+	{
+		byte[] buffer = new byte[BLOCK_SIZE];
+
+		var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+		initFile.Seek(0, SeekOrigin.Begin);
+		initFile.Read(buffer, 0, BLOCK_SIZE);
+
+		FromByteArray(buffer);
+	}
+
+	private void SaveToInit()
+	{
+		byte[] buffer = ToByteArray();
+
+		var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+		initFile.Seek(0, SeekOrigin.Begin);
+		initFile.Write(buffer, 0, BLOCK_SIZE);
+		initFile.Flush();
+		initFile.Close();
+	}
+
+	private ExtendibleHashFile<T> FromByteArray(byte[] data)
+	{
+        int offset = 0;
+
+		_blockFactor = BitConverter.ToInt32(data, offset);
+		offset += sizeof(int);
+
+		_depth = BitConverter.ToInt32(data, offset);
+		offset += sizeof(int);
+
+		RecordsCount = BitConverter.ToInt32(data, offset);
+		offset += sizeof(int);
+
+		int addressesCount = BitConverter.ToInt32(data, offset);
+		offset += sizeof(int);
+
+		_addresses.Clear();
+
+		for (int i = 0; i < addressesCount; i++)
+		{
+			ExtendibleHashFileBlock<T> address = new();
+            var addressSize = address.GetSize();
+
+            byte[] addressData = data[offset..(offset + addressSize)];
+			address.FromByteArray(addressData);
+			_addresses.Add(address);
+			offset += address.GetSize();
+		}
+
+		return this;
+	}
+
+	private byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[BLOCK_SIZE];
+		int offset = 0;
+
+		BitConverter.GetBytes(_blockFactor).CopyTo(bytes, offset);
+		offset += sizeof(int);
+
+		BitConverter.GetBytes(_depth).CopyTo(bytes, offset);
+		offset += sizeof(int);
+
+		BitConverter.GetBytes(RecordsCount).CopyTo(bytes, offset);
+		offset += sizeof(int);
+
+		BitConverter.GetBytes(_addresses.Count).CopyTo(bytes, offset);
+		offset += sizeof(int);
+
+		foreach (var address in _addresses)
+		{
+			address.ToByteArray().CopyTo(bytes, offset);
+			offset += address.GetSize();
+		}
+
+		return bytes;
+	}
+
 	private int GetPrefix(BitArray hash)
     {
-        var reversedHash = new BitArray(Depth);
-        for (int i = 0; i < Depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
-        return BitArrayToInt(reversedHash);
-    }
-
-    private int GetPrefix(BitArray hash, int depth)
-    {
-        var reversedHash = new BitArray(depth);
-        for (int i = 0; i < depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
+        var reversedHash = new BitArray(_depth);
+        for (int i = 0; i < _depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
         return BitArrayToInt(reversedHash);
     }
     
-    private int BitArrayToInt(BitArray bitArray)
+    private static int BitArrayToInt(BitArray bitArray)
     {
         if (bitArray.Length > 32) throw new ArgumentException("BitArray must be less than 32 bits!");
 
@@ -184,14 +274,14 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         var hash = data.GetHash();
         int prefix = GetPrefix(hash);
-        return Addresses[prefix];
+        return _addresses[prefix];
     }
     
     private void SplitBlock(int splittingIndex)
     {
-        var groupLength = (int)Math.Pow(2, Depth - Addresses[splittingIndex].Depth);
+        var groupLength = (int)Math.Pow(2, _depth - _addresses[splittingIndex].Depth);
         var addressIndex = (splittingIndex/groupLength) * groupLength;
-        var splittingBlock = Addresses[addressIndex];
+        var splittingBlock = _addresses[addressIndex];
         var localDepth = splittingBlock.Depth;
         splittingBlock.Depth++;
 
@@ -199,14 +289,14 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         {
             Depth = splittingBlock.Depth
         };
-        var halfLength = ((int)Math.Pow(2, Depth - localDepth))/2;
+        var halfLength = ((int)Math.Pow(2, _depth - localDepth))/2;
         var startIndex = addressIndex + halfLength;
         var endIndex = startIndex + halfLength;
  
-        for (int i = startIndex; i < endIndex; i++) Addresses[i] = newAddressBlock;
+        for (int i = startIndex; i < endIndex; i++) _addresses[i] = newAddressBlock;
         
-        var oldBlockItems = new List<IHashable<T>>();
-        var newBlockItems = new List<IHashable<T>>();
+        var oldBlockItems = new List<T>();
+        var newBlockItems = new List<T>();
         for (int i = 0; i < splittingBlock.Values.Count; i++)
         {
             var record = splittingBlock.Values[i];
@@ -222,88 +312,87 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
     private void IncreaseDepth()
     {
-        Depth++;
+        _depth++;
         List<ExtendibleHashFileBlock<T>> newAddresses = [];
-        foreach (var address in Addresses)
+        foreach (var address in _addresses)
         {
             newAddresses.Add(new ExtendibleHashFileBlock<T>(address));
             newAddresses.Add(new ExtendibleHashFileBlock<T>(address));
         }
-        Addresses = newAddresses;
+        _addresses = newAddresses;
     }
 
     private void DecreaseDepth()
     {
-        Depth--;
-        int size = Addresses.Count;
+        _depth--;
+        int size = _addresses.Count;
         var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
         for (int i = 0; i < size; i += 2)
         {
-            newAdresses.Add(Addresses[i]);
+            newAdresses.Add(_addresses[i]);
         }
-        Addresses = newAdresses;
+        _addresses = newAdresses;
     }
     
     private void MergeBlock(int blockIndex)
         {
-            var length = (int)Math.Pow(2, Depth - Addresses[blockIndex].Depth);
+            var length = (int)Math.Pow(2, _depth - _addresses[blockIndex].Depth);
             var actualMergeIndex = (blockIndex / length) * length;
-            var block = Addresses[actualMergeIndex];
+            var block = _addresses[actualMergeIndex];
  
             var neighborIndex = actualMergeIndex + length;
             var neighborLength = 0;
-            if (actualMergeIndex < Addresses.Count/2)
+            if (actualMergeIndex < _addresses.Count/2)
             {
-                if (neighborIndex >= Addresses.Count/2)
+                if (neighborIndex >= _addresses.Count/2)
                 {
                     neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
                     neighborIndex = (neighborIndex / neighborLength) * neighborLength;
                 }
                 else
                 {
                     neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
                     neighborIndex = (neighborIndex / neighborLength) * neighborLength;
                 }
             }
             else
             {
-                if (neighborIndex >= Addresses.Count)
+                if (neighborIndex >= _addresses.Count)
                 {
                     neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
                     neighborIndex = (neighborIndex / neighborLength) * neighborLength;
                 }
                 else
                 {
                     neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, Depth - Addresses[neighborIndex].Depth);
+                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
                     neighborIndex = (neighborIndex / neighborLength) * neighborLength;
                 }
             }
  
-            var neighbor = Addresses[neighborIndex];
-            if (neighbor.Depth == block.Depth && neighbor.Values.Count + block.Values.Count <= BlockFactor)
+            var neighbor = _addresses[neighborIndex];
+            if (neighbor.Depth == block.Depth && neighbor.Values.Count + block.Values.Count <= _blockFactor)
             {
-                var entries = new List<IHashable<T>>(block.Values.Count);
-                List<IHashable<T>> validRecords = new();
+                var entries = new List<T>(block.Values.Count);
+                List<T> validRecords = new();
                 for (int i = 0; i < block.Values.Count; i++) validRecords.Add(block.Values[i]);
                 entries.AddRange(validRecords);
                 block.Values = entries;
                 block.Depth--;
                 
                 var endIndex = neighborIndex + neighborLength;
-                for (int i = neighborIndex; i < endIndex; i++) Addresses[i] = block;
+                for (int i = neighborIndex; i < endIndex; i++) _addresses[i] = block;
  
                 var maxDepth = int.MinValue;
-                foreach (var address in Addresses)
+                foreach (var address in _addresses)
                 {
                     if (maxDepth < address.Depth) maxDepth = address.Depth;
                 }
-                if (maxDepth < Depth) DecreaseDepth();
+                if (maxDepth < _depth) DecreaseDepth();
             }
         }
-    
     #endregion // Private methods
 }

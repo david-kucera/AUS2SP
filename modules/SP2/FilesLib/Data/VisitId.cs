@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
@@ -14,7 +15,12 @@ namespace FilesLib.Data
         #endregion // Properties
 
         #region Public functions
-        public VisitId CreateClass()
+        public override string ToString()
+		{
+			return $"Address: {Address}, Id: {Id}";
+		}
+
+		public VisitId CreateClass()
         {
             return new VisitId();
         }
@@ -26,8 +32,17 @@ namespace FilesLib.Data
 
         public VisitId FromByteArray(byte[] byteArray)
         {
-            throw new NotImplementedException(); // TODO
-        }
+			int offset = 0;
+
+			// Address
+			Address = BitConverter.ToInt32(byteArray, offset);
+			offset += sizeof(int);
+
+			// Id
+			Id = BitConverter.ToInt32(byteArray, offset);
+
+			return this;
+		}
 
         public BitArray GetHash()
         {
@@ -41,9 +56,18 @@ namespace FilesLib.Data
 
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException(); // TODO
-        }
+			byte[] bytes = new byte[GetSize()];
+			int offset = 0;
+
+			// Address
+			BitConverter.GetBytes(Address).CopyTo(bytes, offset);
+			offset += sizeof(int);
+
+			// Id
+			BitConverter.GetBytes(Id).CopyTo(bytes, offset);
+
+			return bytes;
+		}
         #endregion // Public functions
-        
     }
 }

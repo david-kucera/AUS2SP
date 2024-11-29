@@ -8,7 +8,7 @@ namespace CarLib
 	/// <summary>
 	/// Trieda implementujúca rozhranie programu.
 	/// </summary>
-	public class CarSys : ICar
+	public class CarSys
 	{
 		#region Constants
 		private const int BLOCK_SIZE = 4096 * 2;
@@ -27,10 +27,10 @@ namespace CarLib
         #region Constructor
         public CarSys()
 		{
-			if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
-			if (File.Exists(INIT_FILE_HEAP)) File.Delete(INIT_FILE_HEAP);
-			if (File.Exists(INIT_FILE_ID)) File.Delete(INIT_FILE_ID);
-			if (File.Exists(INIT_FILE_ECV)) File.Delete(INIT_FILE_ECV);
+			//if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
+			//if (File.Exists(INIT_FILE_HEAP)) File.Delete(INIT_FILE_HEAP);
+			//if (File.Exists(INIT_FILE_ID)) File.Delete(INIT_FILE_ID);
+			//if (File.Exists(INIT_FILE_ECV)) File.Delete(INIT_FILE_ECV);
 
 			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
             _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockFactor);
@@ -90,12 +90,6 @@ namespace CarLib
 			_hashFileEcv.Insert(visitEcv);
         }
 
-		public void AddVisit(Person person, Visit visit)
-		{
-			// TODO
-			throw new NotImplementedException();
-		}
-
 		public void Update(Person updatedPerson)
 		{
 			var address = _hashFileId.Find(new VisitId { Id = updatedPerson.Id }).Address;
@@ -115,17 +109,23 @@ namespace CarLib
 			throw new NotImplementedException();
 		}
 
-		public void RemoveVisit(Person person, Visit visit)
-		{
-			// TODO
-			throw new NotImplementedException();
-		}
-
 		public void Remove(Person person)
 		{
-            // TODO
-            //_hashFileId.Delete(person);
-        }
+			try
+			{
+				var visitId = new VisitId { Id = person.Id };
+				var address = _hashFileId.Find(visitId).Address;
+				_hashFileId.Delete(visitId);
+				var visitEcv = new VisitEcv { Ecv = person.Ecv };
+				_hashFileEcv.Delete(visitEcv);
+
+				_heapFile.Delete(address, person);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Chyba pri mazaní osoby: " + ex.Message);
+			}
+		}
 
         public void GenerujData(int count)
 		{
@@ -161,12 +161,18 @@ namespace CarLib
 
         public string ZobrazHashFileIdInfo()
         {
-	        return _hashFileId.SequentialOutput();
+			string result = _hashFileId.ToString();
+			result += "\n\n";
+			result += _hashFileId.SequentialOutput();
+			return result;
         }
 
         public string ZobrazHashFileEcvInfo()
         {
-            return _hashFileEcv.SequentialOutput();
+			string result = _hashFileEcv.ToString();
+			result += "\n\n";
+			result += _hashFileEcv.SequentialOutput();
+			return result;
 		}
 
         public void CheckId(int id)

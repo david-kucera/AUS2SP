@@ -8,10 +8,11 @@ namespace FilesTest
     public static class Program
     {
         #region Constants
-        public static int BLOCK_SIZE = 2500;
-        public static string INIT_FILE = "../../userdata/person_init.aus";
-        public static string DATA_FILE = "../../userdata/person.aus";
-        public static int NUMBER_OF_PEOPLE = 1_000;
+        public static int BLOCK_SIZE = 4096;
+		private const string INIT_FILE = "../../userdata/t_heap_init.aus";
+		private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
+		private const string DATA_FILE = "../../userdata/t_person.aus";
+		public static int NUMBER_OF_PEOPLE = 1_000;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
@@ -26,6 +27,7 @@ namespace FilesTest
             Console.WriteLine("1 - Test heap file with TestRP1");
             Console.WriteLine("2 - Test hash file with TestRP1");
             Console.WriteLine("3 - Test heap file with Person class !!!Block size must be larger than 2500!!!");
+            Console.Write("Choice: ");
             var choice = Console.ReadLine();
             if (choice == "1") TestHeapFile();
             else if (choice == "2") TestHashFile();
@@ -194,10 +196,11 @@ namespace FilesTest
             {
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
-                Console.WriteLine($"{r}. replication");
+                if (File.Exists(INIT_FILE_HASH)) File.Delete(INIT_FILE_HASH);
+				Console.WriteLine($"{r}. replication");
 
-                HeapFile<TestRP1> heapFile = new(DATA_FILE, DATA_FILE, BLOCK_SIZE);
-                ExtendibleHashFile<TestRP1Id> extendibleHashFile = new(null!, heapFile.BlockFactor);
+                HeapFile<TestRP1> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
+                ExtendibleHashFile<TestRP1Id> extendibleHashFile = new(INIT_FILE_HASH, heapFile.BlockFactor);
                 DataGenerator generator = new(r);
                 List<TestRP1> people = [];
                 
@@ -223,7 +226,7 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    Console.WriteLine(i + ". " + operation);
+                    //Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -271,7 +274,8 @@ namespace FilesTest
 
                 Console.WriteLine($"Inserted {inserts} inserts, {deletes} deletes, {searches} searches");
                 extendibleHashFile.Close();
-            }
+				heapFile.Close();
+			}
         }
         #endregion // Hash file
     }

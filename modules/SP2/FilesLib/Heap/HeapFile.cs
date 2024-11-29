@@ -51,12 +51,11 @@ namespace FilesLib.Heap
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Error while opening file: " + ex.Message);
+				throw new Exception("Error while opening data file: " + ex.Message);
             }
 
-   //         if (_file.Length == 0) SaveInitData();
-			//else LoadInitData();
-        }
+			if (_file.Length > 0) LoadInitData();
+		}
         #endregion // Constructor
 
         #region Public functions
@@ -108,7 +107,12 @@ namespace FilesLib.Heap
 	        return GetBlock(address).GetRecord(data);
         }
 
-        public void Update(int address, T newData)
+		/// <summary>
+		/// Updatne daný prvok na danej adrese. Kľúč sa nemení.
+		/// </summary>
+		/// <param name="address">Adresa bloku</param>
+		/// <param name="newData">Nové dáta</param>
+		public void Update(int address, T newData)
         {
 	        CheckAddress(address);
 	        
@@ -148,97 +152,20 @@ namespace FilesLib.Heap
 			return true;
 		}
 
-        /// <summary>
-        /// Vráti blok na zadanej adrese.
-        /// </summary>
-        /// <param name="address">Adresa vrámci súboru.</param>
-        /// <returns>Blok</returns>
-		public Block<T> GetBlock(int address)
-		{
-			CheckAddress(address);
-			_file.Seek(address, SeekOrigin.Begin);
-			byte[] bytes = new byte[BlockSize];
-			_file.Read(bytes, 0, BlockSize);
-			var block = new Block<T>(BlockSize, new T());
-			block.FromByteArray(bytes);
-			return block;
-		}
-		
-        /// <summary>
-        /// Vráti všetky bloky.
-        /// </summary>
-        /// <returns>List blokov</returns>
-        public List<Block<T>> GetAllBlocks()
+		/// <summary>
+		/// Metóda pre výpis informácií o heap súbore.
+		/// </summary>
+		/// <returns>String</returns>
+		public override string ToString()
         {
-	        var ret = new List<Block<T>>();
-	        for (int i = 0; i < BlockCount; i++)
-	        {
-		        Block<T> block = new Block<T>(BlockSize, new T());
-		        int offset = i * BlockSize;
-		        _file.Seek(offset, SeekOrigin.Begin);
-		        byte[] bytes = new byte[BlockSize];
-		        _file.Read(bytes, 0, BlockSize);
-		        block.FromByteArray(bytes);
-		        
-		        ret.Add(block);
-	        }
-	        return ret;
+	        return "NextFreeBlockAddress: " + _nextFreeBlockAddress + ", NextEmptyBlockAddress: " + _nextEmptyBlockAddress + ", BlockSize: " + BlockSize + ", BlockFactor: " + BlockFactor;
         }
 
-        /// <summary>
-        /// Vráti všetky údaje zapísané v blokoch.
-        /// </summary>
-        /// <returns>List údajov</returns>
-        public List<T> GetAllRecords()
-        {
-	        var ret = new List<T>();
-	        for (int i = 0; i < BlockCount; i++)
-	        {
-		        Block<T> block = new Block<T>(BlockSize, new T());
-		        int offset = i * BlockSize;
-		        _file.Seek(offset, SeekOrigin.Begin);
-		        byte[] bytes = new byte[BlockSize];
-		        _file.Read(bytes, 0, BlockSize);
-		        block.FromByteArray(bytes);
-
-		        for (int j = 0; j < block.ValidCount; j++)
-		        {
-			        ret.Add(block.Records[j]);
-		        }
-	        }
-	        return ret;
-        }
-        
-        /// <summary>
-        /// Vytvorí nový blok na koniec súboru.
-        /// </summary>
-        /// <returns>Adresa nového bloku.</returns>
-        public int CreateNewBlock()
-        {
-	        var address = (int)_file.Length;
-	        var newBlock = new Block<T>(BlockSize, new T());
-	        WriteBlock(newBlock, address);
-	        return address;
-        }
-        
-        /// <summary>
-        /// Zapíše dáta bloku do súboru na danú adresu.
-        /// </summary>
-        /// <param name="block">Blok</param>
-        /// <param name="address">Adresa</param>
-        public void WriteBlock(Block<T> block, int address)
-        {
-	        byte[] bytes = block.ToByteArray();
-	        _file.Seek(address, SeekOrigin.Begin);
-	        _file.Write(bytes, 0, BlockSize);
-	        _file.Flush();
-        }
-
-        /// <summary>
-        /// Vráti sekvečnú reprezentáciu celého súboru na disku.
-        /// </summary>
-        /// <returns>Reťazec tvorený dátami bloku.</returns>
-        public string SequentialOutput()
+		/// <summary>
+		/// Vráti sekvečnú reprezentáciu celého súboru na disku.
+		/// </summary>
+		/// <returns>Reťazec tvorený dátami bloku.</returns>
+		public string SequentialOutput()
         {
 	        string ret = string.Empty;
 	        var allBlocks = GetAllBlocks();
@@ -261,7 +188,6 @@ namespace FilesLib.Heap
         {
 	        _nextFreeBlockAddress = -1;
 	        _nextEmptyBlockAddress = -1;
-	        SaveInitData();
 	        _file.SetLength(0);
 	        _file.Flush();
         }
@@ -277,50 +203,87 @@ namespace FilesLib.Heap
 	        _file.Flush();
 	        _file.Close();
         }
-
-        /// <summary>
-        /// Metóda pre výpis zreťazenia heap file.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-	        return "NextFreeBlockAddress: " + _nextFreeBlockAddress + ", NextEmptyBlockAddress: " + _nextEmptyBlockAddress;
-        }
-
         #endregion // Public functions
 
         #region Private functions
         private void SaveInitData()
         {
-	        byte[] buffer = new byte[BlockSize];
+	        byte[] buffer = new byte[GetSize()];
 	        int offset = 0;
 	        
 	        BitConverter.GetBytes(_nextFreeBlockAddress).CopyTo(buffer, offset);
 	        offset += sizeof(int);
 	        BitConverter.GetBytes(_nextEmptyBlockAddress).CopyTo(buffer, offset);
-	        
-	        var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+			offset += sizeof(int);
+			BitConverter.GetBytes(BlockSize).CopyTo(buffer, offset);
+
+			var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 	        initFile.Seek(0, SeekOrigin.Begin);
-	        initFile.Write(buffer, 0, BlockSize);
+	        initFile.Write(buffer, 0, GetSize());
 	        initFile.Flush();
 	        initFile.Close();
         }
 
+        private int GetSize()
+        {
+			int ret = 0;
+			ret += sizeof(int) * 3; // _nextFreeBlockAddress , _nextEmptyBlockAddress, BlockSize
+			return ret;
+		}
+
         private void LoadInitData()
         {
-	        byte[] buffer = new byte[BlockSize];
+	        byte[] buffer = new byte[GetSize()];
 	        int offset = 0;
 	        
 	        var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 	        initFile.Seek(offset, SeekOrigin.Begin);
-	        initFile.Read(buffer, offset, BlockSize);
+	        initFile.Read(buffer, offset, GetSize());
             
 	        _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
 	        offset += sizeof(int);
 	        _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
+			offset += sizeof(int);
+			BlockSize = BitConverter.ToInt32(buffer, offset);
+		}
+
+        private void WriteBlock(Block<T> block, int address)
+        {
+	        byte[] bytes = block.ToByteArray();
+	        _file.Seek(address, SeekOrigin.Begin);
+	        _file.Write(bytes, 0, BlockSize);
+	        _file.Flush();
         }
-        
-        private void AddBlockToFreeList(Block<T> block, int address)
+
+		private Block<T> GetBlock(int address)
+        {
+	        CheckAddress(address);
+	        _file.Seek(address, SeekOrigin.Begin);
+	        byte[] bytes = new byte[BlockSize];
+	        _file.Read(bytes, 0, BlockSize);
+	        var block = new Block<T>(BlockSize, new T());
+	        block.FromByteArray(bytes);
+	        return block;
+        }
+
+        private List<Block<T>> GetAllBlocks()
+        {
+	        var ret = new List<Block<T>>();
+	        for (int i = 0; i < BlockCount; i++)
+	        {
+		        Block<T> block = new Block<T>(BlockSize, new T());
+		        int offset = i * BlockSize;
+		        _file.Seek(offset, SeekOrigin.Begin);
+		        byte[] bytes = new byte[BlockSize];
+		        _file.Read(bytes, 0, BlockSize);
+		        block.FromByteArray(bytes);
+
+		        ret.Add(block);
+	        }
+	        return ret;
+        }
+
+		private void AddBlockToFreeList(Block<T> block, int address)
         {
 	        if (_nextEmptyBlockAddress == address)
 	        {
