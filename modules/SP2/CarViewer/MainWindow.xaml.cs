@@ -222,6 +222,7 @@ namespace CarViewer
 		private void VisitsListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			_currentlySelectedVisit = (Visit)VisitsListBox.SelectedItem!;
+			if (_currentlySelectedVisit == null!) return;
 			var notes = _currentlySelectedVisit.Notes;
 			if (notes.Count == 0) NotesTextBox.Text = string.Empty;
 			else NotesTextBox.Text = string.Join("\n", notes);
@@ -248,7 +249,8 @@ namespace CarViewer
 				EcvTextBox.Text = _currentlyDisplayedObject.Ecv;
                 NameTextBox.Text = _currentlyDisplayedObject.Name;
                 SurnameTextBox.Text = _currentlyDisplayedObject.Surname;
-                foreach (var visit in _currentlyDisplayedObject.Visits)
+				VisitsListBox.Items.Clear();
+				foreach (var visit in _currentlyDisplayedObject.Visits)
                 {
 	                VisitsListBox.Items.Add(visit);
                 }
