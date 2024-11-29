@@ -11,7 +11,7 @@ namespace CarLib
 	public class CarSys : ICar
 	{
 		#region Constants
-		private const int BLOCK_SIZE = 4096;
+		private const int BLOCK_SIZE = 4096 * 2;
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
         private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
         private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";
@@ -144,9 +144,19 @@ namespace CarLib
             _hashFileEcv.Close();
         }
 
-        public string ZobrazHeapFileInfo()
+		public void Clear()
+		{
+			_heapFile.Clear();
+			_hashFileId.Clear();
+			_hashFileEcv.Clear();
+		}
+
+		public string ZobrazHeapFileInfo()
         {
-            return _heapFile.SequentialOutput();
+			string result = _heapFile.ToString();
+			result += "\n\n";
+			result += _heapFile.SequentialOutput();
+			return result;
 		}
 
         public string ZobrazHashFileIdInfo()

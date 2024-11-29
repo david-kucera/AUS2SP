@@ -155,6 +155,11 @@ namespace CarViewer
 			RefreshData();
 		}
 
+		private void DeleteData_OnClick(object sender, RoutedEventArgs e)
+		{
+			_carSys.Clear();
+		}
+
 		private void GenerateData_OnClick(object sender, RoutedEventArgs e)
 		{
 			InputWindow inputWindow = new(InputWindowType.GENERATE);
@@ -178,20 +183,23 @@ namespace CarViewer
 		private void ShowHeapFileDetails_OnClick(object sender, RoutedEventArgs e)
 		{
 			var msg = _carSys.ZobrazHeapFileInfo();
-			MessageBox.Show(msg, "Info o dátach", MessageBoxButton.OK);
+			DetailWindow detailWindow = new DetailWindow("Info o heap file", msg);
+			detailWindow.ShowDialog();
 		}
 
         private void ShowHashFileIdDetails_OnClick(object sender, RoutedEventArgs e)
         {
             var msg = _carSys.ZobrazHashFileIdInfo();
-            MessageBox.Show(msg, "Info o hash file ID", MessageBoxButton.OK);
-        }
+			DetailWindow detailWindow = new DetailWindow("Info o hash file s ID", msg);
+			detailWindow.ShowDialog();
+		}
 
         private void ShowHashFileEcvDetails_OnClick(object sender, RoutedEventArgs e)
         {
             var msg = _carSys.ZobrazHashFileEcvInfo();
-            MessageBox.Show(msg, "Info o hash file ECV", MessageBoxButton.OK);
-        }
+			DetailWindow detailWindow = new DetailWindow("Info o hash file s ECV", msg);
+			detailWindow.ShowDialog();
+		}
 
         private void About_OnClick(object sender, RoutedEventArgs e)
 		{

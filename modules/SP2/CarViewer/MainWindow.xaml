@@ -22,6 +22,7 @@
             <MenuItem Header="_Edit">
                 <MenuItem Header="Pridaj záznam o vozidle..." Click="AddPerson_OnClick"></MenuItem>
                 <Separator></Separator>
+                <MenuItem Header="Vymaž všetky dáta" Click="DeleteData_OnClick"></MenuItem>
                 <MenuItem Header="Vyčisti obrazovku dát" Click="ClearDataDisplay_OnClick"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="Generuj dáta..." Click="GenerateData_OnClick"></MenuItem>

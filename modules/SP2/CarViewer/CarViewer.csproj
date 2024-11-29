@@ -13,7 +13,12 @@
     <OutputPath Condition="'$(Configuration)' == 'Debug' and '$(Platform)' == 'x64'">$(ProjectDir)..\..\..\run64_D\</OutputPath>
     <IntermediateOutputPath>$(ProjectDir)..\..\..\tmp\$(Configuration)\$(Platform)\$(MSBuildProjectName)\obj</IntermediateOutputPath>
     <Configurations>Debug;Release</Configurations>
+    <ApplicationIcon>car-wheel.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="car-wheel.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CarLib\CarLib.csproj" />
