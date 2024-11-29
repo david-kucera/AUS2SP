@@ -54,9 +54,18 @@ namespace CarViewer
 		private void EditButton_OnClick(object sender, RoutedEventArgs e)
 		{
 			if (_currentlyDisplayedObject == null!) return;
-			bool keyChanged = _currentlyDisplayedObject.Id != int.Parse(IdTextBox.Text) || !_currentlyDisplayedObject.Ecv.Equals(EcvTextBox.Text);
+			bool keyChanged = false;
+			try
+			{
+				keyChanged = _currentlyDisplayedObject.Id != int.Parse(IdTextBox.Text) || !_currentlyDisplayedObject.Ecv.Equals(EcvTextBox.Text);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Chyba pri editácii údajov: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
 
-			if (keyChanged)
+			if (keyChanged) // TODO zmenit po implementacii operacie delete v hash file
 			{
 				MessageBox.Show("Nie je možné meniť ID alebo ECV osoby!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
@@ -66,18 +75,63 @@ namespace CarViewer
 			string oldEcv = _currentlyDisplayedObject.Ecv;
 			if (keyChanged)
 			{
-				_currentlyDisplayedObject.Id = int.Parse(IdTextBox.Text);
+				try
+				{
+					_currentlyDisplayedObject.Id = int.Parse(IdTextBox.Text);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Chyba pri editácii údajov: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
+				try
+				{
+					_carSys.CheckId(_currentlyDisplayedObject.Id);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Chyba pri editácii údajov: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
+
 				_currentlyDisplayedObject.Ecv = EcvTextBox.Text;
+				try
+				{
+					_carSys.CheckEcv(_currentlyDisplayedObject.Ecv);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Chyba pri editácii údajov: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
 			}
+
 
 			_currentlyDisplayedObject.Name = NameTextBox.Text;
 			_currentlyDisplayedObject.Surname = SurnameTextBox.Text;
 			_currentlyDisplayedObject.Visits = VisitsListBox.Items.Cast<Visit>().ToList();
 
+			string notes = NotesTextBox.Text;
+			if (_currentlySelectedVisit != null!)
+			{
+				_currentlySelectedVisit.Notes = notes.Split('\n').ToList();
+				foreach (var note in _currentlySelectedVisit.Notes)
+				{
+					if (note.Length > 20)
+					{
+						MessageBox.Show("Poznámka nesmie byť dlhšia ako 20 znakov!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+						return;
+					}
+				}
+			}
+
 			try
 			{
 				if (keyChanged) _carSys.UpdateKeyChanged(_currentlyDisplayedObject, oldId, oldEcv);
 				else _carSys.Update(_currentlyDisplayedObject);
+
+				MessageBox.Show("Údaje boli úspešne upravené!", "Úspech", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			catch (Exception ex)
 			{
@@ -92,7 +146,15 @@ namespace CarViewer
             throw new NotImplementedException();
 		}
 
-        private void AddPerson_OnClick(object sender, RoutedEventArgs e)
+		private void RemoveVisitButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			_currentlySelectedVisit = (Visit)VisitsListBox.SelectedItem!;
+			if (_currentlySelectedVisit == null!) return;
+			VisitsListBox.Items.Remove(_currentlySelectedVisit);
+			_currentlyDisplayedObject.Visits.Remove(_currentlySelectedVisit);
+		}
+
+		private void AddPerson_OnClick(object sender, RoutedEventArgs e)
         {
 	        int id = int.MinValue;
 			string ecv = string.Empty;
@@ -223,14 +285,15 @@ namespace CarViewer
 		{
 			_currentlySelectedVisit = (Visit)VisitsListBox.SelectedItem!;
 			if (_currentlySelectedVisit == null!) return;
+			RemoveVisitButton.IsEnabled = true;
 			var notes = _currentlySelectedVisit.Notes;
 			if (notes.Count == 0) NotesTextBox.Text = string.Empty;
 			else NotesTextBox.Text = string.Join("\n", notes);
 		}
-        #endregion // Event handlers
+		#endregion // Event handlers
 
-        #region Private functions
-        private void RefreshData()
+		#region Private functions
+		private void RefreshData()
 		{
 			if (_currentlyDisplayedObject == null!)
 			{
@@ -253,7 +316,8 @@ namespace CarViewer
 				foreach (var visit in _currentlyDisplayedObject.Visits)
                 {
 	                VisitsListBox.Items.Add(visit);
-                }
+                }	
+				NotesTextBox.Text = string.Empty;
                 EditButton.IsEnabled = true;
 				AddVisitButton.IsEnabled = true;
 			}

@@ -52,7 +52,8 @@
                 <!--modifikacia-->
                 <Button Name="DeleteButton" Margin="30,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Vyraď" IsEnabled="False" Click="DeleteButton_OnClick"></Button>
                 <Button Name="EditButton" Margin="5,0,0,0" Padding="5" MaxWidth="70" MinWidth="50" Content="Uprav" IsEnabled="False" Click="EditButton_OnClick"></Button>
-                <Button Name="AddVisitButton" Margin="5,0,0,0" Padding="5" MaxWidth="100" MinWidth="70" Content="Pridaj návštevu..." IsEnabled="False" Click="AddVisitButton_OnClick"></Button>
+                <Button Name="AddVisitButton" Margin="5,0,0,0" Padding="5" MaxWidth="120" MinWidth="70" Content="Pridaj návštevu..." IsEnabled="False" Click="AddVisitButton_OnClick"></Button>
+                <Button Name="RemoveVisitButton" Margin="5,0,0,0" Padding="5" MaxWidth="120" MinWidth="90" Content="Odober návštevu" IsEnabled="False" Click="RemoveVisitButton_OnClick"></Button>
             </StackPanel>
         </GroupBox>
 
@@ -80,19 +81,19 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <Label Grid.Row="0" Grid.Column="0" Content="ID:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdTextBox" MinWidth="200" Margin="0,0,0,0" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                        <Label Grid.Row="1" Grid.Column="0" Content="ECV:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="EcvTextBox" MinWidth="200" Margin="0,0,0,0" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                        <Label Grid.Row="2" Grid.Column="0" Content="Meno:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="NameTextBox" MinWidth="200" Margin="0,0,0,0" Text="David" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
-                        <Label Grid.Row="3" Grid.Column="0" Content="Priezvisko:" Margin="0,0,0,0"></Label>
-                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="SurnameTextBox" MinWidth="200" Margin="0,0,0,0" Text="Kučera" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="0" Grid.Column="0" Content="ID:" Margin="0,0,0,5"></Label>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdTextBox" MinWidth="200" Margin="0,0,0,5" Text="49" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="1" Grid.Column="0" Content="ECV:" Margin="0,0,0,5"></Label>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="EcvTextBox" MinWidth="200" Margin="0,0,0,5" Text="TN494GT" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Meno:" Margin="0,0,0,5"></Label>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="NameTextBox" MinWidth="200" Margin="0,0,0,5" Text="David" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Priezvisko:" Margin="0,0,0,5"></Label>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="SurnameTextBox" MinWidth="200" Margin="0,0,0,5" Text="Kučera" TextAlignment="Center" FontSize="16" TextWrapping="WrapWithOverflow"></TextBox>
                     </Grid>
                 </GroupBox>
                 <!--visits-->
                 <GroupBox Grid.Column="1" Grid.Row="0" Header="Visits" Margin="5" Padding="5">
-                    <ListBox Name="VisitsListBox" Margin="5" SelectionChanged="VisitsListBoxSelectionChanged">
+                    <ListBox Name="VisitsListBox" Margin="5" SelectionChanged="VisitsListBoxSelectionChanged" MinHeight="200">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -111,7 +112,9 @@
                 </GroupBox>
                 <!--notes-->
                 <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Notes" Margin="5" Padding="5">
-                    <TextBox Name="NotesTextBox" Margin="5" Padding="5" TextWrapping="WrapWithOverflow" FontSize="16" TextAlignment="Left"></TextBox>
+                    <ScrollViewer Margin="5">
+                        <TextBox Name="NotesTextBox" Margin="5" Padding="5" TextWrapping="WrapWithOverflow" FontSize="16" TextAlignment="Left" MinHeight="100"></TextBox>
+                    </ScrollViewer>
                 </GroupBox>
             </Grid>
         </GroupBox>
