@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using CarLib;
 using FilesLib.Data;
@@ -141,9 +142,18 @@ namespace CarViewer
 
 		private void AddVisitButton_OnClick(object sender, RoutedEventArgs e)
 		{
-            // TODO - pridanie navstevy osoby
-            // otvorit nove okno , kde sa vyplnia data o navsteve - datum, double cena a notes
-            throw new NotImplementedException();
+			NewVisitWindow newVisitWindow = new NewVisitWindow();
+			if (newVisitWindow.ShowDialog() == true)
+			{
+				Visit newVisit = new Visit
+				{
+					Date = DateOnly.FromDateTime(newVisitWindow.DatePickerInput.SelectedDate!.Value.Date),
+					Price = double.Parse(newVisitWindow.PriceTextBox.Text),
+					Notes = newVisitWindow.NotesTextBox.Text.Split('\n').ToList()
+				};
+				_currentlyDisplayedObject.Visits.Add(newVisit);
+				VisitsListBox.Items.Add(newVisit);
+			}
 		}
 
 		private void RemoveVisitButton_OnClick(object sender, RoutedEventArgs e)

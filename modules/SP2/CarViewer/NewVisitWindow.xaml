@@ -1,0 +1,44 @@
+﻿<Window x:Class="CarViewer.NewVisitWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CarViewer"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        mc:Ignorable="d"
+        Title="Nová návšteva servisu" Height="350" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Dátum" Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Dátum servisu:" VerticalAlignment="Center" Margin="5"/>
+                <DatePicker Name="DatePickerInput" SelectedDate="{x:Static sys:DateTime.Today}" Margin="5"/>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="Cena" Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Cena:" VerticalAlignment="Center" Margin="5"/>
+                <TextBox Name="PriceTextBox" Margin="5" MinWidth="100" VerticalContentAlignment="Center"/>
+                <Label Content="EUR" VerticalAlignment="Center"></Label>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Header="Poznámky" Grid.Row="2" Height="150">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBox Name="NotesTextBox" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+            </ScrollViewer>
+        </GroupBox>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button Content="OK" Margin="5" Padding="5" MinWidth="60" Click="Ok"/>
+            <Button Content="Cancel" Margin="5" Padding="5" MinWidth="60" Click="Cancel"/>
+        </StackPanel>
+    </Grid>
+</Window>
