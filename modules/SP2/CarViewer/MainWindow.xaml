@@ -17,6 +17,7 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="Exit without saving" Click="ExitWithoutSaving_OnClick"></MenuItem>
+                <Separator></Separator>
                 <MenuItem Header="_Exit" Click="Exit_OnClick"></MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
@@ -115,7 +116,8 @@
                 <!--notes-->
                 <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Notes" Margin="5" Padding="5">
                     <ScrollViewer Margin="5">
-                        <TextBox Name="NotesTextBox" Margin="5" Padding="5" TextWrapping="WrapWithOverflow" FontSize="16" TextAlignment="Left" MinHeight="100"></TextBox>
+                        <TextBox Name="NotesTextBox" Margin="5" Padding="5" AcceptsReturn="True" TextWrapping="WrapWithOverflow" FontSize="16" TextAlignment="Left" MinHeight="100">
+                        </TextBox>
                     </ScrollViewer>
                 </GroupBox>
             </Grid>

@@ -154,7 +154,7 @@ namespace FilesLib.Data
 			for (int i = 0; i < Notes.Count; i++)
 			{
 				var noteString = Notes[i];
-				if (noteString.Length < MAX_NOTE_LENGTH)
+				if (noteString.Length <= MAX_NOTE_LENGTH)
 				{
 					noteString = noteString.PadRight(MAX_NOTE_LENGTH, ' ');
 				}

@@ -178,7 +178,7 @@ namespace FilesLib.Data
 
 			// Name
 			var nameToFile = string.Empty;
-			if (Name.Length < MAX_NAME_LENGTH)
+			if (Name.Length <= MAX_NAME_LENGTH)
 			{
 				nameToFile = Name.PadRight(MAX_NAME_LENGTH, ' ');
 			}
@@ -192,7 +192,7 @@ namespace FilesLib.Data
 
 			// Surname
 			var surnameToFile = string.Empty;
-			if (Surname.Length < MAX_SURNAME_LENGTH)
+			if (Surname.Length <= MAX_SURNAME_LENGTH)
 			{
 				surnameToFile = Surname.PadRight(MAX_SURNAME_LENGTH, ' ');
 			}
@@ -206,7 +206,7 @@ namespace FilesLib.Data
             
             // ECV
             var ecvToFile = string.Empty;
-            if (Ecv.Length < MAX_ECV_LENGTH)
+            if (Ecv.Length <= MAX_ECV_LENGTH)
             {
 	            ecvToFile = Ecv.PadRight(MAX_ECV_LENGTH, ' ');
             }

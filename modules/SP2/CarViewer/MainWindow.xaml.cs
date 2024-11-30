@@ -23,7 +23,18 @@ namespace CarViewer
 		#region Button handlers
 		private void FindById_OnClick(object sender, RoutedEventArgs e)
 		{
-			int searchId = int.Parse(IdCar.Text);
+			int searchId;
+            try
+			{
+                searchId = int.Parse(IdCar.Text);
+            }
+			catch (Exception ex)
+			{
+                MessageBox.Show("Chyba pri hľadaní osoby: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+
             var foundPerson = _carSys.Find(searchId);
 			if (foundPerson != null) 
 			{
@@ -35,8 +46,8 @@ namespace CarViewer
 
 		private void FindByEcv_OnClick(object sender, RoutedEventArgs e)
 		{
-			string searchEcv = EcvCar.Text;
-			var foundPerson = _carSys.Find(searchEcv);
+            string searchEcv = EcvCar.Text;
+            var foundPerson = _carSys.Find(searchEcv);
             if (foundPerson != null)
 			{
 				_currentlyDisplayedObject = foundPerson;
@@ -73,7 +84,8 @@ namespace CarViewer
 
 			int oldId = _currentlyDisplayedObject.Id;
 			string oldEcv = _currentlyDisplayedObject.Ecv;
-			if (keyChanged)
+            // TODO kontrola dlzky ecv a id
+            if (keyChanged)
 			{
 				try
 				{
@@ -107,16 +119,37 @@ namespace CarViewer
 				}
 			}
 
-
-			_currentlyDisplayedObject.Name = NameTextBox.Text;
+			if (NameTextBox.Text.Length > 15)
+            {
+                MessageBox.Show("Meno nesmie byť dlhšie ako 15 znakov!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+			if (SurnameTextBox.Text.Length > 20)
+            {
+                MessageBox.Show("Priezvisko nesmie byť dlhšie ako 20 znakov!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+			if (VisitsListBox.Items.Count > 5)
+            {
+                MessageBox.Show("Osoba nesmie mať viac ako 5 návštev!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            _currentlyDisplayedObject.Name = NameTextBox.Text;
 			_currentlyDisplayedObject.Surname = SurnameTextBox.Text;
 			_currentlyDisplayedObject.Visits = VisitsListBox.Items.Cast<Visit>().ToList();
 
 			string notes = NotesTextBox.Text;
-			if (_currentlySelectedVisit != null!)
+            notes = notes.Replace("\r", string.Empty);
+			List<string> listNotes = new();
+            if (_currentlySelectedVisit != null!)
 			{
-				_currentlySelectedVisit.Notes = notes.Split('\n').ToList();
-				foreach (var note in _currentlySelectedVisit.Notes)
+				listNotes = notes.Split('\n').ToList();
+				if (listNotes.Count > 10)
+                {
+                    MessageBox.Show("Návšteva nesmie mať viac ako 10 poznámok!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                foreach (var note in listNotes)
 				{
 					if (note.Length > 20)
 					{
@@ -124,9 +157,10 @@ namespace CarViewer
 						return;
 					}
 				}
-			}
+                _currentlySelectedVisit.Notes = listNotes;
+            }
 
-			try
+            try
 			{
 				if (keyChanged) _carSys.UpdateKeyChanged(_currentlyDisplayedObject, oldId, oldEcv);
 				else _carSys.Update(_currentlyDisplayedObject);
@@ -144,13 +178,22 @@ namespace CarViewer
 			NewVisitWindow newVisitWindow = new NewVisitWindow();
 			if (newVisitWindow.ShowDialog() == true)
 			{
-				Visit newVisit = new Visit
+				Visit newVisit;
+                try
 				{
-					Date = DateOnly.FromDateTime(newVisitWindow.DatePickerInput.SelectedDate!.Value.Date),
-					Price = double.Parse(newVisitWindow.PriceTextBox.Text),
-					Notes = newVisitWindow.NotesTextBox.Text.Split('\n').ToList()
-				};
-				_currentlyDisplayedObject.Visits.Add(newVisit);
+                    newVisit = new Visit
+                    {
+                        Date = DateOnly.FromDateTime(newVisitWindow.DatePickerInput.SelectedDate!.Value.Date),
+                        Price = double.Parse(newVisitWindow.PriceTextBox.Text),
+                        Notes = newVisitWindow.NotesTextBox.Text.Split('\n').ToList()
+                    };
+                }
+				catch (Exception ex)
+                {
+                    MessageBox.Show("Chyba pri pridávaní návštevy: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                _currentlyDisplayedObject.Visits.Add(newVisit);
 				VisitsListBox.Items.Add(newVisit);
 			}
 		}
@@ -171,7 +214,15 @@ namespace CarViewer
 			InputWindow inputWindowId = new InputWindow(InputWindowType.INPUT_ID);
 	        if (inputWindowId.ShowDialog() == true)
 	        {
-		        id = int.Parse(inputWindowId.TextBoxInput.Text);
+				try
+				{
+					id = int.Parse(inputWindowId.TextBoxInput.Text);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Chyba pri pridávaní osoby: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
 	        }
 
 			try
@@ -236,7 +287,16 @@ namespace CarViewer
 			InputWindow inputWindow = new(InputWindowType.GENERATE);
 			if (inputWindow.ShowDialog() == true)
 			{
-				int count = Int32.Parse(inputWindow.TextBoxInput.Text);
+				int count;
+				try
+				{
+					count = int.Parse(inputWindow.TextBoxInput.Text);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Chyba pri generovaní dát: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+					return;
+				}
 				try
 				{
 					_carSys.GenerujData(count);
@@ -279,7 +339,14 @@ namespace CarViewer
 
 		private void Exit_OnClick(object sender, RoutedEventArgs e)
 		{
-			_carSys.Close();
+			try
+			{
+				_carSys.Close();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Chyba pri ukončovaní aplikácie: " + ex.Message, "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 			Environment.Exit(0);
 		}
 
