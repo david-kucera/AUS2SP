@@ -60,7 +60,12 @@ namespace FilesLib.Data
             byte[] stringBytes = Encoding.UTF8.GetBytes(Ecv);
             using SHA256 sha256 = SHA256.Create();
             byte[] hashBytes = sha256.ComputeHash(stringBytes);
-            return new BitArray(hashBytes);
+            byte[] firstFourBytes = new byte[4];
+			for (int i = 0; i < 4; i++)
+			{
+				firstFourBytes[i] = hashBytes[i];
+			}
+			return new BitArray(firstFourBytes);
         }
 
         public int GetSize()

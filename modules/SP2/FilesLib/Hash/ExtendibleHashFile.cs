@@ -252,7 +252,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
 	private int GetPrefix(BitArray hash)
     {
-        var reversedHash = new BitArray(_depth);
+        if (hash.Length > 32) throw new ArgumentException("BitArray must be less than 32 bits!");
+
+		var reversedHash = new BitArray(_depth);
         for (int i = 0; i < _depth; i++) reversedHash[reversedHash.Length - i - 1] = hash[i];
         return BitArrayToInt(reversedHash);
     }
