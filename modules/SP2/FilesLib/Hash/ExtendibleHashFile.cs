@@ -9,10 +9,6 @@ namespace FilesLib.Hash;
 /// <typeparam name="T"></typeparam>
 public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
-	#region Constants
-    private int BLOCK_SIZE = 4096 * 4096;
-	#endregion // Constants
-
 	#region Class members
 	private int _blockFactor = 1;
 	private int _depth = 1;
@@ -172,22 +168,25 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	#region Private methods
 	private void LoadFromInit()
 	{
-		byte[] buffer = new byte[BLOCK_SIZE];
+		long fileSize = new FileInfo(_initFilePath).Length;
+		byte[] buffer = new byte[fileSize];
 
-		var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-		initFile.Seek(0, SeekOrigin.Begin);
-		initFile.Read(buffer, 0, BLOCK_SIZE);
+		using (var initFile = new FileStream(_initFilePath, FileMode.Open, FileAccess.Read))
+		{
+			initFile.Read(buffer, 0, buffer.Length);
+		}
 
 		FromByteArray(buffer);
 	}
 
 	private void SaveToInit()
 	{
-		byte[] buffer = ToByteArray();
+		var size = GetSize();
+		byte[] buffer = ToByteArray(size);
 
-		var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+		using var initFile = new FileStream(_initFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 		initFile.Seek(0, SeekOrigin.Begin);
-		initFile.Write(buffer, 0, BLOCK_SIZE);
+		initFile.Write(buffer, 0, size);
 		initFile.Flush();
 		initFile.Close();
 	}
@@ -224,9 +223,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		return this;
 	}
 
-	private byte[] ToByteArray()
+	private byte[] ToByteArray(int size)
 	{
-		byte[] bytes = new byte[BLOCK_SIZE];
+		byte[] bytes = new byte[size];
 		int offset = 0;
 
 		BitConverter.GetBytes(_blockFactor).CopyTo(bytes, offset);
@@ -248,6 +247,11 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		}
 
 		return bytes;
+	}
+
+	private int GetSize()
+	{
+		return sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int) + _addresses.Sum(address => address.GetSize());
 	}
 
 	private int GetPrefix(BitArray hash)
