@@ -50,7 +50,7 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
     /// <returns>String</returns>
     public override string ToString()
     {
-	    string ret = $"Depth: {Depth}, ValidCount: {Values.Count}";
+	    string ret = $"Depth: {Depth}, BlockFactor: {BlockFactor}, ValidCount: {Values.Count}";
 		foreach (var value in Values)
 		{
 			ret += $"\n{value}";

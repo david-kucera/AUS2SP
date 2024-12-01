@@ -203,6 +203,7 @@ namespace CarViewer
 			_currentlySelectedVisit = (Visit)VisitsListBox.SelectedItem!;
 			if (_currentlySelectedVisit == null!) return;
 			VisitsListBox.Items.Remove(_currentlySelectedVisit);
+			NotesTextBox.Text = string.Empty;
 			_currentlyDisplayedObject.Visits.Remove(_currentlySelectedVisit);
 		}
 
@@ -360,7 +361,11 @@ namespace CarViewer
 		private void VisitsListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			_currentlySelectedVisit = (Visit)VisitsListBox.SelectedItem!;
-			if (_currentlySelectedVisit == null!) return;
+			if (_currentlySelectedVisit == null!)
+			{
+				RemoveVisitButton.IsEnabled = false;
+				return;
+			}
 			RemoveVisitButton.IsEnabled = true;
 			var notes = _currentlySelectedVisit.Notes;
 			if (notes.Count == 0) NotesTextBox.Text = string.Empty;
