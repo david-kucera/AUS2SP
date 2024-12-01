@@ -19,3 +19,4 @@
 /run_D/net8.0
 /modules/SP1/GeoLib/.vs
 *.user
+*.DS_Store
