@@ -328,77 +328,21 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         _addresses = newAddresses;
     }
 
-    private void DecreaseDepth()
-    {
-        _depth--;
-        int size = _addresses.Count;
-        var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
-        for (int i = 0; i < size; i += 2)
-        {
-            newAdresses.Add(_addresses[i]);
-        }
-        _addresses = newAdresses;
-    }
-    
-    private void MergeBlock(int blockIndex)
-        {
-            var length = (int)Math.Pow(2, _depth - _addresses[blockIndex].Depth);
-            var actualMergeIndex = (blockIndex / length) * length;
-            var block = _addresses[actualMergeIndex];
- 
-            var neighborIndex = actualMergeIndex + length;
-            var neighborLength = 0;
-            if (actualMergeIndex < _addresses.Count/2)
-            {
-                if (neighborIndex >= _addresses.Count/2)
-                {
-                    neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-                else
-                {
-                    neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-            }
-            else
-            {
-                if (neighborIndex >= _addresses.Count)
-                {
-                    neighborIndex = actualMergeIndex - 1;
-                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-                else
-                {
-                    neighborIndex = actualMergeIndex + length;
-                    neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-                    neighborIndex = (neighborIndex / neighborLength) * neighborLength;
-                }
-            }
- 
-            var neighbor = _addresses[neighborIndex];
-            if (neighbor.Depth == block.Depth && neighbor.Values.Count + block.Values.Count <= _blockFactor)
-            {
-                var entries = new List<T>(block.Values.Count);
-                List<T> validRecords = new();
-                for (int i = 0; i < block.Values.Count; i++) validRecords.Add(block.Values[i]);
-                entries.AddRange(validRecords);
-                block.Values = entries;
-                block.Depth--;
-                
-                var endIndex = neighborIndex + neighborLength;
-                for (int i = neighborIndex; i < endIndex; i++) _addresses[i] = block;
- 
-                var maxDepth = int.MinValue;
-                foreach (var address in _addresses)
-                {
-                    if (maxDepth < address.Depth) maxDepth = address.Depth;
-                }
-                if (maxDepth < _depth) DecreaseDepth();
-            }
-        }
-    #endregion // Private methods
+	private void DecreaseDepth()
+	{
+		_depth--;
+		int size = _addresses.Count;
+		var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
+		for (int i = 0; i < size; i += 2)
+		{
+			newAdresses.Add(_addresses[i]);
+		}
+		_addresses = newAdresses;
+	}
+
+	private void MergeBlock(int blockIndex)
+	{
+		// TODO
+	}
+	#endregion // Private methods
 }
