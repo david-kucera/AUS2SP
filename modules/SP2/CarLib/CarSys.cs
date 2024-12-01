@@ -11,7 +11,7 @@ namespace CarLib
 	public class CarSys
 	{
 		#region Constants
-		private const int BLOCK_SIZE = 4096 * 2;
+		private const int BLOCK_SIZE_HEAP = 4096 * 2;
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
         private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
         private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";
@@ -27,18 +27,18 @@ namespace CarLib
         #region Constructor
         public CarSys()
 		{
-			//if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
-			//if (File.Exists(INIT_FILE_HEAP)) File.Delete(INIT_FILE_HEAP);
-			//if (File.Exists(INIT_FILE_ID)) File.Delete(INIT_FILE_ID);
-			//if (File.Exists(INIT_FILE_ECV)) File.Delete(INIT_FILE_ECV);
-
-			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
+			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE_HEAP);
             _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockFactor);
             _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_ECV, _heapFile.BlockFactor);
         }
 		#endregion // Constructor
 
 		#region Public functions
+		/// <summary>
+		/// Metóda na vyhľadanie osoby podľa ID.
+		/// </summary>
+		/// <param name="id">Id osoby</param>
+		/// <returns>Person</returns>
 		public Person Find(int id)
 		{
 			VisitId dummy = new()
@@ -56,6 +56,11 @@ namespace CarLib
             return _heapFile.Find(heapFileAddress, personData);
 		}
 
+		/// <summary>
+		/// Metóda na vyhľadanie osoby podľa EČV.
+		/// </summary>
+		/// <param name="ecv">EČV vozidla</param>
+		/// <returns>Person</returns>
 		public Person Find(string ecv)
 		{
 			VisitEcv dummy = new()
@@ -73,6 +78,10 @@ namespace CarLib
             return _heapFile.Find(heapFileAddress, personData);
 		}
 
+		/// <summary>
+		/// Metóda na pridanie osoby do súboru.
+		/// </summary>
+		/// <param name="person">Person</param>
 		public void Add(Person person)
 		{
 			var address = _heapFile.Insert(person);
@@ -90,6 +99,11 @@ namespace CarLib
 			_hashFileEcv.Insert(visitEcv);
         }
 
+		/// <summary>
+		/// Metóda na aktualizáciu dát osoby.
+		/// </summary>
+		/// <param name="updatedPerson">Person</param>
+		/// <exception cref="Exception">Ak nastane chyba pri upravovaní osoby.</exception>
 		public void Update(Person updatedPerson)
 		{
 			var address = _hashFileId.Find(new VisitId { Id = updatedPerson.Id }).Address;
@@ -111,6 +125,7 @@ namespace CarLib
 
 		public void Remove(Person person)
 		{
+			// TODO
 			try
 			{
 				var visitId = new VisitId { Id = person.Id };
@@ -127,7 +142,11 @@ namespace CarLib
 			}
 		}
 
-        public void GenerujData(int count)
+		/// <summary>
+		/// Metóda na generovanie náhodných dát.
+		/// </summary>
+		/// <param name="count">Integer</param>
+		public void GenerujData(int count)
 		{
 			var generator = new DataGenerator(count % 100);
 			for (int i = 0; i < count; i++)
@@ -137,6 +156,9 @@ namespace CarLib
 			}
 		}
 
+		/// <summary>
+		/// Metóda na zatvorenie súborov.
+		/// </summary>
 		public void Close()
         {
             _heapFile.Close();
@@ -144,6 +166,9 @@ namespace CarLib
             _hashFileEcv.Close();
         }
 
+		/// <summary>
+		/// Metóda na vymazanie všetkých dát zo súborov.
+		/// </summary>
 		public void Clear()
 		{
 			_heapFile.Clear();
@@ -151,46 +176,53 @@ namespace CarLib
 			_hashFileEcv.Clear();
 		}
 
+		/// <summary>
+		/// Metóda na zobrazenie informácií o heap file.
+		/// </summary>
+		/// <returns>string</returns>
 		public string ZobrazHeapFileInfo()
         {
-			string result = _heapFile.ToString();
-			result += "\n\n";
-			result += _heapFile.SequentialOutput();
-			return result;
+			return _heapFile.ToString() + "\n\n" + _heapFile.SequentialOutput();
 		}
 
-        public string ZobrazHashFileIdInfo()
+		/// <summary>
+		/// Metóda na zobrazenie informácií o hash file ID.
+		/// </summary>
+		/// <returns>string</returns>
+		public string ZobrazHashFileIdInfo()
         {
-			string result = _hashFileId.ToString();
-			result += "\n\n";
-			result += _hashFileId.SequentialOutput();
-			return result;
+			return _hashFileId.ToString() + "\n\n" + _hashFileId.SequentialOutput();
         }
 
-        public string ZobrazHashFileEcvInfo()
+		/// <summary>
+		/// Metóda na zobrazenie informácií o hash file EČV.
+		/// </summary>
+		/// <returns>string</returns>
+		public string ZobrazHashFileEcvInfo()
         {
-			string result = _hashFileEcv.ToString();
-			result += "\n\n";
-			result += _hashFileEcv.SequentialOutput();
-			return result;
+			return _hashFileEcv.ToString() + "\n\n" + _hashFileEcv.SequentialOutput();
 		}
 
-        public void CheckId(int id)
+		/// <summary>
+		/// Metóda na kontrolu unikátnosti ID.
+		/// </summary>
+		/// <param name="id">ID</param>
+		/// <exception cref="Exception">Ak osoba s daným ID bola nájdená.</exception>
+		public void CheckId(int id)
         {
 	        var person = Find(id);
-	        if (person != null)
-	        {
-		        throw new Exception("Osoba s ID " + id + " bola nájdená!");
-	        }
+	        if (person != null) throw new Exception("Osoba s ID " + id + " bola nájdená!");
         }
 
-        public void CheckEcv(string ecv)
+		/// <summary>
+		/// Metóda na kontrolu unikátnosti EČV.
+		/// </summary>
+		/// <param name="ecv">EČV</param>
+		/// <exception cref="Exception">Ak osoba s daným EČV bola nájdená.</exception>
+		public void CheckEcv(string ecv)
         {
 	        var person = Find(ecv);
-	        if (person != null)
-	        {
-		        throw new Exception("Osoba s ECV " + ecv + " bola nájdená!");
-	        }
+	        if (person != null) throw new Exception("Osoba s ECV " + ecv + " bola nájdená!");
         }
 		#endregion // Public functions
 	}

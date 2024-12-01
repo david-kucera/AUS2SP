@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml.Linq;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Data
@@ -89,7 +87,7 @@ namespace FilesLib.Data
 
 			// ECV
 			var ecvToFile = string.Empty;
-			if (Ecv.Length < MAX_ECV_LENGTH)
+			if (Ecv.Length <= MAX_ECV_LENGTH)
 			{
 				ecvToFile = Ecv.PadRight(MAX_ECV_LENGTH, ' ');
 			}

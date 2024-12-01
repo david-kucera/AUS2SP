@@ -61,46 +61,6 @@ public class DataGenerator
     }
 
     /// <summary>
-    /// Generates list of Visits with random values.
-    /// </summary>
-    /// <param name="count">Number of visits.</param>
-    /// <returns></returns>
-    public List<Visit> GenerateVisits(int count)
-    {
-        var ret = new List<Visit>();
-        for (int i = 0; i < count; i++)
-        {
-            var visit = new Visit
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(_rand.Next(-20, 20))),
-                Price = _rand.Next(0, 100),
-                Notes = GenerateNotes(_rand.Next(1,MAX_COUNT_VISIT))
-            };
-            ret.Add(visit);
-        }
-
-        return ret;
-    }
-
-    /// <summary>
-    /// Generates list of random notes.
-    /// </summary>
-    /// <param name="count">Count of notes.</param>
-    /// <returns></returns>
-    private List<string> GenerateNotes(int count)
-    {
-        List<string> ret = new List<string>();
-        
-        for (int i = 0; i < count; i++)
-        {
-            string noteString = GenerateString(_rand.Next(1,MAX_LENGTH_VISIT));
-            ret.Add(noteString);
-        }
-
-        return ret;
-    }
-    
-    /// <summary>
     /// Generates random integer in given interval.
     /// </summary>
     /// <param name="min">Minimum</param>
@@ -120,10 +80,40 @@ public class DataGenerator
         var ret = (OperationType)_rand.Next(0, 3);
         return ret;
     }
-    #endregion // Public methods
-    
-    #region Private methods
-    private string GenerateString(int length)
+	#endregion // Public methods
+
+	#region Private methods
+	private List<Visit> GenerateVisits(int count)
+	{
+		var ret = new List<Visit>();
+		for (int i = 0; i < count; i++)
+		{
+			var visit = new Visit
+			{
+				Date = DateOnly.FromDateTime(DateTime.Now.AddDays(_rand.Next(-20, 20))),
+				Price = _rand.Next(0, 100),
+				Notes = GenerateNotes(_rand.Next(1, MAX_COUNT_VISIT))
+			};
+			ret.Add(visit);
+		}
+
+		return ret;
+	}
+
+	private List<string> GenerateNotes(int count)
+	{
+		List<string> ret = new List<string>();
+
+		for (int i = 0; i < count; i++)
+		{
+			string noteString = GenerateString(_rand.Next(1, MAX_LENGTH_VISIT));
+			ret.Add(noteString);
+		}
+
+		return ret;
+	}
+
+	private string GenerateString(int length)
     {
         string ret = string.Empty;
         for (int i = 0; i < length; i++)

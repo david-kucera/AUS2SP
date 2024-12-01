@@ -1,3 +1,4 @@
+using FilesLib.Data;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
@@ -8,10 +9,6 @@ namespace FilesLib.Hash;
 /// <typeparam name="T"></typeparam>
 public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 {
-	#region Constants 
-	private const int BLOCK_SIZE = 4096;
-	#endregion // Constants
-
 	#region Properties
 	/// <summary>
 	/// Depth of block.
@@ -21,18 +18,28 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
     /// Values/records in this block.
     /// </summary>
     public List<T> Values { get; set; } = new();
-    #endregion // Properties
+	/// <summary>
+	/// Block size.
+	/// </summary>
+	public int BlockFactor { get; set; } = 0;
+	#endregion // Properties
 
-    #region Constructors
-    public ExtendibleHashFileBlock()
+	#region Constructors
+	public ExtendibleHashFileBlock()
     {
 
     }
 
-    public ExtendibleHashFileBlock(ExtendibleHashFileBlock<T> copy)
+	public ExtendibleHashFileBlock(int blockFactor)
+	{
+		BlockFactor = blockFactor;
+	}
+
+	public ExtendibleHashFileBlock(ExtendibleHashFileBlock<T> copy)
     {
         Depth = copy.Depth;
         Values = copy.Values;
+		BlockFactor = copy.BlockFactor;
     }
     #endregion // Constructors
     
@@ -71,7 +78,7 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 	/// <returns>Integer</returns>
 	public int GetSize()
 	{
-		return BLOCK_SIZE;
+		return sizeof(int) + sizeof(int) + sizeof(int) + BlockFactor * new VisitEcv().GetSize(); // Depth + BlockFactor + Count of values + BlockFactor*sizeof(VisitEcv)
 	}
 
 	/// <summary>
@@ -80,19 +87,23 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 	/// <returns>Byte[]</returns>
 	public byte[] ToByteArray()
 	{
-        byte[] data = new byte[BLOCK_SIZE];
+        byte[] data = new byte[GetSize()];
 		int offset = 0;
 
 		BitConverter.GetBytes(Depth).CopyTo(data, offset);
 		offset += sizeof(int);
 
+		BitConverter.GetBytes(BlockFactor).CopyTo(data, offset);
+		offset += sizeof(int);
+
 		BitConverter.GetBytes(Values.Count).CopyTo(data, offset);
         offset += sizeof(int);
 
+		var valueSize = new VisitEcv().GetSize();
 		foreach (var value in Values)
 		{
 			value.ToByteArray().CopyTo(data, offset);
-			offset += value.GetSize();
+			offset += valueSize;
 		}
 
         return data;
@@ -110,20 +121,23 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 		Depth = BitConverter.ToInt32(data, offset);
 		offset += sizeof(int);
 
+		BlockFactor = BitConverter.ToInt32(data, offset);
+		offset += sizeof(int);
+
 		int count = BitConverter.ToInt32(data, offset);
 		offset += sizeof(int);
 
 		Values.Clear();
 
+		var valueSize = new VisitEcv().GetSize();
 		for (int i = 0; i < count; i++)
 		{
 			T value = new();
-            int valueSize = value.GetSize();
 
             byte[] valueData = data[offset..(offset + valueSize)];
 			value.FromByteArray(valueData);
 			Values.Add(value);
-			offset += value.GetSize();
+			offset += valueSize;
 		}
 
 		return this;

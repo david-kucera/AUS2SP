@@ -82,20 +82,12 @@ public class TestRP1 : IHashable<TestRP1>
 			
 		}
 
-		public TestRP1(int id, string ecv, string name, string surname)
+		public TestRP1(TestRP1 copy)
 		{
-			Name = name;
-			Surname = surname;
-			Ecv = ecv;
-			Id = id;
-		}
-
-		public TestRP1(TestRP1 p)
-		{
-			Name = p.Name;
-			Surname = p.Surname;
-			Ecv = p.Ecv;
-			Id = p.Id;
+			Name = copy.Name;
+			Surname = copy.Surname;
+			Ecv = copy.Ecv;
+			Id = copy.Id;
 		}
 		#endregion // Constructors
 
