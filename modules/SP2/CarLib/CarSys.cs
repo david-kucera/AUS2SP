@@ -172,10 +172,10 @@ namespace CarLib
             _hashFileEcv.Close();
         }
 
-		/// <summary>
-		/// Metóda na vymazanie všetkých dát zo súborov.
-		/// </summary>
-		public void Clear()
+        /// <summary>
+        /// Metóda na vymazanie všetkých dát zo súborov.
+        /// </summary>
+        public void Clear()
 		{
 			_heapFile.Clear();
 			_hashFileId.Clear();

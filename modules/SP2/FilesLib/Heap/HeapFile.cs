@@ -54,7 +54,7 @@ namespace FilesLib.Heap
 				throw new Exception("Error while opening data file: " + ex.Message);
             }
 
-			if (_file.Length > 0) LoadInitData();
+			if (File.ReadAllBytes(initFilePath).Length > 0) LoadInitData();
 		}
         #endregion // Constructor
 

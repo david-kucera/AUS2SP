@@ -350,11 +350,6 @@ namespace CarViewer
 			}
 			Environment.Exit(0);
 		}
-
-		private void ExitWithoutSaving_OnClick(object sender, RoutedEventArgs e)
-		{
-			Environment.Exit(0);
-		}
 		#endregion // Button handlers
 
 		#region Event handlers
@@ -371,10 +366,15 @@ namespace CarViewer
 			if (notes.Count == 0) NotesTextBox.Text = string.Empty;
 			else NotesTextBox.Text = string.Join("\n", notes);
 		}
-		#endregion // Event handlers
 
-		#region Private functions
-		private void RefreshData()
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+			Exit_OnClick(null!, null!);
+        }
+        #endregion // Event handlers
+
+        #region Private functions
+        private void RefreshData()
 		{
 			if (_currentlyDisplayedObject == null!)
 			{
@@ -404,5 +404,5 @@ namespace CarViewer
 			}
         }
         #endregion // Private functions
-	}
+    }
 }
