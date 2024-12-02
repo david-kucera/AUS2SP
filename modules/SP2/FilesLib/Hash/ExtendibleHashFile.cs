@@ -1,4 +1,5 @@
 using System.Collections;
+using FilesLib.Heap;
 using FilesLib.Interfaces;
 
 namespace FilesLib.Hash;
@@ -10,9 +11,9 @@ namespace FilesLib.Hash;
 public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 {
 	#region Class members
-	private int _blockFactor = 1;
 	private int _depth = 1;
 	private List<ExtendibleHashFileBlock<T>> _addresses = [];
+    private HeapFile<T> _heapFile = null!;
     private readonly string _initFilePath = string.Empty;
 	#endregion // Class members
 
@@ -24,23 +25,25 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     #endregion // Properties
 
     #region Constructors
-    public ExtendibleHashFile(string initFilePath, int blockFactor)
+    public ExtendibleHashFile(string initFilePath, string initHeapFilePath, string dataHeapFilePath, int blockSize)
     {
 	    if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
-	    _initFilePath = initFilePath;
-		if (File.ReadAllBytes(initFilePath).Length > 0)
+        if (!File.Exists(initHeapFilePath)) File.Create(initHeapFilePath).Close();
+        if (!File.Exists(dataHeapFilePath)) File.Create(dataHeapFilePath).Close();
+        _initFilePath = initFilePath;
+        _heapFile = new HeapFile<T>(initHeapFilePath, dataHeapFilePath, blockSize);
+        if (File.ReadAllBytes(initFilePath).Length > 0)
 		{
-			LoadFromInit();
+            LoadFromInit();
             return;
 		}
 
-		_addresses = [];
-        _addresses.Add(new ExtendibleHashFileBlock<T>(blockFactor));
-        _addresses.Add(new ExtendibleHashFileBlock<T>(blockFactor));
-        _blockFactor = blockFactor;
+        _addresses = [];
+        _addresses.Add(new ExtendibleHashFileBlock<T>(_heapFile.CreateNewBlock()));
+        _addresses.Add(new ExtendibleHashFileBlock<T>(_heapFile.CreateNewBlock()));
     }
     #endregion // Constructors
-    
+
     #region Public methods
     /// <summary>
     /// Vloží dáta do súboru.
@@ -55,8 +58,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         {
             int prefix = GetPrefix(hash);
             var block = GetBlock(data);
+            var heapFileBlock = _heapFile.GetBlock(block.Address);
 
-            if (_blockFactor == block.Values.Count)
+            if (heapFileBlock.BlockFactor == heapFileBlock.ValidCount)
             {
                 if (_addresses[prefix].Depth == _depth)
                 {
@@ -67,7 +71,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             }
             else
             {
-                _addresses[prefix].Values.Add(data);
+                heapFileBlock.AddRecord(data);
+                _heapFile.WriteBlock(heapFileBlock, block.Address);
                 RecordsCount++;
                 notInserted = false;
             }
@@ -82,7 +87,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     public T Find(T data)
     {
         var addressBlock = GetBlock(data);
-        foreach (var record in addressBlock.Values)
+        var heapFileBlock = _heapFile.GetBlock(addressBlock.Address);
+        foreach (var record in heapFileBlock.Records)
         {
             if (record.Equals(data)) return (T)record;
         }
@@ -97,20 +103,6 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     public void Delete(T data)
     {
         throw new NotImplementedException();
-		var hash = data.GetHash();
-        var prefix = GetPrefix(hash);
-        var block = _addresses[prefix];
-        var entry = block.GetValue(data);
- 
-        if (entry != null!)
-        {
-            _addresses[prefix].Values.Remove(entry);
-            RecordsCount--;
-            if (block.Values.Count < _blockFactor / 2 && block.Depth > 1)
-            {
-                MergeBlock(prefix);
-            }
-        }
     }
 
 	/// <summary>
@@ -119,7 +111,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	/// <returns>String</returns>
 	public override string ToString()
     {
-	    return $"Depth: {_depth}, RecordsCount: {RecordsCount}, BlockFactor: {_blockFactor}";
+	    return $"Depth: {_depth}, RecordsCount: {RecordsCount}";
     }
 
     /// <summary>
@@ -146,6 +138,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     public void Close()
     {
         SaveToInit();
+        _heapFile.Close();
     }
 
     /// <summary>
@@ -153,9 +146,10 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	/// </summary>
 	public void Clear()
     {
+        _heapFile.Clear();
 	    _addresses = [];
-	    _addresses.Add(new ExtendibleHashFileBlock<T>(_blockFactor));
-	    _addresses.Add(new ExtendibleHashFileBlock<T>(_blockFactor));
+	    _addresses.Add(new ExtendibleHashFileBlock<T>());
+	    _addresses.Add(new ExtendibleHashFileBlock<T>());
 	    _depth = 1;
 	    RecordsCount = 0;
     }
@@ -192,13 +186,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	{
         int offset = 0;
 
-		_blockFactor = BitConverter.ToInt32(data, offset);
-		offset += sizeof(int);
-
 		_depth = BitConverter.ToInt32(data, offset);
-		offset += sizeof(int);
-
-		RecordsCount = BitConverter.ToInt32(data, offset);
 		offset += sizeof(int);
 
 		int addressesCount = BitConverter.ToInt32(data, offset);
@@ -208,7 +196,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
 		for (int i = 0; i < addressesCount; i++)
 		{
-			ExtendibleHashFileBlock<T> address = new(_blockFactor);
+			ExtendibleHashFileBlock<T> address = new();
             var addressSize = address.GetSize();
 
             byte[] addressData = data[offset..(offset + addressSize)];
@@ -225,13 +213,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		byte[] bytes = new byte[size];
 		int offset = 0;
 
-		BitConverter.GetBytes(_blockFactor).CopyTo(bytes, offset);
-		offset += sizeof(int);
-
 		BitConverter.GetBytes(_depth).CopyTo(bytes, offset);
-		offset += sizeof(int);
-
-		BitConverter.GetBytes(RecordsCount).CopyTo(bytes, offset);
 		offset += sizeof(int);
 
 		BitConverter.GetBytes(_addresses.Count).CopyTo(bytes, offset);
@@ -248,7 +230,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
 	private int GetSize()
 	{
-		return sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int) + _addresses.Sum(address => address.GetSize());
+		return sizeof(int) + sizeof(int) + _addresses.Sum(address => address.GetSize());
 	}
 
 	private int GetPrefix(BitArray hash)
@@ -286,32 +268,37 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         var groupLength = (int)Math.Pow(2, _depth - _addresses[splittingIndex].Depth);
         var addressIndex = (splittingIndex/groupLength) * groupLength;
         var splittingBlock = _addresses[addressIndex];
+        var splittingBlockHeapFile = _heapFile.GetBlock(splittingBlock.Address);
         var localDepth = splittingBlock.Depth;
         splittingBlock.Depth++;
 
         var newAddressBlock = new ExtendibleHashFileBlock<T>()
         {
             Depth = splittingBlock.Depth,
-            BlockFactor = _blockFactor
-		};
+            Address = _heapFile.CreateNewBlock()
+        };
+        var newBlockHeapFile = _heapFile.GetBlock(newAddressBlock.Address);
+
         var halfLength = ((int)Math.Pow(2, _depth - localDepth))/2;
         var startIndex = addressIndex + halfLength;
         var endIndex = startIndex + halfLength;
  
         for (int i = startIndex; i < endIndex; i++) _addresses[i] = newAddressBlock;
         
-        var oldBlockItems = new List<T>();
-        var newBlockItems = new List<T>();
-        foreach (var record in splittingBlock.Values)
+        var recordsToRehash = new List<T>(splittingBlockHeapFile.Records);
+        splittingBlockHeapFile.ClearRecords();
+        newBlockHeapFile.ClearRecords();
+        foreach (var record in recordsToRehash)
         {
 	        var hash = record.GetHash();
 	        int newPrefix = GetPrefix(hash);
-            
-	        if (newPrefix != addressIndex) newBlockItems.Add(record);
-	        else oldBlockItems.Add(record);
+
+            if (newPrefix != addressIndex) newBlockHeapFile.AddRecord(record);
+            else splittingBlockHeapFile.AddRecord(record);
         }
-        splittingBlock.Values = oldBlockItems;
-        newAddressBlock.Values = newBlockItems;
+
+        _heapFile.WriteBlock(splittingBlockHeapFile, splittingBlock.Address);
+        _heapFile.WriteBlock(newBlockHeapFile, newAddressBlock.Address);
     }
 
     private void IncreaseDepth()
@@ -325,10 +312,5 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
         }
         _addresses = newAddresses;
     }
-
-	private void MergeBlock(int blockIndex)
-	{
-		// TODO
-	}
 	#endregion // Private methods
 }

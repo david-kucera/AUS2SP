@@ -55,15 +55,14 @@ namespace FilesLib.Data
 
         public BitArray GetHash()
         {
-            byte[] stringBytes = Encoding.UTF8.GetBytes(Ecv);
-            using SHA256 sha256 = SHA256.Create();
-            byte[] hashBytes = sha256.ComputeHash(stringBytes);
-            byte[] firstFourBytes = new byte[4];
-			for (int i = 0; i < 4; i++)
+            byte[] stringBytes = Encoding.ASCII.GetBytes(Ecv);
+            byte[] lastFourBytes = new byte[4];
+            int bytesToCopy = stringBytes.Length >= 4 ? 4 : stringBytes.Length;
+            for (int i = 0; i < bytesToCopy; i++)
 			{
-				firstFourBytes[i] = hashBytes[i];
+				lastFourBytes[i] = stringBytes[stringBytes.Length - bytesToCopy + i];
 			}
-			return new BitArray(firstFourBytes);
+			return new BitArray(lastFourBytes);
         }
 
         public int GetSize()

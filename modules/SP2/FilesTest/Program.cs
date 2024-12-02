@@ -9,9 +9,12 @@ namespace FilesTest
     {
         #region Constants
         public static int BLOCK_SIZE = 4096;
-		private const string INIT_FILE = "../../userdata/t_heap_init.aus";
-		private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
-		private const string DATA_FILE = "../../userdata/t_person.aus";
+		private const string INIT_FILE = "../../userdata/t_person_init.aus";
+        private const string DATA_FILE = "../../userdata/t_person.aus";
+        
+        private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
+        private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
+        private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
 		public static int NUMBER_OF_PEOPLE = 1_000;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 10;
@@ -200,7 +203,7 @@ namespace FilesTest
 				Console.WriteLine($"{r}. replication");
 
                 HeapFile<TestRP1> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
-                ExtendibleHashFile<TestRP1Id> extendibleHashFile = new(INIT_FILE_HASH, heapFile.BlockFactor);
+                ExtendibleHashFile<TestRP1Id> extendibleHashFile = new(INIT_FILE_HASH, INIT_FILE_HEAP_HASH, DATA_FILE_HEAP_HASH, BLOCK_SIZE);
                 DataGenerator generator = new(r);
                 List<TestRP1> people = [];
                 

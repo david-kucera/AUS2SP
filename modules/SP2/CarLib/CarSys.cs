@@ -11,7 +11,7 @@ namespace CarLib
 	public class CarSys
 	{
 		#region Constants
-		private const int BLOCK_SIZE_HEAP = 4096 * 2;
+		private const int BLOCK_SIZE_HEAP = 5000;
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
         private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
         private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";

@@ -182,6 +182,47 @@ namespace FilesLib.Heap
         }
 
         /// <summary>
+        /// Zapíše blok na danú adresu.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="address"></param>
+        public void WriteBlock(Block<T> block, int address)
+        {
+            byte[] bytes = block.ToByteArray();
+            _file.Seek(address, SeekOrigin.Begin);
+            _file.Write(bytes, 0, BlockSize);
+            _file.Flush();
+        }
+
+        /// <summary>
+        /// Vráti blok na danej adrese.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public Block<T> GetBlock(int address)
+        {
+            CheckAddress(address);
+            _file.Seek(address, SeekOrigin.Begin);
+            byte[] bytes = new byte[BlockSize];
+            _file.Read(bytes, 0, BlockSize);
+            var block = new Block<T>(BlockSize, new T());
+            block.FromByteArray(bytes);
+            return block;
+        }
+
+        /// <summary>
+        /// Vytvorí nový blok na koniec súboru.
+        /// </summary>
+        /// <returns>Adresa nového bloku.</returns>
+        public int CreateNewBlock()
+        {
+            var address = (int)_file.Length;
+            var newBlock = new Block<T>(BlockSize, new T());
+            WriteBlock(newBlock, address);
+            return address;
+        }
+
+        /// <summary>
         /// Vyčistí celý súbor.
         /// </summary>
         public void Clear()
@@ -246,25 +287,6 @@ namespace FilesLib.Heap
 			offset += sizeof(int);
 			BlockSize = BitConverter.ToInt32(buffer, offset);
 		}
-
-        private void WriteBlock(Block<T> block, int address)
-        {
-	        byte[] bytes = block.ToByteArray();
-	        _file.Seek(address, SeekOrigin.Begin);
-	        _file.Write(bytes, 0, BlockSize);
-	        _file.Flush();
-        }
-
-		private Block<T> GetBlock(int address)
-        {
-	        CheckAddress(address);
-	        _file.Seek(address, SeekOrigin.Begin);
-	        byte[] bytes = new byte[BlockSize];
-	        _file.Read(bytes, 0, BlockSize);
-	        var block = new Block<T>(BlockSize, new T());
-	        block.FromByteArray(bytes);
-	        return block;
-        }
 
         private List<Block<T>> GetAllBlocks()
         {
@@ -408,5 +430,5 @@ namespace FilesLib.Heap
 	        if (address % BlockSize != 0 || address < 0 || address > _file.Length) throw new ArgumentException("Invalid address");
         }
         #endregion // Private functions
-	}
+    }
 }
