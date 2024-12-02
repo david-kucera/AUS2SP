@@ -11,15 +11,21 @@ namespace CarLib
 	public class CarSys
 	{
 		#region Constants
-		private const int BLOCK_SIZE_HEAP = 5000;
+		private const int BLOCK_SIZE = 5000;
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
-        private const string INIT_FILE_ID = "../../userdata/hashId_init.aus";
-        private const string INIT_FILE_ECV = "../../userdata/hashEcv_init.aus";
         private const string DATA_FILE = "../../userdata/person.aus";
-		#endregion // Constants
 
-		#region Class members
-		private HeapFile<Person> _heapFile;
+        private const string INIT_FILE_HASH_ID = "../../userdata/hash_init_id.aus";
+        private const string INIT_FILE_HEAP_HASH_ID = "../../userdata/hash_init_heap_id.aus";
+        private const string DATA_FILE_HEAP_HASH_ID = "../../userdata/hash_heap_id.aus";
+
+        private const string INIT_FILE_HASH_ECV = "../../userdata/hash_init_ecv.aus";
+        private const string INIT_FILE_HEAP_HASH_ECV = "../../userdata/hash_init_heap_ecv.aus";
+        private const string DATA_FILE_HEAP_HASH_ECV = "../../userdata/hash_heap_ecv.aus";
+        #endregion // Constants
+
+        #region Class members
+        private HeapFile<Person> _heapFile;
         private readonly ExtendibleHashFile<VisitId> _hashFileId;
 		private readonly ExtendibleHashFile<VisitEcv> _hashFileEcv;
         #endregion // Class members
@@ -27,9 +33,9 @@ namespace CarLib
         #region Constructor
         public CarSys()
 		{
-			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE_HEAP);
-            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_ID, _heapFile.BlockFactor);
-            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_ECV, _heapFile.BlockFactor);
+			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
+            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_HASH_ID, INIT_FILE_HEAP_HASH_ID, DATA_FILE_HEAP_HASH_ID, BLOCK_SIZE);
+            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_HASH_ECV, INIT_FILE_HEAP_HASH_ECV, DATA_FILE_HEAP_HASH_ECV, BLOCK_SIZE);
         }
 		#endregion // Constructor
 

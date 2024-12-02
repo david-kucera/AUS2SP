@@ -30,6 +30,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	    if (!File.Exists(initFilePath)) File.Create(initFilePath).Close();
         if (!File.Exists(initHeapFilePath)) File.Create(initHeapFilePath).Close();
         if (!File.Exists(dataHeapFilePath)) File.Create(dataHeapFilePath).Close();
+
         _initFilePath = initFilePath;
         _heapFile = new HeapFile<T>(initHeapFilePath, dataHeapFilePath, blockSize);
         if (File.ReadAllBytes(initFilePath).Length > 0)
@@ -189,10 +190,13 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		_depth = BitConverter.ToInt32(data, offset);
 		offset += sizeof(int);
 
-		int addressesCount = BitConverter.ToInt32(data, offset);
+        RecordsCount = BitConverter.ToInt32(data, offset);
+        offset += sizeof(int);
+
+        int addressesCount = BitConverter.ToInt32(data, offset);
 		offset += sizeof(int);
 
-		_addresses.Clear();
+        _addresses.Clear();
 
 		for (int i = 0; i < addressesCount; i++)
 		{
@@ -216,7 +220,10 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		BitConverter.GetBytes(_depth).CopyTo(bytes, offset);
 		offset += sizeof(int);
 
-		BitConverter.GetBytes(_addresses.Count).CopyTo(bytes, offset);
+        BitConverter.GetBytes(RecordsCount).CopyTo(bytes, offset);
+        offset += sizeof(int);
+
+        BitConverter.GetBytes(_addresses.Count).CopyTo(bytes, offset);
 		offset += sizeof(int);
 
 		foreach (var address in _addresses)
@@ -230,7 +237,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 
 	private int GetSize()
 	{
-		return sizeof(int) + sizeof(int) + _addresses.Sum(address => address.GetSize());
+		return sizeof(int) + sizeof(int) + sizeof(int) + _addresses.Sum(address => address.GetSize());
 	}
 
 	private int GetPrefix(BitArray hash)
