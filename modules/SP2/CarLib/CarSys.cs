@@ -26,16 +26,16 @@ namespace CarLib
 
         #region Class members
         private HeapFile<Person> _heapFile;
-        private readonly ExtendibleHashFile<VisitId> _hashFileId;
-		private readonly ExtendibleHashFile<VisitEcv> _hashFileEcv;
+        private readonly ExtendibleHashFile<PersonId> _hashFileId;
+		private readonly ExtendibleHashFile<PersonEcv> _hashFileEcv;
         #endregion // Class members
 
         #region Constructor
         public CarSys()
 		{
 			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
-            _hashFileId = new ExtendibleHashFile<VisitId>(INIT_FILE_HASH_ID, INIT_FILE_HEAP_HASH_ID, DATA_FILE_HEAP_HASH_ID, BLOCK_SIZE);
-            _hashFileEcv = new ExtendibleHashFile<VisitEcv>(INIT_FILE_HASH_ECV, INIT_FILE_HEAP_HASH_ECV, DATA_FILE_HEAP_HASH_ECV, BLOCK_SIZE);
+            _hashFileId = new ExtendibleHashFile<PersonId>(INIT_FILE_HASH_ID, INIT_FILE_HEAP_HASH_ID, DATA_FILE_HEAP_HASH_ID, BLOCK_SIZE);
+            _hashFileEcv = new ExtendibleHashFile<PersonEcv>(INIT_FILE_HASH_ECV, INIT_FILE_HEAP_HASH_ECV, DATA_FILE_HEAP_HASH_ECV, BLOCK_SIZE);
         }
 		#endregion // Constructor
 
@@ -47,7 +47,7 @@ namespace CarLib
 		/// <returns>Person</returns>
 		public Person Find(int id)
 		{
-			VisitId dummy = new()
+			PersonId dummy = new()
 			{
 				Id = id
 			};
@@ -69,7 +69,7 @@ namespace CarLib
 		/// <returns>Person</returns>
 		public Person Find(string ecv)
 		{
-			VisitEcv dummy = new()
+			PersonEcv dummy = new()
 			{
 				Ecv = ecv
 			};
@@ -91,12 +91,12 @@ namespace CarLib
 		public void Add(Person person)
 		{
 			var address = _heapFile.Insert(person);
-			VisitId visitId = new()
+			PersonId visitId = new()
 			{
 				Address = address,
 				Id = person.Id
 			};
-			VisitEcv visitEcv = new()
+			PersonEcv visitEcv = new()
 			{
 				Address = address,
 				Ecv = person.Ecv
@@ -112,7 +112,7 @@ namespace CarLib
 		/// <exception cref="Exception">Ak nastane chyba pri upravovaní osoby.</exception>
 		public void Update(Person updatedPerson)
 		{
-			var address = _hashFileId.Find(new VisitId { Id = updatedPerson.Id }).Address;
+			var address = _hashFileId.Find(new PersonId { Id = updatedPerson.Id }).Address;
 			try
 			{
 				_heapFile.Update(address, updatedPerson);
@@ -134,10 +134,10 @@ namespace CarLib
 			// TODO
 			try
 			{
-				var visitId = new VisitId { Id = person.Id };
+				var visitId = new PersonId { Id = person.Id };
 				var address = _hashFileId.Find(visitId).Address;
 				_hashFileId.Delete(visitId);
-				var visitEcv = new VisitEcv { Ecv = person.Ecv };
+				var visitEcv = new PersonEcv { Ecv = person.Ecv };
 				_hashFileEcv.Delete(visitEcv);
 
 				_heapFile.Delete(address, person);

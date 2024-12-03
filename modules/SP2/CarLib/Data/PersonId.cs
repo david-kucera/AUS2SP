@@ -6,7 +6,7 @@ namespace CarLib.Data
     /// <summary>
     /// Class used for storing in ExtendibleHashFile.
     /// </summary>
-    public class VisitId : IHashable<VisitId>
+    public class PersonId : IHashable<PersonId>
     {
         #region Properties
         public int Id { get; set; } = -1;
@@ -19,17 +19,17 @@ namespace CarLib.Data
 			return $"Address: {Address}, Id: {Id}";
 		}
 
-		public VisitId CreateClass()
+		public PersonId CreateClass()
         {
-            return new VisitId();
+            return new PersonId();
         }
 
-        public bool Equals(VisitId data)
+        public bool Equals(PersonId data)
         {
             return Id == data.Id;
         }
 
-        public VisitId FromByteArray(byte[] byteArray)
+        public PersonId FromByteArray(byte[] byteArray)
         {
 			int offset = 0;
 

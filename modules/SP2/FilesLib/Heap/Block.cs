@@ -62,32 +62,6 @@ namespace FilesLib.Heap
 				}
 			}
 		}
-
-		public Block(Block<T> block)
-		{
-			_blockSize = block._blockSize;
-			_size = block._size;
-			_dataSize = block._dataSize;
-			ClassType = block.ClassType;
-
-			ValidCount = 0;
-			_prevBlock = block.Previous;
-			_nextBlock = block.Next;
-			
-			Records = new List<T>(BlockFactor);
-			for (int i = 0; i < BlockFactor; i++)
-			{
-				try
-				{
-					T? dummy = Activator.CreateInstance(ClassType) as T;	
-					Records.Add(dummy!);
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e.Message);
-				}
-			}
-		}
 		#endregion // Constructors
 
 		#region Public functions
@@ -125,11 +99,6 @@ namespace FilesLib.Heap
             }
             return false;
         }
-
-		public T GetRecord(int index)
-		{
-			return Records[index];
-		}
 
 		public T GetRecord(T record)
 		{

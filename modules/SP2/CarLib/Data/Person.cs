@@ -125,38 +125,6 @@ namespace CarLib.Data
 			}
 			return $"[{Id}, {Ecv}] {Name} {Surname} ({Visits.Count}):\n{zaznamy}";
 		}
-		
-		/// <summary>
-		/// Adds a visit to a list of visits, if possible.
-		/// </summary>
-		/// <param name="visit">New visit.</param>
-		/// <exception cref="ArgumentException">If limit is reached.</exception>
-		public void AddVisit(Visit visit)
-		{
-			if (Visits.Count == MAX_VISITS) throw new ArgumentException("Zaznamy is full!");
-			else Visits.Add(visit);
-		}
-
-		/// <summary>
-		/// Gets visit at given index from list of visits.
-		/// </summary>
-		/// <param name="i">Index from visits list.</param>
-		/// <returns>Visit at given index.</returns>
-		public Visit GetVisit(int i)
-		{
-			return Visits.ElementAt(i);
-		}
-
-		/// <summary>
-		/// Removes a visit from list of visits.
-		/// </summary>
-		/// <param name="visit">Visit to remove.</param>
-		/// <exception cref="ArgumentException">If visit is not in the visits list.</exception>
-		public void RemoveVisit(Visit visit)
-		{
-			if (Visits.Contains(visit)) Visits.Remove(visit);
-			else throw new ArgumentException($"Visit {visit.ToString()} is not in the list!");
-		}
 
 		/// <summary>
 		/// Serializes the class to byte array.

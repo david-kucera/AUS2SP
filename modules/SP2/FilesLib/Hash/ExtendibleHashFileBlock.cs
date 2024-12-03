@@ -6,7 +6,7 @@ namespace FilesLib.Hash;
 /// Class that represents hash file block.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
+public class ExtendibleHashFileBlock<T> : IRecord<T> where T : class, IHashable<T>, new()
 {
 	#region Properties
 	/// <summary>
@@ -79,16 +79,16 @@ public class ExtendibleHashFileBlock<T> where T : class, IHashable<T>, new()
 	/// </summary>
 	/// <param name="data">Byte[]</param>
 	/// <returns>Class instance</returns>
-	public ExtendibleHashFileBlock<T> FromByteArray(byte[] data)
-	{
+    public T FromByteArray(byte[] data)
+    {
         int offset = 0;
 
-		Depth = BitConverter.ToInt32(data, offset);
-		offset += sizeof(int);
+        Depth = BitConverter.ToInt32(data, offset);
+        offset += sizeof(int);
 
-		Address = BitConverter.ToInt32(data, offset);
+        Address = BitConverter.ToInt32(data, offset);
 
-		return this;
-	}
-	#endregion // Public methods
+        return this as T;
+    }
+    #endregion // Public methods
 }

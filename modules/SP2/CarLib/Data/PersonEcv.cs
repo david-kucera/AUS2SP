@@ -7,7 +7,7 @@ namespace CarLib.Data
     /// <summary>
     /// Class used for storing in ExtendibleHashFile.
     /// </summary>
-    public class VisitEcv : IHashable<VisitEcv>
+    public class PersonEcv : IHashable<PersonEcv>
     {
         #region Constants
         private const int MAX_ECV_LENGTH = 10;
@@ -24,17 +24,17 @@ namespace CarLib.Data
 	        return $"Address: {Address}, Ecv: {Ecv}";
         }
 
-        public VisitEcv CreateClass()
+        public PersonEcv CreateClass()
         {
-            return new VisitEcv();
+            return new PersonEcv();
         }
 
-        public bool Equals(VisitEcv data)
+        public bool Equals(PersonEcv data)
         {
             return Ecv == data.Ecv;
         }
 
-        public VisitEcv FromByteArray(byte[] byteArray)
+        public PersonEcv FromByteArray(byte[] byteArray)
         {
 			int offset = 0;
 
