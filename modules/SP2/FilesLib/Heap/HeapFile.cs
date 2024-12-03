@@ -280,8 +280,9 @@ namespace FilesLib.Heap
 	        var initFile = new FileStream(_initFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 	        initFile.Seek(offset, SeekOrigin.Begin);
 	        initFile.Read(buffer, offset, GetSize());
-            
-	        _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
+            initFile.Close();
+
+            _nextFreeBlockAddress = BitConverter.ToInt32(buffer, offset);
 	        offset += sizeof(int);
 	        _nextEmptyBlockAddress = BitConverter.ToInt32(buffer, offset);
 			offset += sizeof(int);

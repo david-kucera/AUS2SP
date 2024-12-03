@@ -165,7 +165,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 		using (var initFile = new FileStream(_initFilePath, FileMode.Open, FileAccess.Read))
 		{
 			initFile.Read(buffer, 0, buffer.Length);
-		}
+            initFile.Close();
+        }
 
 		FromByteArray(buffer);
 	}
