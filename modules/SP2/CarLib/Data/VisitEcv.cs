@@ -1,9 +1,8 @@
 ﻿using System.Collections;
-using System.Security.Cryptography;
 using System.Text;
 using FilesLib.Interfaces;
 
-namespace FilesLib.Data
+namespace CarLib.Data
 {
     /// <summary>
     /// Class used for storing in ExtendibleHashFile.

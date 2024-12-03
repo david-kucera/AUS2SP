@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using FilesLib.Interfaces;
 
-namespace FilesLib.Data
+namespace CarLib.Data
 {
 	public class Visit : IData<Visit>
 	{

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using FilesLib.Interfaces;
 
-namespace FilesLib.Data
+namespace CarLib.Data
 {
     /// <summary>
     /// Class used for storing in ExtendibleHashFile.

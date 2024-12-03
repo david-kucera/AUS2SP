@@ -1,4 +1,4 @@
-namespace FilesLib.Generator;
+namespace CarLib.Generator;
 
 public enum OperationType
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using FilesLib.Interfaces;
 
-namespace FilesLib.Data
+namespace CarLib.Data.TestingData
 {
     /// <summary>
     /// Class for testing purposes...
@@ -28,13 +28,13 @@ namespace FilesLib.Data
         {
             int offset = 0;
 
-			Id = BitConverter.ToInt32(byteArray, offset);
-			offset += sizeof(int);
+            Id = BitConverter.ToInt32(byteArray, offset);
+            offset += sizeof(int);
 
-			Address = BitConverter.ToInt32(byteArray, offset);
+            Address = BitConverter.ToInt32(byteArray, offset);
 
-			return this;
-		}
+            return this;
+        }
 
         public BitArray GetHash()
         {
@@ -50,11 +50,11 @@ namespace FilesLib.Data
         {
             byte[] data = new byte[GetSize()];
 
-			BitConverter.GetBytes(Id).CopyTo(data, 0);
+            BitConverter.GetBytes(Id).CopyTo(data, 0);
 
-			BitConverter.GetBytes(Address).CopyTo(data, sizeof(int));
+            BitConverter.GetBytes(Address).CopyTo(data, sizeof(int));
 
-			return data;
+            return data;
         }
         #endregion // Public functions
     }
