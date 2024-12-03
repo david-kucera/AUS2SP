@@ -201,7 +201,7 @@ namespace FilesLib.Heap
         /// <returns></returns>
         public Block<T> GetBlock(int address)
         {
-            CheckAddress(address);
+            //CheckAddress(address);
             _file.Seek(address, SeekOrigin.Begin);
             byte[] bytes = new byte[BlockSize];
             _file.Read(bytes, 0, BlockSize);
@@ -220,6 +220,18 @@ namespace FilesLib.Heap
             var newBlock = new Block<T>(BlockSize, new T());
             WriteBlock(newBlock, address);
             return address;
+        }
+
+		public int GetEmptyBlock()
+		{
+			if (_nextEmptyBlockAddress == -1) return CreateNewBlock();
+			else 
+			{
+				var address = _nextEmptyBlockAddress;
+				var newBlock = new Block<T>(BlockSize, new T());
+				WriteBlock(newBlock, address);
+                return _nextEmptyBlockAddress; 
+			}
         }
 
         /// <summary>

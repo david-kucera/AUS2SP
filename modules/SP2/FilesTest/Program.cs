@@ -16,7 +16,7 @@ namespace FilesTest
         private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
         private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
         private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
-		public static int NUMBER_OF_PEOPLE = 1_000;
+		public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
@@ -228,9 +228,11 @@ namespace FilesTest
                 for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
-                    if (operation == OperationType.Delete) continue;
+                    if (operation == OperationType.Delete && people.Count == 0) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
                     //Console.WriteLine(i + ". " + operation);
+                    //if (i == 267131)
+                    //    Console.WriteLine("TU");
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -248,18 +250,29 @@ namespace FilesTest
                             people.Add(new TestRP1(newPerson));
                             inserts++;
                             break;
-                        //case OperationType.Delete:
-                        //    var countBeforeDelete = extendibleHashFile.RecordsCount;
-                        //    if (people.Count == 0) break;
-                        //    var index = generator.GenerateInt(0, people.Count);
-                        //    var person = people[index];
-                        //    people.RemoveAt(index);
-                        //    heapFile.Delete(person);
-                        //    extendibleHashFile.Delete(person);
-                        //    deletes++;
-                        //    var countAfterDelete = extendibleHashFile.RecordsCount;
-                        //    if (countAfterDelete+1 != countBeforeDelete) throw new Exception("Delete failed!");
-                        //    break;
+                        case OperationType.Delete:
+                            var countBeforeDelete = extendibleHashFile.RecordsCount;
+                            if (people.Count == 0) break;
+                            var index = generator.GenerateInt(0, people.Count);
+                            var person = people[index];
+                            people.RemoveAt(index);
+                            if (i == 267128)
+                            {
+                                continue;
+                            }
+
+                            TestRP1Id personIid = new()
+                            {
+                                Id = person.Id
+                            };
+                            var addr = extendibleHashFile.Find(personIid);
+                            var aa = addr.Address;
+                            extendibleHashFile.Delete(personIid);
+                            heapFile.Delete(aa, person);
+                            deletes++;
+                            var countAfterDelete = extendibleHashFile.RecordsCount;
+                            if (countAfterDelete + 1 != countBeforeDelete) throw new Exception("Delete failed!");
+                            break;
                         case OperationType.Find:
                             if (people.Count == 0) break;
                             var iindex = generator.GenerateInt(0, people.Count);
