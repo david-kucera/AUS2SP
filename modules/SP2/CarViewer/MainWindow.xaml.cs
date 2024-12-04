@@ -58,9 +58,10 @@ namespace CarViewer
 
 		private void DeleteButton_OnClick(object sender, RoutedEventArgs e)
 		{
-            // TODO - vymazanie osoby z databazy
-            throw new NotImplementedException();
-		}
+			_carSys.Remove(_currentlyDisplayedObject);
+            _currentlyDisplayedObject = null!;
+            RefreshData();
+        }
 
 		private void EditButton_OnClick(object sender, RoutedEventArgs e)
 		{
@@ -76,20 +77,20 @@ namespace CarViewer
 				return;
 			}
 
-			if (keyChanged) // TODO zmenit po implementacii operacie delete v hash file
-			{
-				MessageBox.Show("Nie je možné meniť ID alebo ECV osoby!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
-				return;
-			}
+			//if (keyChanged) // TODO zmenit po implementacii operacie delete v hash file
+			//{
+			//	MessageBox.Show("Nie je možné meniť ID alebo ECV osoby!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+			//	return;
+			//}
 
 			int oldId = _currentlyDisplayedObject.Id;
 			string oldEcv = _currentlyDisplayedObject.Ecv;
-            // TODO kontrola dlzky ecv a id
+
             if (keyChanged)
 			{
 				try
 				{
-					_currentlyDisplayedObject.Id = int.Parse(IdTextBox.Text);
+                    _currentlyDisplayedObject.Id = int.Parse(IdTextBox.Text);
 				}
 				catch (Exception ex)
 				{
@@ -110,7 +111,12 @@ namespace CarViewer
 				_currentlyDisplayedObject.Ecv = EcvTextBox.Text;
 				try
 				{
-					_carSys.CheckEcv(_currentlyDisplayedObject.Ecv);
+					if (_currentlyDisplayedObject.Ecv.Length > 10)
+                    {
+                        MessageBox.Show("ECV nesmie byť dlhšie ako 10 znakov!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    _carSys.CheckEcv(_currentlyDisplayedObject.Ecv);
 				}
 				catch (Exception ex)
 				{
@@ -386,7 +392,8 @@ namespace CarViewer
                 NotesTextBox.Text = string.Empty;
                 EditButton.IsEnabled = false;
 				AddVisitButton.IsEnabled = false;
-			}
+				DeleteButton.IsEnabled = false;
+            }
 			else
 			{
                 IdTextBox.Text = _currentlyDisplayedObject.Id.ToString();
@@ -401,7 +408,8 @@ namespace CarViewer
 				NotesTextBox.Text = string.Empty;
                 EditButton.IsEnabled = true;
 				AddVisitButton.IsEnabled = true;
-			}
+				DeleteButton.IsEnabled = true;
+            }
         }
         #endregion // Private functions
     }

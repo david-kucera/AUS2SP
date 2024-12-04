@@ -116,14 +116,7 @@ namespace CarLib.Data
 		/// <returns>string</returns>
 		public override string ToString()
 		{
-			var zaznamy = string.Empty;
-			int i = 1;
-			foreach (var visit in Visits)
-			{
-				zaznamy += $"{i}. {visit.ToString()}\n";
-				i++;
-			}
-			return $"[{Id}, {Ecv}] {Name} {Surname} ({Visits.Count}):\n{zaznamy}";
+			return $"[{Id}, {Ecv}] {Name} {Surname} ({Visits.Count})\n";
 		}
 
 		/// <summary>

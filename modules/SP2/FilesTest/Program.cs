@@ -16,7 +16,7 @@ namespace FilesTest
         private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
         private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
         private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
-		public static int NUMBER_OF_PEOPLE = 0;
+		public static int NUMBER_OF_PEOPLE = 10_000;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
@@ -201,6 +201,8 @@ namespace FilesTest
                 if (File.Exists(DATA_FILE)) File.Delete(DATA_FILE);
                 if (File.Exists(INIT_FILE)) File.Delete(INIT_FILE);
                 if (File.Exists(INIT_FILE_HASH)) File.Delete(INIT_FILE_HASH);
+                if (File.Exists(INIT_FILE_HEAP_HASH)) File.Delete(INIT_FILE_HEAP_HASH);
+                if (File.Exists(DATA_FILE_HEAP_HASH)) File.Delete(DATA_FILE_HEAP_HASH);
 				Console.WriteLine($"{r}. replication");
 
                 HeapFile<TestRP1> heapFile = new(INIT_FILE, DATA_FILE, BLOCK_SIZE);
@@ -230,9 +232,8 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete && people.Count == 0) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    Console.WriteLine(i + ". " + operation);
-                    //if (i == 267131)
-                    //    Console.WriteLine("TU");
+                    if (operation == OperationType.Insert) continue;
+                    //Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:
@@ -256,11 +257,6 @@ namespace FilesTest
                             var index = generator.GenerateInt(0, people.Count);
                             var person = people[index];
                             people.RemoveAt(index);
-                            if (i == 267128)
-                            {
-                                continue;
-                            }
-
                             TestRP1Id personIid = new()
                             {
                                 Id = person.Id
@@ -289,7 +285,9 @@ namespace FilesTest
                     }
                 }
 
-                Console.WriteLine($"Inserted {inserts} inserts, {deletes} deletes, {searches} searches");
+                //Console.WriteLine($"Inserted {inserts} inserts, {deletes} deletes, {searches} searches");
+                Console.WriteLine(extendibleHashFile.SequentialOutput());
+                Console.WriteLine(heapFile.SequentialOutput());
                 extendibleHashFile.Close();
 				heapFile.Close();
 			}

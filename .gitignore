@@ -20,3 +20,5 @@
 /modules/SP1/GeoLib/.vs
 *.user
 *.DS_Store
+/runARM64_D/net8.0
+/uml/png/Thumbs.db

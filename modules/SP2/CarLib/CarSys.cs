@@ -116,7 +116,7 @@ namespace CarLib
 			try
 			{
 				_heapFile.Update(address, updatedPerson);
-			}
+            }
 			catch (Exception ex)
 			{
 				throw new Exception("Chyba pri upravovaní osoby: " + ex.Message);
@@ -125,13 +125,26 @@ namespace CarLib
 
 		public void UpdateKeyChanged(Person editedPerson, int oldId, string oldEcv)
 		{
-			// TODO - najskor zmazat z indexov, heap file a potom vlozit s novymi hodnotami
-			throw new NotImplementedException();
-		}
+			Update(editedPerson);
+
+            _hashFileId.Delete(new PersonId { Id = oldId });
+            _hashFileEcv.Delete(new PersonEcv { Ecv = oldEcv });
+
+            PersonId visitId = new()
+            {
+                Id = editedPerson.Id,
+            };
+            PersonEcv visitEcv = new()
+            {
+                Ecv = editedPerson.Ecv,
+            };
+
+            _hashFileId.Insert(visitId);
+            _hashFileEcv.Insert(visitEcv);
+        }
 
 		public void Remove(Person person)
 		{
-			// TODO
 			try
 			{
 				var visitId = new PersonId { Id = person.Id };

@@ -78,7 +78,7 @@ namespace FilesLib.Heap
 	            blockToAdd = GetBlock(address);
 	            blockToAdd.AddRecord(data);
 
-	            if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddBlockToFreeList(blockToAdd, address);
+	            if (blockToAdd.ValidCount < blockToAdd.BlockFactor) AddEmptyBlockToFreeList(blockToAdd, address);
 	            else RemoveBlockFromLinkedLists(blockToAdd, address);
             }
             else
@@ -137,8 +137,12 @@ namespace FilesLib.Heap
 			if (blockToDeleteFrom is { Next: -1, Previous: -1 })
 			{
 				if (blockToDeleteFrom.ValidCount > 0) AddBlockToFreeList(blockToDeleteFrom, address);
-				else AddBlockToEmptyList(blockToDeleteFrom, address);
-			}
+				else 
+				{ 
+					AddBlockToEmptyList(blockToDeleteFrom, address);
+                    if (_nextFreeBlockAddress == address) _nextFreeBlockAddress = -1;
+                }
+            }
 			else
 			{
 				if (blockToDeleteFrom.ValidCount == 0) MoveBlockFromFreeToEmptyList(blockToDeleteFrom, address);
@@ -172,6 +176,7 @@ namespace FilesLib.Heap
 	        int por = 0;
 	        foreach (var block in allBlocks)
 	        {
+				ret += "***************************************************************" + Environment.NewLine;
 		        ret += por + ". Block:" +  " at address: " + por * BlockSize + Environment.NewLine;
 		        ret += block.ToString();
 		        ret += Environment.NewLine;
@@ -318,11 +323,11 @@ namespace FilesLib.Heap
 	        return ret;
         }
 
-		private void AddBlockToFreeList(Block<T> block, int address)
+		private void AddEmptyBlockToFreeList(Block<T> block, int address)
         {
-	        if (_nextEmptyBlockAddress == address)
-	        {
-		        if (block.Next != -1)
+			if (_nextEmptyBlockAddress == address)
+			{
+				if (block.Next != -1)
 		        {
 			        var nextBlock = GetBlock(block.Next);
 			        nextBlock.Previous = -1;
@@ -338,9 +343,24 @@ namespace FilesLib.Heap
 		        }
 		        block.Next = _nextFreeBlockAddress;
 		        _nextFreeBlockAddress = address;
-	        }
+			}
+		}
+
+        private void AddBlockToFreeList(Block<T> block, int address)
+        {
+            if (_nextFreeBlockAddress != address)
+            {
+				if (_nextFreeBlockAddress != -1)
+				{
+					var nextBlock = GetBlock(_nextFreeBlockAddress);
+                    nextBlock.Previous = address;
+					block.Next = _nextFreeBlockAddress;
+                    WriteBlock(nextBlock, _nextFreeBlockAddress);
+                }
+                _nextFreeBlockAddress = address;
+            }
         }
-        
+
         private void AddNewBlockToFreeList(Block<T> block, int address)
         {
 	        if (_nextFreeBlockAddress != -1)
@@ -363,8 +383,6 @@ namespace FilesLib.Heap
 		        WriteBlock(nextEmptyBlock, _nextEmptyBlockAddress);
 	        }
 	        _nextEmptyBlockAddress = address;
-					
-	        if (_nextFreeBlockAddress == address) _nextFreeBlockAddress = -1;
         }
 
         private void RemoveBlockFromLinkedLists(Block<T> block, int address)
