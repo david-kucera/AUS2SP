@@ -230,7 +230,7 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete && people.Count == 0) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    //Console.WriteLine(i + ". " + operation);
+                    Console.WriteLine(i + ". " + operation);
                     //if (i == 267131)
                     //    Console.WriteLine("TU");
                     switch (operation)

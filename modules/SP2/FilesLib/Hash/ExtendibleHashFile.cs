@@ -147,6 +147,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             ret += Environment.NewLine;
             index++;
         }
+        ret += Environment.NewLine;
+        ret += _heapFile.SequentialOutput();
         return ret;
     }
 
