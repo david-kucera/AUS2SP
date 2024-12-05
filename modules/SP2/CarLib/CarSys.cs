@@ -123,44 +123,6 @@ namespace CarLib
 			}
 		}
 
-		public void UpdateKeyChanged(Person editedPerson, int oldId, string oldEcv)
-		{
-			Update(editedPerson);
-
-            _hashFileId.Delete(new PersonId { Id = oldId });
-            _hashFileEcv.Delete(new PersonEcv { Ecv = oldEcv });
-
-            PersonId visitId = new()
-            {
-                Id = editedPerson.Id,
-            };
-            PersonEcv visitEcv = new()
-            {
-                Ecv = editedPerson.Ecv,
-            };
-
-            _hashFileId.Insert(visitId);
-            _hashFileEcv.Insert(visitEcv);
-        }
-
-		public void Remove(Person person)
-		{
-			try
-			{
-				var visitId = new PersonId { Id = person.Id };
-				var address = _hashFileId.Find(visitId).Address;
-				_hashFileId.Delete(visitId);
-				var visitEcv = new PersonEcv { Ecv = person.Ecv };
-				_hashFileEcv.Delete(visitEcv);
-
-				_heapFile.Delete(address, person);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Chyba pri mazaní osoby: " + ex.Message);
-			}
-		}
-
 		/// <summary>
 		/// Metóda na generovanie náhodných dát.
 		/// </summary>

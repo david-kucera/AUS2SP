@@ -103,24 +103,7 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     /// <returns>True, ak sa operácia podarila, False inak</returns>
     public void Delete(T data)
     {
-        var hash = data.GetHash();
-        var prefix = GetPrefix(hash);
-        var block = _addresses[prefix];
-        var blockHeapFile = _heapFile.GetBlock(block.Address);
-
-        if (blockHeapFile.GetRecord(data) == null) throw new Exception("Data not found in block!");
-
-        _heapFile.Delete(block.Address, data);
-        RecordsCount--;
-        var heapFileBlock = _heapFile.GetBlock(block.Address);
-        if (heapFileBlock.ValidCount < heapFileBlock.BlockFactor / 2 && block.Depth > 1)
-        {
-            bool canMerge = true;
-            while (canMerge)
-            {
-                (canMerge, prefix) = MergeBlock(prefix);
-            }
-        }
+	    throw new NotImplementedException();
     }
 
     /// <summary>
@@ -338,85 +321,6 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
             newAddresses.Add(new ExtendibleHashFileBlock<T>(address));
         }
         _addresses = newAddresses;
-    }
-
-    private void DecreaseDepth()
-    {
-        _depth--;
-        int size = _addresses.Count;
-        var newAdresses = new List<ExtendibleHashFileBlock<T>>(size / 2);
-        for (int i = 0; i < size; i += 2)
-        {
-            newAdresses.Add(_addresses[i]);
-        }
-        _addresses = newAdresses;
-    }
-
-    private (bool, int) MergeBlock(int mergeIndex)
-    {
-        var groupLength = (int)Math.Pow(2, _depth - _addresses[mergeIndex].Depth);
-        var actualMergeIndex = (mergeIndex / groupLength) * groupLength;
-        var block = _addresses[actualMergeIndex];   
-        if (block.Depth == 1) return (false, mergeIndex);
-
-        //var blockBit = (actualMergeIndex / groupLength) % 2;
-        var blockBit = (actualMergeIndex >> (block.Depth - 1)) & 1;
-
-        var neighborIndex = actualMergeIndex + groupLength;
-        int neighborLength;
-        if (neighborIndex < _addresses.Count)
-        {
-            neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-            var nBlockBit = (neighborIndex >> (block.Depth - 1)) & 1;
-            if (block.Depth != _addresses[neighborIndex].Depth || blockBit != nBlockBit)
-            {
-                neighborIndex = actualMergeIndex - groupLength;
-                neighborLength = (int)Math.Pow(2, _depth - _addresses[neighborIndex].Depth);
-                nBlockBit = (neighborIndex >> (block.Depth - 1)) & 1;
-                if (block.Depth != _addresses[neighborIndex].Depth || blockBit != nBlockBit) return (false, mergeIndex);
-            }
-        }
-        else return (false, mergeIndex);
-        
-
-        var neighbor = _addresses[neighborIndex];
-        var blockHeapFile = _heapFile.GetBlock(block.Address);
-        var neighborHeapFile = _heapFile.GetBlock(neighbor.Address);
-        if (blockHeapFile.ValidCount + neighborHeapFile.ValidCount > blockHeapFile.BlockFactor) return (false, mergeIndex);
-
-        var entries = new List<T>();
-        for (int i = 0; i < blockHeapFile.ValidCount; i++)
-        {
-            entries.Add(blockHeapFile.Records[i]);
-        }
-        for (int i = 0; i < neighborHeapFile.ValidCount; i++)
-        {
-            entries.Add(neighborHeapFile.Records[i]);
-        }
-        neighborHeapFile.ClearRecords();
-        blockHeapFile.ClearRecords();
-        for (int i = 0; i < entries.Count; i++)
-        {
-            blockHeapFile.AddRecord(entries[i]);
-        }
-
-        _heapFile.WriteBlock(blockHeapFile, block.Address);
-        _heapFile.WriteBlock(neighborHeapFile, neighbor.Address);
-        neighbor.Depth--;
-        block.Depth--;
-
-        var endIndex = neighborIndex + neighborLength;
-        for (int i = neighborIndex; i < endIndex; i++) _addresses[i] = block;
-
-        var maxDepth = int.MinValue;
-        foreach (var address in _addresses)
-        {
-            if (maxDepth < address.Depth) maxDepth = address.Depth;
-        }
-        if (maxDepth < _depth) DecreaseDepth();
-
-        if (block.Depth == 1) return (false, mergeIndex);
-        return (true, neighborIndex);
     }
     #endregion // Private methods
 }

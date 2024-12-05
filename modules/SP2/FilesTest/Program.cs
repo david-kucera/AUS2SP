@@ -16,9 +16,9 @@ namespace FilesTest
         private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
         private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
         private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
-		public static int NUMBER_OF_PEOPLE = 10_000;
-        public static int NUMBER_OF_OPERATIONS = 1_000_000;
-        public static int NUMBER_OF_REPLICATIONS = 10;
+		public static int NUMBER_OF_PEOPLE = 0;
+        public static int NUMBER_OF_OPERATIONS = 100_000;
+        public static int NUMBER_OF_REPLICATIONS = 100;
         #endregion // Constants
 
         #region Main
@@ -230,9 +230,8 @@ namespace FilesTest
                 for (int i = 0; i < NUMBER_OF_OPERATIONS; i++)
                 {
                     var operation = generator.GenerateOperation();
-                    if (operation == OperationType.Delete && people.Count == 0) continue;
+                    if (operation == OperationType.Delete) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    if (operation == OperationType.Insert) continue;
                     //Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
@@ -284,10 +283,8 @@ namespace FilesTest
                             break;
                     }
                 }
-
-                //Console.WriteLine($"Inserted {inserts} inserts, {deletes} deletes, {searches} searches");
-                Console.WriteLine(extendibleHashFile.SequentialOutput());
-                Console.WriteLine(heapFile.SequentialOutput());
+                //Console.WriteLine(extendibleHashFile.SequentialOutput());
+                //Console.WriteLine(heapFile.SequentialOutput());
                 extendibleHashFile.Close();
 				heapFile.Close();
 			}

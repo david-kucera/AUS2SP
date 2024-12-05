@@ -227,6 +227,10 @@ namespace FilesLib.Heap
             return address;
         }
 
+		/// <summary>
+		/// Vráti adresu prázdneho bloku.
+		/// </summary>
+		/// <returns></returns>
 		public int GetEmptyBlock()
 		{
 			if (_nextEmptyBlockAddress == -1) return CreateNewBlock();
@@ -406,12 +410,12 @@ namespace FilesLib.Heap
 	        {
 		        var nextBlock = GetBlock(block.Next);
 		        nextBlock.Previous = block.Previous;
-		        if (_nextFreeBlockAddress == address)
-		        {
-			        _nextFreeBlockAddress = block.Next;
-			        nextBlock.Previous = -1;
-		        }
-		        WriteBlock(nextBlock, block.Next);
+				if (_nextFreeBlockAddress == address)
+				{
+					_nextFreeBlockAddress = block.Next;
+					nextBlock.Previous = -1;
+				}
+				WriteBlock(nextBlock, block.Next);
 	        }
 
 	        if (block.Previous != -1)
