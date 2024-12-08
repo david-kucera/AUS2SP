@@ -16,7 +16,7 @@ namespace FilesTest
         private const string INIT_FILE_HASH = "../../userdata/t_hash_init.aus";
         private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
         private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
-		public static int NUMBER_OF_PEOPLE = 10_000;
+		public static int NUMBER_OF_PEOPLE = 0;
         public static int NUMBER_OF_OPERATIONS = 1_000_000;
         public static int NUMBER_OF_REPLICATIONS = 10;
         #endregion // Constants
@@ -232,8 +232,8 @@ namespace FilesTest
                     var operation = generator.GenerateOperation();
                     if (operation == OperationType.Delete && people.Count == 0) continue;
                     if (operation == OperationType.Find && people.Count == 0) continue;
-                    if (operation == OperationType.Insert) continue;
-                    //Console.WriteLine(i + ". " + operation);
+                    //if (operation == OperationType.Insert) continue;
+                    Console.WriteLine(i + ". " + operation);
                     switch (operation)
                     {
                         case OperationType.Insert:

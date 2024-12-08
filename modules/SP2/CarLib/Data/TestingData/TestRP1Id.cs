@@ -38,7 +38,7 @@ namespace CarLib.Data.TestingData
 
         public BitArray GetHash()
         {
-            return new BitArray(BitConverter.GetBytes(Id));
+			return new BitArray(BitConverter.GetBytes(Id));
         }
 
         public int GetSize()

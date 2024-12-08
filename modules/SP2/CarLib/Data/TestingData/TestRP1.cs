@@ -94,7 +94,7 @@ public class TestRP1 : IHashable<TestRP1>
     #region Public functions
     public BitArray GetHash()
     {
-        return new BitArray(BitConverter.GetBytes(Id));
+		return new BitArray(BitConverter.GetBytes(Id));
     }
 
     public override string ToString()

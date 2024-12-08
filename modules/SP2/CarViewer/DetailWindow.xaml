@@ -8,7 +8,7 @@
         Title="DetailWindow" Height="450" Width="800">
     <Grid>
         <ScrollViewer Margin="5">
-            <TextBlock x:Name="Data" Padding="5" TextWrapping="Wrap"/>
+            <TextBox x:Name="Data" Padding="5" TextWrapping="Wrap"/>
         </ScrollViewer>
     </Grid>
 </Window>
