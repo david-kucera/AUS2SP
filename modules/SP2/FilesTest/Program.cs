@@ -17,8 +17,8 @@ namespace FilesTest
         private const string INIT_FILE_HEAP_HASH = "../../userdata/t_hash_init_heap.aus";
         private const string DATA_FILE_HEAP_HASH = "../../userdata/t_hash_heap.aus";
 		public static int NUMBER_OF_PEOPLE = 0;
-        public static int NUMBER_OF_OPERATIONS = 100_000;
-        public static int NUMBER_OF_REPLICATIONS = 100;
+        public static int NUMBER_OF_OPERATIONS = 1_000_000;
+        public static int NUMBER_OF_REPLICATIONS = 5;
         #endregion // Constants
 
         #region Main

@@ -186,6 +186,10 @@ namespace CarViewer
 					return;
 				}
 	        }
+			else
+			{
+				return;
+			}
 
 			try
 			{
@@ -201,6 +205,10 @@ namespace CarViewer
 			if (inputWindowEcv.ShowDialog() == true)
 			{
 				ecv = inputWindowEcv.TextBoxInput.Text;
+			}
+			else
+			{
+				return;
 			}
 
 			try
