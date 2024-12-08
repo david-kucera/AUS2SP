@@ -11,7 +11,8 @@ namespace CarLib
 	public class CarSys
 	{
 		#region Constants
-		private const int BLOCK_SIZE = 5000;
+		private const int BLOCK_SIZE_HEAP = 2500; // Person =~ 2500
+		private const int BLOCK_SIZE_HASH = 30; // ById = 8 // ByEcv = 18
 		private const string INIT_FILE_HEAP = "../../userdata/heap_init.aus";
         private const string DATA_FILE = "../../userdata/person.aus";
 
@@ -33,9 +34,9 @@ namespace CarLib
         #region Constructor
         public CarSys()
 		{
-			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE);
-            _hashFileId = new ExtendibleHashFile<PersonId>(INIT_FILE_HASH_ID, INIT_FILE_HEAP_HASH_ID, DATA_FILE_HEAP_HASH_ID, BLOCK_SIZE);
-            _hashFileEcv = new ExtendibleHashFile<PersonEcv>(INIT_FILE_HASH_ECV, INIT_FILE_HEAP_HASH_ECV, DATA_FILE_HEAP_HASH_ECV, BLOCK_SIZE);
+			_heapFile = new HeapFile<Person>(INIT_FILE_HEAP, DATA_FILE, BLOCK_SIZE_HEAP);
+            _hashFileId = new ExtendibleHashFile<PersonId>(INIT_FILE_HASH_ID, INIT_FILE_HEAP_HASH_ID, DATA_FILE_HEAP_HASH_ID, BLOCK_SIZE_HASH);
+            _hashFileEcv = new ExtendibleHashFile<PersonEcv>(INIT_FILE_HASH_ECV, INIT_FILE_HEAP_HASH_ECV, DATA_FILE_HEAP_HASH_ECV, BLOCK_SIZE_HASH);
         }
 		#endregion // Constructor
 
