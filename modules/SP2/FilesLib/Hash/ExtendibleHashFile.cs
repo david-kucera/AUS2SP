@@ -151,9 +151,9 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
     {
         _heapFile.Clear();
 	    _addresses = [];
-	    _addresses.Add(new ExtendibleHashFileBlock<T>());
-	    _addresses.Add(new ExtendibleHashFileBlock<T>());
-	    _depth = 1;
+		_addresses.Add(new ExtendibleHashFileBlock<T>(_heapFile.GetEmptyBlock()));
+		_addresses.Add(new ExtendibleHashFileBlock<T>(_heapFile.GetEmptyBlock()));
+		_depth = 1;
 	    RecordsCount = 0;
     }
 	#endregion // Public methods
