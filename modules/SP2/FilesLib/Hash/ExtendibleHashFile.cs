@@ -320,8 +320,8 @@ public class ExtendibleHashFile<T> where T : class, IHashable<T>, new()
 	        var hash = record.GetHash();
 	        int newPrefix = GetPrefix(hash);
 
-            if (newPrefix != addressIndex) newBlockHeapFile.AddRecord(record);
-            else splittingBlockHeapFile.AddRecord(record);
+            if (newPrefix >= addressIndex && newPrefix < addressIndex + halfLength) splittingBlockHeapFile.AddRecord(record);
+            else newBlockHeapFile.AddRecord(record);
         }
 
         _heapFile.WriteBlock(splittingBlockHeapFile, splittingBlock.Address);
